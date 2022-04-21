@@ -3,6 +3,8 @@
 #include "lapse_lib.h"
 #include "lapse_array.h"
 
+#include "iostream"
+
 // TODO should this be called errors or something instead of exceptions?
 //   not sure about the definitions of these terms
 
@@ -13,7 +15,12 @@ enum class error_code{
   failure,
   success,
   close_app,
-  breakpoint
+  breakpoint = 244
+};
+
+struct error_queue_callback{
+  void (*callback)(error_code);
+  void* captures;
 };
 
 class LapseErrorQueue{
@@ -105,13 +112,13 @@ public:
     };
 
     iterator begin() { return iterator(front ); };
-    iterator end()   { return iterator(last()); };
+    iterator end()   { return iterator{nullptr}; };
 
   };
 public:
   noexcept_list<error_code> queue_of_errors;
 
-  noexcept_list<void (*)(error_code)> callbacks;
+  noexcept_list<error_queue_callback> callbacks;
 
   static LapseErrorQueue& the() {
     static LapseErrorQueue* my_error_queue = nullptr;
@@ -121,27 +128,19 @@ public:
     return *my_error_queue;
   };
 
-  void register_callback(void (*func_ptr)(error_code)) {
-    callbacks.push(func_ptr);
+  void register_callback(error_queue_callback a_callback) {
+    callbacks.push(a_callback);
   };
 
   void tick() {
     if (!callbacks.is_empty() && !queue_of_errors.is_empty()) {
       for (auto err : queue_of_errors) {
         for (auto callback : callbacks) {
-          callback->value(err->value);
+          callback->value.callback(err->value);
         }
       }
     }
   }
-
-/*
-1>C:\superfolderm\devprojects2022\89-Nigh-Sooth\lapse_lib\src\lapse_exceptions.h(131,1): 
-error C2664: 'void (lapse::error_code)': 
-cannot convert argument 1 from 
-'lapse::LapseErrorQueue::noexcept_list<lapse::error_code>::list_node *' to 
-'lapse::error_code'
-*/
 
 };
 

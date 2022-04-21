@@ -99,30 +99,45 @@ int main() {
   {
     bool good = true;
 
-    std::cout << "registering error callbacks, throwing errors";
+    std::cout << "registering error callbacks, throwing errors\n";
 
-    lapse::error_code expected_code{};
+    lapse::error_code expected_code{lapse::error_code::breakpoint};
 
-    struct callback_struct{
-      bool& callback_good;
-      lapse::error_code e_code{};
+    // allocate space for two pointers
+    void* captures = malloc(sizeof(bool*) + sizeof(lapse::error_code*));
 
-      void actual_callback(lapse::error_code err) {
-        callback_good &= err == e_code;
-      };
-    } idk_whats_going_on{good};
+    *(bool**)captures = &good;
 
-    void (*test_callback)(lapse::error_code) = 
-      reinterpret_cast<void (*)(lapse::error_code)>(callback_struct::actual_callback);
+    // move up 8 bytes (one pointer sizeof in bytes)
+    void* capture_point = sizeof(bool*) + (char*)(void*)captures;
 
-    lapse::LapseErrorQueue::the().register_callback(test_callback);
+    *(lapse::error_code**)capture_point = &expected_code;
+
+    lapse::LapseErrorQueue::the().register_callback(
+      lapse::error_queue_callback{
+        [](lapse::error_code err) {
+          std::cout << "inside the callback!\n";
+          int i = 493;
+          i += 2348092;
+          if (err == lapse::error_code::breakpoint) {
+            std::cout << "breakpoint called for \n";
+            __debugbreak();
+          }
+        },
+        captures
+      }
+    );
+
+    lapse::error(expected_code);
+
+    lapse::LapseErrorQueue::the().tick();
 
     // lapse::LapseErrorQueue::the().register_callback(
     //   [&good, expected_code](lapse::error_code err) {
     //   good &= err == expected_code;
     // } );
 
-        if (good) {
+    if (good) {
       std::cout << "test passed\n";
     } else {
       std::cout << "test FAILED\n";

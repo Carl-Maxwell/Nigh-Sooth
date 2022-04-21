@@ -29,12 +29,20 @@ typedef double f64;
 #include "lapse_array.h"
 #include "lapse_string.h"
 
+// TODO random, rng, etc
+// TODO uids
+
 // data structures
 
 // TODO hashmap
 // TODO binary_tree
+// TODO slot_map (for UIDs)
 
 // math
 
 // TODO vec2, vec3, vec4, mat4x4
 // TODO euler, quaternion, etc
+
+// logging utilities
+
+// TODO to_string
