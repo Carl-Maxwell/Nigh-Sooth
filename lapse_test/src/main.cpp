@@ -62,12 +62,77 @@ int main() {
 
     good = a_list.front->value == 8;
 
+    a_list.remove(a_list.front);
+
+    good &= a_list.is_empty();
+
+    a_list.push(1);
+    a_list.push(2);
+    a_list.push(3);
+    a_list.push(4);
+
+    good &= a_list.front->next->next->next->value == 1;
+
+    a_list.remove(a_list.front->next->next->next); // remove 1
+
+    good &= a_list.front->next->next->next == nullptr;
+
+    a_list.remove(a_list.front->next); // remove 3
+
+    good &= a_list.front->next->value == 2;
+
+    a_list.remove(a_list.front); // remove 4
+
+    good &= a_list.front->value == 2;
+
+    good &= !a_list.is_empty();
+
     if (good) {
       std::cout << "test passed\n";
+    } else {
+      std::cout << "test FAILED\n";
     }
-
   }
 
+  // registering error callbacks, throwing errors
+  
+  {
+    bool good = true;
+
+    std::cout << "registering error callbacks, throwing errors";
+
+    lapse::error_code expected_code{};
+
+    struct callback_struct{
+      bool& callback_good;
+      lapse::error_code e_code{};
+
+      void actual_callback(lapse::error_code err) {
+        callback_good &= err == e_code;
+      };
+    } idk_whats_going_on{good};
+
+    void (*test_callback)(lapse::error_code) = 
+      reinterpret_cast<void (*)(lapse::error_code)>(callback_struct::actual_callback);
+
+    lapse::LapseErrorQueue::the().register_callback(test_callback);
+
+    // lapse::LapseErrorQueue::the().register_callback(
+    //   [&good, expected_code](lapse::error_code err) {
+    //   good &= err == expected_code;
+    // } );
+
+        if (good) {
+      std::cout << "test passed\n";
+    } else {
+      std::cout << "test FAILED\n";
+    }
+
+
+  }
+  //
+  //
+  //
 
 
   return 0;
