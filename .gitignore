@@ -1,0 +1,10 @@
+
+# bins
+bin/
+bin-intermediate/
+
+# visual studios
+.vs/
+*.sln
+*.vcx*
+
