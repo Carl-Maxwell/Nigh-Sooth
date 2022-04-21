@@ -1,7 +1,8 @@
 #pragma once
 
 #include "lapse_lib.h"
-#include "lapse_array.h"
+
+#include <functional>
 
 #include "iostream"
 
@@ -16,11 +17,6 @@ enum class error_code{
   success,
   close_app,
   breakpoint = 244
-};
-
-struct error_queue_callback{
-  void (*callback)(error_code);
-  void* captures;
 };
 
 class LapseErrorQueue{
@@ -86,9 +82,7 @@ public:
         front = nullptr;
       }
 
-      bad_node = nullptr;
-
-      bad_node = nullptr;
+      bad_node = nullptr; // TODO is this the right way to do this?
 
       delete bad_node;
     }
@@ -118,7 +112,7 @@ public:
 public:
   noexcept_list<error_code> queue_of_errors;
 
-  noexcept_list<error_queue_callback> callbacks;
+  std::function<void(error_code)> callback;
 
   static LapseErrorQueue& the() {
     static LapseErrorQueue* my_error_queue = nullptr;
@@ -128,20 +122,21 @@ public:
     return *my_error_queue;
   };
 
-  void register_callback(error_queue_callback a_callback) {
-    callbacks.push(a_callback);
+  void register_callback(std::function<void(error_code)> a_callback) {
+    callback = a_callback;
+    // TODO crash if this is called twice
   };
 
   void tick() {
-    if (!callbacks.is_empty() && !queue_of_errors.is_empty()) {
+    if (callback && !queue_of_errors.is_empty()) {
       for (auto err : queue_of_errors) {
-        for (auto callback : callbacks) {
-          callback->value.callback(err->value);
-        }
+        callback(err->value);
+        queue_of_errors.remove(err);
+        
+        // TODO why isn't err an iterator? for some reason it's a list_node*
       }
     }
   }
-
 };
 
 void error(error_code code) {

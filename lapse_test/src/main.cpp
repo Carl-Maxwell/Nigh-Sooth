@@ -101,7 +101,7 @@ int main() {
 
     std::cout << "registering error callbacks, throwing errors\n";
 
-    lapse::error_code expected_code{lapse::error_code::breakpoint};
+    lapse::error_code expected_code{};
 
     // allocate space for two pointers
     void* captures = malloc(sizeof(bool*) + sizeof(lapse::error_code*));
@@ -111,44 +111,42 @@ int main() {
     // move up 8 bytes (one pointer sizeof in bytes)
     void* capture_point = sizeof(bool*) + (char*)(void*)captures;
 
-    *(lapse::error_code**)capture_point = &expected_code;
-
     lapse::LapseErrorQueue::the().register_callback(
-      lapse::error_queue_callback{
-        [](lapse::error_code err) {
-          std::cout << "inside the callback!\n";
-          int i = 493;
-          i += 2348092;
-          if (err == lapse::error_code::breakpoint) {
-            std::cout << "breakpoint called for \n";
-            __debugbreak();
-          }
-        },
-        captures
+      [&good, &expected_code](lapse::error_code err) {
+        bool pre_good = good;
+        good &= err == expected_code;
+        if (pre_good != good) {
+          std::cout << "Failed on error code #: " << (int)expected_code << "\n";
+        }
       }
     );
 
+    expected_code = lapse::error_code::undefined;
     lapse::error(expected_code);
-
     lapse::LapseErrorQueue::the().tick();
-
-    // lapse::LapseErrorQueue::the().register_callback(
-    //   [&good, expected_code](lapse::error_code err) {
-    //   good &= err == expected_code;
-    // } );
+    expected_code = lapse::error_code::failure;
+    lapse::error(expected_code);
+    lapse::LapseErrorQueue::the().tick();
+    expected_code = lapse::error_code::success;
+    lapse::error(expected_code);
+    lapse::LapseErrorQueue::the().tick();
+    expected_code = lapse::error_code::close_app;
+    lapse::error(expected_code);
+    lapse::LapseErrorQueue::the().tick();
+    expected_code = lapse::error_code::breakpoint;
+    lapse::error(expected_code);
+    lapse::LapseErrorQueue::the().tick();
 
     if (good) {
       std::cout << "test passed\n";
     } else {
       std::cout << "test FAILED\n";
     }
-
-
   }
-  //
-  //
-  //
 
+  //
+  // 
+  //
 
   return 0;
 }
