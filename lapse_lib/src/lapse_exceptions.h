@@ -14,11 +14,11 @@ enum class error_code{
 };
 
 class LapseErrorQueue{
-private:
-  template<typename T>
-
+public:
+  
   // a queue list
   //   array &c depend on exceptions, so we can't use them
+  template<typename T>
   class noexcept_list{
   public:
     struct list_node{
@@ -38,7 +38,6 @@ private:
       inline bool operator==(const iterator& right) { 
         return my_node == right.my_node;
       };
-
     };
 
     list_node* front = nullptr;
@@ -70,7 +69,6 @@ private:
 
       delete bad_node;
     }
-
   };
 public:
   noexcept_list<error_code> queue;
@@ -84,12 +82,10 @@ public:
     return *my_error_queue;
   };
 
-
 };
 
-void do_error(error_code code) {
+void error(error_code code) {
   LapseErrorQueue::the().queue.push(code);
-  
 };
 
 };

@@ -11,3 +11,4 @@ workspace "nigh_sooth"
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
 include "lapse_lib"
+include "lapse_test"

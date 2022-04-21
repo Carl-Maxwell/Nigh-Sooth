@@ -8,3 +8,5 @@ bin-intermediate/
 *.sln
 *.vcx*
 
+# vscode
+.vscode/
