@@ -42,7 +42,6 @@ int main() {
   // math
   //
 
-  
   {
     std::cout << "testing math library (round, floor, etc) \n";
 
@@ -54,14 +53,54 @@ int main() {
 
     good &= lapse::round( 0.1) ==  0 && lapse::round( 0.9) ==  1;
     good &= lapse::round(-3.2) == -3 && lapse::round(-3.9) == -4;
+
     good &= lapse::floor_i( 1.9f) ==  1 && lapse::floor_f( 1.9f) ==  1;
     good &= lapse::floor_i(-1.9f) == -2 && lapse::floor_f(-1.9f) == -2;
     good &= lapse::floor_i( 1.1f) ==  1 && lapse::floor_f( 1.1f) ==  1;
     good &= lapse::floor_i(-1.1f) == -2 && lapse::floor_f(-1.1f) == -2;
+
     good &= lapse::ceil_i( 1.1f) ==  2 && lapse::ceil_f( 1.1f) ==  2;
     good &= lapse::ceil_i(-1.1f) == -1 && lapse::ceil_f(-1.1f) == -1;
     good &= lapse::ceil_i( 1.9f) ==  2 && lapse::ceil_f( 1.9f) ==  2;
     good &= lapse::ceil_i(-1.9f) == -1 && lapse::ceil_f(-1.9f) == -1;
+
+    good &= lapse::pow(2, 0) == 1 && lapse::pow(2, 1) == 2;
+    good &= lapse::pow(2, 2) == 4 && lapse::pow(2, 5) == 32;
+
+    std::cout << "37'822'859'361\n" << lapse::pow(21, 8) << "\n";
+
+    // std::cout << lapse::f32_c_str(321.0f) << "\n";
+    // std::cout << lapse::f32_c_str(123.0f) << "\n";
+
+    std::cout << lapse::f32_c_str(321.123f) << "\n";
+
+    // lapse::f32_c_str(987654321.123456789);
+    // lapse::f32_c_str(lapse::pow(21, 8));
+
+    __debugbreak();
+
+    std::cout << lapse::u32_max << "\n" << lapse::pow(2, 32)-1 << "\n";
+
+    good &= (lapse::pow(2, 32)-1) == lapse::u32_max && lapse::pow(21, 8) == 37'822'859'361;
+
+    __debugbreak();
+
+    // if (!good) { std::cout << "test passed\n"; }
+
+    lapse::fixed_array<lapse::i32> powers_of_two;
+    powers_of_two = lapse::range(1, 10).map([](lapse::i32 a){ return pow(2, a); });
+
+    good &= powers_of_two[powers_of_two.length-1] && lapse::pow(2, 10);
+
+    std::cout << "log base 4 of 29: " << lapse::logarithm_i(4, 29) << "\n";
+    std::cout << "log base 2 of 17: " << lapse::logarithm_i(2, 29) << "\n";
+    for (int i = 0; i < 100; i++) {
+      good &= lapse::sqrt(lapse::pow(2, i)) == i;
+      good &= powers_of_two.contains( lapse::pow(2, lapse::logarithm_i(2, i)) );
+      // std::cout << "lapse::pow(2, lapse::logarithm_i(2, " << i << ")))" << lapse::pow(2, lapse::logarithm_i(2, i)) << "\n";
+    }
+
+    good &= lapse::sqrt(4) == 2 && lapse::round(lapse::sqrt(lapse::u32_max)) == 65'536;
 
     if (good) {
       std::cout << "test passed\n";

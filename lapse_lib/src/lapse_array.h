@@ -34,6 +34,21 @@ struct fixed_array{
   };
   // removes all elements
   void clear() { delete elements; elements = nullptr; size = 0; length = 0; };
+  bool contains(T elem) {
+    for (u32 i = 0; i < length; i++) {
+      if (elem == elements[i]) {
+        return true;
+      }
+    }
+    return false;
+  }
+  fixed_array& map(std::function<T(T)> callback) {
+    for (u32 i = 0; i < length; i++) {
+      elements[i] = callback(elements[i]);
+    }
+
+    return *this;
+  }
   // like .push_back(), add an element to the end of the array
   void push(T elem) {
     at(length) = elem;
@@ -69,6 +84,7 @@ struct fixed_array{
       error(error_code::close_app);
     }
   }
+  
 
   inline T& operator[](u32 i) const {
     return at(i);

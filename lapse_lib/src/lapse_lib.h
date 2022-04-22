@@ -32,8 +32,19 @@ const u64 u64_max = u64(-1); // 2**64
 
 // floats
 
-typedef float f32;
-typedef double f64;
+typedef float f16;  // IEEE 754 16-bit half   precision (binary16)
+typedef float f32;  // IEEE 754 32-bit single precision (binary32)
+typedef double f64; // IEEE 754 64-bit double precision (binary64)
+
+const u64 f32_significant_digits   =  7;
+const u64 f32_exponent_max         =  127;
+const u64 f32_exponent_max_base_10 =  38;
+const i64 f32_exponent_min         = -37;
+const u64 f32_sign_bit             = u64(1) << 31;
+
+const u64 f64_significant_digits   =  16;
+
+// TODO need to test out these f32 & f64 constants
 
 }; // namespace
 
@@ -42,6 +53,8 @@ typedef double f64;
 #include "lapse_exceptions.h"
 #include "lapse_array.h"
 #include "lapse_string.h"
+
+#include "lapse_range.h"
 
 // TODO random, rng, etc
 // TODO uids
