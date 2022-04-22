@@ -145,8 +145,52 @@ int main() {
   }
 
   //
-  // 
+  // arrays
   //
+
+  {
+    std::cout << "";
+
+    bool good = true;
+  
+    lapse::LapseErrorQueue::the().register_callback([](lapse::error_code err){
+      std::cout << "Error! " << (int)err;
+    });
+
+    lapse::fixed_array<lapse::u32> arr(4);
+    
+    arr.push(5);
+    arr.push(3);
+    arr.push(6);
+    arr.push(1);
+
+    for (lapse::u32 i = 0; i < arr.length; i++) {
+      std::cout << "array[" << i << "] " << arr[i] << "\n";
+    }
+
+    good &= arr[0] == 5 && arr[1] == 3 && arr[2] == 6 && arr[3] == 1;
+
+    // .clear()
+
+    good &= arr.size == 4 && arr.length == 4;
+
+    arr.clear();
+
+    good &= arr.size == 0 && arr.length == 0;
+
+    good &= arr.elements == nullptr;
+
+    // .remove()
+
+    arr.reserve(10);
+    
+
+    if (good) {
+      std::cout << "test passed\n";
+    } else {
+      std::cout << "test FAILED\n";
+    }
+  }
 
   return 0;
 }
