@@ -149,7 +149,7 @@ int main() {
   //
 
   {
-    std::cout << "";
+    std::cout << "Testing fixed_array\n";
 
     bool good = true;
   
@@ -200,6 +200,24 @@ int main() {
     for (lapse::u32 i = 0; i < arr.length; i++) {
       std::cout << "array[" << i << "] " << arr[i] << "\n";
     }
+
+    if (good) {
+      std::cout << "test passed\n";
+    } else {
+      std::cout << "test FAILED\n";
+    }
+  }
+
+  {
+    std::cout << "testing dynamic array\n";
+
+    lapse::LapseErrorQueue::the().register_callback([](lapse::error_code err){
+      std::cout << "Error! " << (int)err;
+    });
+
+    bool good = true;
+
+    
 
     if (good) {
       std::cout << "test passed\n";

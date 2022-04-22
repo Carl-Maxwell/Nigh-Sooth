@@ -66,13 +66,7 @@ struct fixed_array{
       elements = new T[better_size];
       size = better_size;
     } else {
-      T* old_elements = elements;
-      elements = new T[better_size];
-      for (u32 i = 0; i < length; i++) {
-        elements[i] = old_elements[i];
-      }
-      delete elements;
-      size = better_size;
+      error(error_code::close_app);
     }
   }
 
@@ -99,18 +93,6 @@ struct array : public fixed_array<T>{
   u32 size    = 0; // allocated space
   u32 length  = 0; // count of elements inserted
 
-  array(u32 n) { reserve(n); };
-  // returns elem, with safety check
-  inline T& at(u32 i) const {
-    if (!size || i > size-1) {
-      error(error_code::breakpoint);
-      return *(T*)nullptr;
-    } else {
-      return elements[i];
-    }
-  };
-  // removes all elements
-  void clear() { delete elements; elements = nullptr; size = 0; length = 0; };
   void push(T elem) {
     elements[length] = elem;
     length++;
@@ -119,38 +101,20 @@ struct array : public fixed_array<T>{
       error(error_code::breakpoint);
     }
   };
-  // remove all elements equal to argument,
-  //   compacts array with each removal
-  void remove(T elem) {
-    for (u32 i = 0; i < length; i++) {
-      if (elements[i] == elem) {
-        remove_at(i);
-        return remove(elem);
-        // TODO recursion here might hit a stack overflow
-        //   when removing all elems from large arrays
-      }
-    }
-  }
-  void remove_at(u32 removal_i) {
-    for (u32 i = removal_i; i < length-1; i++) {
-      elements[i] = elements[i+1];
-    }
-    length--;
-  }
   void reserve(u32 better_size) {
     if (length == 0) {
       elements = new T[better_size];
       size = better_size;
     } else {
-
+      T* old_elements = elements;
+      elements = new T[better_size];
+      for (u32 i = 0; i < length; i++) {
+        elements[i] = old_elements[i];
+      }
+      delete elements;
+      size = better_size;
     }
   }
-
-  inline T& operator[](u32 i) const {
-    return at(i);
-  };
-
-  // TODO initializer list
 
   // TODO .join()
   // TODO .sort()
