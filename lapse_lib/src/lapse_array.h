@@ -97,8 +97,8 @@ struct array : public fixed_array<T>{
     elements[length] = elem;
     length++;
 
-    if (length > size) {
-      error(error_code::breakpoint);
+    if (length == size) {
+      reserve(u32(ceil_i(f32(size) * 1.5)));
     }
   };
   void reserve(u32 better_size) {

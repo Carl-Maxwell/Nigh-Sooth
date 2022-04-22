@@ -39,6 +39,38 @@ int main() {
   }
 
   //
+  // math
+  //
+
+  
+  {
+    std::cout << "testing math library (round, floor, etc) \n";
+
+    lapse::LapseErrorQueue::the().register_callback([](lapse::error_code err){
+      std::cout << "Error! " << (int)err;
+    });
+
+    bool good = true;
+
+    good &= lapse::round( 0.1) ==  0 && lapse::round( 0.9) ==  1;
+    good &= lapse::round(-3.2) == -3 && lapse::round(-3.9) == -4;
+    good &= lapse::floor_i( 1.9f) ==  1 && lapse::floor_f( 1.9f) ==  1;
+    good &= lapse::floor_i(-1.9f) == -2 && lapse::floor_f(-1.9f) == -2;
+    good &= lapse::floor_i( 1.1f) ==  1 && lapse::floor_f( 1.1f) ==  1;
+    good &= lapse::floor_i(-1.1f) == -2 && lapse::floor_f(-1.1f) == -2;
+    good &= lapse::ceil_i( 1.1f) ==  2 && lapse::ceil_f( 1.1f) ==  2;
+    good &= lapse::ceil_i(-1.1f) == -1 && lapse::ceil_f(-1.1f) == -1;
+    good &= lapse::ceil_i( 1.9f) ==  2 && lapse::ceil_f( 1.9f) ==  2;
+    good &= lapse::ceil_i(-1.9f) == -1 && lapse::ceil_f(-1.9f) == -1;
+
+    if (good) {
+      std::cout << "test passed\n";
+    } else {
+      std::cout << "test FAILED\n";
+    }
+  }
+
+  //
   // exceptions
   //
 
@@ -216,8 +248,6 @@ int main() {
     });
 
     bool good = true;
-
-    
 
     if (good) {
       std::cout << "test passed\n";
