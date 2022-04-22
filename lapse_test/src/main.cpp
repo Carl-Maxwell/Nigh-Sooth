@@ -164,10 +164,6 @@ int main() {
     arr.push(6);
     arr.push(1);
 
-    for (lapse::u32 i = 0; i < arr.length; i++) {
-      std::cout << "array[" << i << "] " << arr[i] << "\n";
-    }
-
     good &= arr[0] == 5 && arr[1] == 3 && arr[2] == 6 && arr[3] == 1;
 
     // .clear()
@@ -182,8 +178,28 @@ int main() {
 
     // .remove()
 
-    arr.reserve(10);
-    
+    arr = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+
+    good &= arr[0] == 1 && arr[5] == 6 && arr[9] == 10;
+
+    arr.remove(6);
+
+    good &= arr.size == 10 && arr.length == 9;
+    good &= arr[0] == 1 && arr[8] == 10;
+
+    arr.clear();
+    arr = {1, 1, 1, 2};
+    arr.remove(1);
+
+    // .remove_at()
+
+    arr = {1, 1, 1, 2};
+    arr.remove_at(1);
+    good &= arr[2] == 2;
+
+    for (lapse::u32 i = 0; i < arr.length; i++) {
+      std::cout << "array[" << i << "] " << arr[i] << "\n";
+    }
 
     if (good) {
       std::cout << "test passed\n";
