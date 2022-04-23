@@ -20,19 +20,19 @@ struct f32_obj{
     } bits;
   };
 
-  f32_obj(f64 in) { value = in; };
+  f32_obj(f64 in) { value = f32(in); };
   f32_obj(f32 in) { value = in; };
   f32_obj(u32 in) { value = f32(in); };
   f32_obj(i32 in) { value = f32(in); };
 
-  u32 exponent() {
+  i32 exponent() {
     return bits.window - (f32_exponent_min+1);
   }
   f64 window_start() {
-    return pow(2, bits.window - (f32_exponent_min+1));
+    return pow(2, f32(exponent()));
   };
   f64 window_end() {
-    return pow(2, 1 + bits.window - (f32_exponent_min+1));
+    return pow(2, f32(1 + exponent()));
   };
   // returns percentage of where this number is in its window
   //   so for 3.0f it returns 0.5 because it's in the middle of the 2..4 window
@@ -71,7 +71,7 @@ char* f32_to_c_str_base2(f32_obj in) {
   while (decimal > 0) {
     decimal *= 10.0;
     auto integer_part = floor_i(decimal);
-    output[length++] = '0' + integer_part;
+    output[length++] = '0' + (char)integer_part;
     decimal -= integer_part;
   }
 
@@ -120,8 +120,8 @@ char* f32_to_c_str(f32_obj in) {
     }
   }
 
-  auto decimal_place = pow(2, in.exponent());
-  decimal_place = logarithm_i(10, decimal_place);
+  auto decimal_place = pow(2, f32(in.exponent()));
+  decimal_place = logarithm_i(10, f32(decimal_place));
 
   u32 length = 0;
   u32 strpos = 0;
@@ -137,7 +137,7 @@ char* f32_to_c_str(f32_obj in) {
   output = new char[length+1+1] {'\0'};
 
   while (integer_form > 0) {
-    output[strpos++] = '0' + integer_form/tens;
+    output[strpos++] = '0' + (char)(integer_form/tens);
     integer_form -= integer_form/tens*tens;
     tens /= 10;
 
@@ -150,59 +150,5 @@ char* f32_to_c_str(f32_obj in) {
 
   return output;
 }
-
-// convert f32 to c_str
-char* f32_c_str_old(f32 in) {
-  char* temp;
-
-  i32 sign_bump = in < 0 ? 1 : 0;
-  in = abs(in);
-
-  u64 integer_part = u64(in);
-  in -= integer_part;
-  u32 integer_length = logarithm_i(10, integer_part);
-  integer_length += sign_bump;
-
-  char* decimal_str = new char[f32_significant_digits];
-
-  // build decimal_str
-  u64 decimal_length = 0;
-  for (i32 i = 0, tens = 10; in > 0 && i < f32_significant_digits; i++, tens *= 10) {
-    u32 digit = in*tens;
-    in -= f32(digit)/tens;
-    decimal_length++;
-    decimal_str[i] = '0' + digit;
-  }
-
-  // +1 length for null terminator
-  temp = new char[integer_length + decimal_length + 1];
-
-  if (sign_bump) { temp[0] = '-'; }
-
-  // build integer part of string
-  for (
-    u32 i = sign_bump, tens=pow(10, integer_length-1-sign_bump);
-    i < integer_length;
-    i++, tens /= 10
-  ) {
-                                          // so for 321 tens would be 100
-    u32 this_part = integer_part/tens;    // so for 321 this would be 3
-    integer_part -= this_part*tens;       // 321 - 300
-    temp[i] = '0' + this_part;           // calculate ascii code for "3"
-  }
-
-  // combine integer and decimal strings
-  if (decimal_length > 0) {
-    temp[integer_length] = '.';
-    for (u32 i=0; i < decimal_length; i++) {
-      temp[integer_length + 1 + i] = decimal_str[i];
-      // +1 accounts for period '.'
-    }
-  }
-
-  // +1 accounts for period '.'
-  temp[integer_length + decimal_length + 1] = '\0';
-  return temp;
-};
 
 }

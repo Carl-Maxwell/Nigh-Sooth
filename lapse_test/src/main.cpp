@@ -134,8 +134,8 @@ int main() {
       std::cout << "log base 4 of 29: " << lapse::logarithm_i(4, 29) << "\n";
       std::cout << "log base 2 of 17: " << lapse::logarithm_i(2, 29) << "\n";
       for (int i = 0; i < 100; i++) {
-        good &= lapse::sqrt(lapse::pow(2, i)) == i;
-        good &= powers_of_two.contains( lapse::pow(2, lapse::logarithm_i(2, i)) );
+        good &= lapse::sqrt(lapse::pow(2, (f32)i)) == i;
+        good &= powers_of_two.contains( lapse::pow(2, (f32)lapse::logarithm_i(2, (f32)i)) );
         // std::cout << "lapse::pow(2, lapse::logarithm_i(2, " << i << ")))" << lapse::pow(2, lapse::logarithm_i(2, i)) << "\n";
       }
 

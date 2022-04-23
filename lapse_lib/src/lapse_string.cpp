@@ -3,7 +3,7 @@
 
 namespace lapse{
 
-u64 as_binary() {}
-u64 as_hexadecimal() {}
+u64 as_binary() { return 0; }
+u64 as_hexadecimal() { return 0; }
 
 }

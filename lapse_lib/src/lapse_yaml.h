@@ -6,6 +6,6 @@ namespace lapse{
 
 struct yaml{
   char* message;
-}
+};
 
 }
