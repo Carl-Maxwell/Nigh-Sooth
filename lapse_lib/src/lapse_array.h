@@ -10,7 +10,8 @@ namespace lapse{
 
 // a fixed-size array, like default arrays in C++
 template<typename T>
-struct fixed_array{
+class fixed_array{
+public:
   T* elements = nullptr; // contents of array
   u32 size    = 0; // allocated space
   u32 length  = 0; // count of elements inserted
@@ -41,8 +42,52 @@ struct fixed_array{
       }
     }
     return false;
-  }
-  fixed_array& map(std::function<T(T)> callback) {
+  };
+  // transforms array to str with sep between elems
+  char* join(const char* sep = ", ") {
+    char* output;
+    u32 length_sum = 0;
+    for (u32 i = 0; i < length; i++) {
+      length_sum += elements[i].to_c_str_estimate_length();
+    }
+
+    auto sep_length = 0;
+    while (sep[sep_length++] != '\0') {}
+    length_sum += length-1 * sep_length;
+
+    output = new char[length_sum];
+
+    u32 str_pos = 0;
+    char* sub_str;
+
+    for (u32 i = 0; i < length; i++) {
+      char* sub_str = elements[i].to_c_str();
+      u32 i2 = 0;
+      while (sub_str[i2] != '\0') { output[str_pos++] = sub_str[i2]; }
+      if (i != length) { 
+        for (auto sep_pos = 0; sep_pos < sep_length; sep_pos++) {
+          output[str_pos++] = sep[sep_pos];
+        }
+      }
+    }
+    return output;
+  };
+  /*
+  template<typename T_STR>
+  // transforms array to str with sep between elems
+  T_STR join(T_STR sep = ", ") {
+    // TODO is there a more efficient way to do this? With a c_str for example?
+    //   maybe each obj should have a estimate_str_len func? then we could reserve(sum)
+    T_STR output = "";
+    for (u32 i = 0; i < length; i++) {
+     output += elements[i].to_str();
+     if (i != length) { output += sep; }
+    }
+    return output;
+  };
+  */
+  // transform each elem with lambda : elem = lambda(elem)
+  fixed_array& map(lapse_lambda(T, T) callback) {
     for (u32 i = 0; i < length; i++) {
       elements[i] = callback(elements[i]);
     }
@@ -84,7 +129,6 @@ struct fixed_array{
       error(error_code::close_app);
     }
   }
-  
 
   inline T& operator[](u32 i) const {
     return at(i);
@@ -102,12 +146,15 @@ struct fixed_array{
 
 };
 
-// a dynamic-sized array, like to std::vector
-template<typename T>
-struct array : public fixed_array<T>{
+// a dynamic-sized array, similar to std::vector
+template<class T>
+class array : public fixed_array<T>{
+public:
   T* elements = nullptr; // contents of array
   u32 size    = 0; // allocated space
   u32 length  = 0; // count of elements inserted
+
+  array() {};
 
   void push(T elem) {
     elements[length] = elem;
@@ -135,7 +182,18 @@ struct array : public fixed_array<T>{
     }
   }
 
+  array& operator+=(const array other) {
+    u32 total_length = length + other.length;
+    reserve(total_length);
+    
+    for (u32 i = length; i < total_length; i++) {
+      elements[i] = other[i];
+    }
+    return *this;
+  };
+
   // TODO .join()
+  // TODO .insert(index, elem)
   // TODO .sort()
   // TODO .sort(lambda) -- comparison lambda
   // TODO .search(elem), .search(lambda)

@@ -66,6 +66,8 @@ char u32_to_ascii(u32 i) { return '0' + i; }
 
 }; // namespace
 
+#include "lapse_lambda.h"
+
 #include "lapse_math.h"
 
 #include "lapse_integer.h"
