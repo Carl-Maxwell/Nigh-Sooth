@@ -5,6 +5,10 @@
 
 using namespace lapse;
 
+void print() {
+  std::cout << "\n";
+}
+
 int main() {
 
   std::cout << "Running lapse_lib tests\n";
@@ -20,6 +24,8 @@ int main() {
       std::cout << "test passed\n";
     }
   }
+
+  print();
 
   {
     // are typedefs there?
@@ -39,6 +45,8 @@ int main() {
       std::cout << "test passed\n";
     }
   }
+
+  print();
 
   //
   // math
@@ -69,6 +77,8 @@ int main() {
       good &= lapse::ceil_i( 1.9f) ==  2 && lapse::ceil_f( 1.9f) ==  2;
       good &= lapse::ceil_i(-1.9f) == -1 && lapse::ceil_f(-1.9f) == -1;
     }
+
+  print();
 
     {
       // testing pow(), sqrt(), etc
@@ -133,11 +143,14 @@ int main() {
 
       std::cout << "log base 4 of 29: " << lapse::logarithm_i(4, 29) << "\n";
       std::cout << "log base 2 of 17: " << lapse::logarithm_i(2, 29) << "\n";
-      for (int i = 0; i < 100; i++) {
-        good &= lapse::sqrt(lapse::pow(2, (f32)i)) == i;
+      int i = 5;
+      // for (int i = 0; i < 100; i++) {
+        std::cout << "lapse::pow((f32)i, 2) == " << lapse::pow((f32)i, 2) << " == " <<  i << "\n";
+        std::cout << "lapse::sqrt(lapse::pow((f32)i, 2)) == " << lapse::sqrt(lapse::pow((f32)i, 2)) << " == " <<  i << "\n";
+        good &= lapse::sqrt(lapse::pow((f32)i, 2)) == i; // nope
         good &= powers_of_two.contains( lapse::pow(2, (f32)lapse::logarithm_i(2, (f32)i)) );
         // std::cout << "lapse::pow(2, lapse::logarithm_i(2, " << i << ")))" << lapse::pow(2, lapse::logarithm_i(2, i)) << "\n";
-      }
+      // }
 
       good &= lapse::sqrt(4) == 2 && lapse::round(lapse::sqrt(lapse::u32_max)) == 65'536;
 
@@ -149,6 +162,8 @@ int main() {
       std::cout << "test FAILED\n";
     }
   }
+
+  print();
 
   //
   // exceptions
@@ -206,6 +221,8 @@ int main() {
     }
   }
 
+  print();
+
   // registering error callbacks, throwing errors
   
   {
@@ -255,6 +272,8 @@ int main() {
       std::cout << "test FAILED\n";
     }
   }
+
+  print();
 
   //
   // arrays
@@ -319,6 +338,8 @@ int main() {
       std::cout << "test FAILED\n";
     }
   }
+
+  print();
 
   {
     std::cout << "testing dynamic array\n";
