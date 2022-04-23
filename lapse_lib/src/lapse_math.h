@@ -11,7 +11,15 @@ f32 sign(f32 a) {
   return a < 0 ? -1.0f : 1.0f;
 };
 
+f64 sign(f64 a) {
+  return a < 0 ? -1.0 : 1.0;
+};
+
 f32 abs(f32 a) {
+  return sign(a) * a;
+}
+
+f64 abs(f64 a) {
   return sign(a) * a;
 }
 
@@ -24,7 +32,7 @@ f32 floor_f(f32 whole) {
 };
 
 i32 ceil_i(f32 whole) {
-  return whole > 0 ? f32(abs(i32(whole))+1) : i32(whole);
+  return whole > 0 ? f32(abs(f32(i32(whole)))+1) : i32(whole);
 };
 
 f32 ceil_f(f32 whole) {
@@ -71,30 +79,28 @@ f32 root(f32 exponent, f32 big_number) {
   return base;
 }
 
-//
+//-----------------------------------------------------------------------------
 // float funcs
-//
-
-}
-
-#include "iostream"
-
-namespace lapse {
+//-----------------------------------------------------------------------------
 
 // TODO account for negative numbers
+// TODO 987'654'321.123456789 comes out as 987'654'336 ... is that unavoidable with f32?
 
+// convert f32 to c_str
 char* f32_c_str(f32 in) {
   char* temp;
 
+  i32 sign_bump = in < 0 ? 1 : 0;
+  in = abs(in);
+
   u64 integer_part = u64(in);
-
   in -= integer_part;
-
   u32 integer_length = logarithm_i(10, integer_part);
-  // while (integer_part/u32(pow(10, integer_length)) > 0) { integer_length++; }
+  integer_length += sign_bump;
 
   char* decimal_str = new char[f32_significant_digits];
 
+  // build decimal_str
   u64 decimal_length = 0;
   for (i32 i = 0, tens = 10; in > 0 && i < f32_significant_digits; i++, tens *= 10) {
     u32 digit = in*tens;
@@ -106,8 +112,11 @@ char* f32_c_str(f32 in) {
   // +1 length for null terminator
   temp = new char[integer_length + decimal_length + 1];
 
+  if (sign_bump) { temp[0] = '-'; }
+
+  // build integer part of string
   for (
-    u32 i=0, tens=pow(10, integer_length-1);
+    u32 i = sign_bump, tens=pow(10, integer_length-1-sign_bump);
     i < integer_length;
     i++, tens /= 10
   ) {
@@ -117,6 +126,7 @@ char* f32_c_str(f32 in) {
     temp[i] = '0' + this_part;          // calculate ascii code for "3"
   }
 
+  // combine integer and decimal strings
   if (decimal_length > 0) {
     temp[integer_length] = '.';
     for (u32 i=0; i < decimal_length; i++) {
@@ -129,5 +139,23 @@ char* f32_c_str(f32 in) {
   temp[integer_length + decimal_length + 1] = '\0';
   return temp;
 };
+
+// convert f64 to c_str
+char* f64_c_str(f64 in) {
+  char* temp;
+
+  return temp;
+}
+
+// breaks f32 into constituent parts then puts it back together
+//   ... effectively a noop, but it was helpful for me learning how f32's are calculated
+u64 f32_mantissa_to_i(f32 input) { 
+  f32_memory_layout mem_f32{input};
+
+  auto window_start = pow(2, mem_f32.bits.window - (f32_exponent_min+1));
+  auto window_end   = pow(2, 1 + mem_f32.bits.window - (f32_exponent_min+1));
+
+  return window_start * (1.0 + f64(mem_f32.bits.offset) / f64(f32_mantissa_max)); ;
+}
 
 }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdint.h>
+#include <iostream>
 
 namespace lapse{
 
@@ -38,11 +39,37 @@ typedef double f64; // IEEE 754 64-bit double precision (binary64)
 
 const u64 f32_significant_digits   =  7;
 const u64 f32_exponent_max         =  127;
+const u64 f32_exponent_min         =  126;
 const u64 f32_exponent_max_base_10 =  38;
-const i64 f32_exponent_min         = -37;
-const u64 f32_sign_bit             = u64(1) << 31;
+const i64 f32_exponent_min_base_10 = -37;
+
+const u64 f32_mantissa_max         = 8'388'608; // pow(2, 23)
+
+// 8388608
+
+// f32 memory layout: 1 bit sign, 8 bits exponent, 23 bits mantissa
+
+const u64 f32_exponent_bits        = 8;
+const u64 f32_mantissa_bits        = 23;
+
+const u32 f32_sign_bit             = 0b1000'0000'0000'0000'0000'0000'0000'0000;
+const u32 f32_bitfield_exponent    = 0b0111'1111'1000'0000'0000'0000'0000'0000;
+const u32 f32_bitfield_mantissa    = 0b0000'0000'0111'1111'1111'1111'1111'1111;
+// const u32 f32_bitfield_mantissa    = 0b1111'1111'1111'1111'1111'1110'0000'0000;
 
 const u64 f64_significant_digits   =  16;
+
+// this union allows convenient access to the components of an f32
+union f32_memory_layout{
+  float f;
+  // a struct with colons (:) is called a bit field,
+  //   each number below specifies the sizeof() that struct member in bits
+  struct {
+    unsigned int offset : f32_mantissa_bits; // mantissa
+    unsigned int window : f32_exponent_bits;  // exponent
+    unsigned int sign   : 1;
+  } bits;
+};
 
 // TODO need to test out these f32 & f64 constants
 
