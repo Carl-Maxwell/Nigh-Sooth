@@ -77,6 +77,8 @@ char u32_to_ascii(u32 i) { return '0' + i; }
 
 #include "lapse_range.h"
 
+#include "lapse_random.h"
+
 // TODO random, rng, etc
 // TODO uids
 
