@@ -3,6 +3,8 @@
 
 #include "lapse_lib.h"
 
+using namespace lapse;
+
 int main() {
 
   std::cout << "Running lapse_lib tests\n";
@@ -76,12 +78,14 @@ int main() {
 
       std::cout << "37'822'859'361\n" << lapse::pow(21, 8) << "\n";
 
-      {
+      std::cout << "u32 1234567 to c_str: " << u32_to_c_str(1234567) << "\n";
 
-        for (int i = 3; i < 100; i++) {
+      {
+        int i = 3;
+        // for (int i = 3; i < 100; i++) {
           lapse::f32 f = lapse::f32(i);
-          std::cout << i << ".0f: " << lapse::f32_mantissa_to_i(lapse::f32(i)) << "\n";
-        }
+          std::cout << i << ".0f in base 2 exp form: " << lapse::f32_c_str_exp((lapse::f32_obj{lapse::f32(i)})) << "\n";
+        // }
 
       }
 

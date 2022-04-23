@@ -80,14 +80,89 @@ f32 root(f32 exponent, f32 big_number) {
 }
 
 //-----------------------------------------------------------------------------
+// integer funcs
+//-----------------------------------------------------------------------------
+
+char* u32_to_c_str(u32 in) {
+  char* output;
+
+  if (in == 0) { return (char*)"0"; }
+
+  u32 original_in = in;
+
+  u32 length = 0;
+  u32 tens = 1; // which tens place we're looking at
+  while (in/tens > 0) {
+    tens *= 10;
+    length++;
+  }
+
+  tens /= 10;
+
+  output = new char[length + 1]; // +1 accounts for null terminator
+  u32 i = 0;
+  
+  while (in > 0) {
+    output[i++] = '0' + in/tens;
+    in -= in/tens*tens;
+    tens /= 10;
+  }
+
+  output[i++] = '\0';
+
+  return output;
+}
+
+//-----------------------------------------------------------------------------
 // float funcs
 //-----------------------------------------------------------------------------
 
 // TODO account for negative numbers
 // TODO 987'654'321.123456789 comes out as 987'654'336 ... is that unavoidable with f32?
 
+// returns something like 3,140 = 3.14 * 2**3
+char* f32_c_str_exp(f32_obj in) {
+  char* output = new char[32] {'\0'};
+
+  f64 decimal = f64(in.bits.offset) / f64(f32_mantissa_max);
+  auto length = 0;
+
+  for (i32 i = 0; decimal > 0; i++) {
+    decimal *= 10.0;
+    output[i] = '0' + floor_i(decimal);
+    decimal -= floor_i(decimal);
+    length++;
+  }
+
+  output[length++] = ' ';
+  output[length++] = '2';
+  output[length++] = '*';
+  output[length++] = '*';
+  
+  auto exp = in.window();
+  char* exp_c_str = u32_to_c_str(exp);
+
+  for (int i = 0; exp_c_str[i] != '\0'; i++) {
+    output[length++] = exp_c_str[i];
+  }
+
+  std::cout << "decimal: " << decimal << "\n";
+
+  __debugbreak();
+
+  return output;
+}
+
+char* f32_c_str(f32_obj in) {
+  char* output;
+
+
+
+  return output;
+}
+
 // convert f32 to c_str
-char* f32_c_str(f32 in) {
+char* f32_c_str_old(f32 in) {
   char* temp;
 
   i32 sign_bump = in < 0 ? 1 : 0;
@@ -145,17 +220,6 @@ char* f64_c_str(f64 in) {
   char* temp;
 
   return temp;
-}
-
-// breaks f32 into constituent parts then puts it back together
-//   ... effectively a noop, but it was helpful for me learning how f32's are calculated
-u64 f32_mantissa_to_i(f32 input) { 
-  f32_memory_layout mem_f32{input};
-
-  auto window_start = pow(2, mem_f32.bits.window - (f32_exponent_min+1));
-  auto window_end   = pow(2, 1 + mem_f32.bits.window - (f32_exponent_min+1));
-
-  return window_start * (1.0 + f64(mem_f32.bits.offset) / f64(f32_mantissa_max)); ;
 }
 
 }

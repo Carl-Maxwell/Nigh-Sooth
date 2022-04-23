@@ -59,16 +59,40 @@ const u32 f32_bitfield_mantissa    = 0b0000'0000'0111'1111'1111'1111'1111'1111;
 
 const u64 f64_significant_digits   =  16;
 
-// this union allows convenient access to the components of an f32
-union f32_memory_layout{
-  float f;
-  // a struct with colons (:) is called a bit field,
-  //   each number below specifies the sizeof() that struct member in bits
-  struct {
-    unsigned int offset : f32_mantissa_bits; // mantissa
-    unsigned int window : f32_exponent_bits;  // exponent
-    unsigned int sign   : 1;
-  } bits;
+// f32 enriched with methods
+struct f32_obj{
+  // this union allows convenient access to the components of an f32
+  union{
+    float value;
+    // a struct with colons (:) is called a bit field,
+    //   each number below specifies the sizeof() that struct member in bits
+    struct {
+      unsigned int offset : f32_mantissa_bits; // mantissa
+      unsigned int window : f32_exponent_bits;  // exponent
+      unsigned int sign   : 1;
+    } bits;
+  };
+
+  f32_obj(f64 in) { value = in; };
+  f32_obj(f32 in) { value = in; };
+
+  u32 window() {
+    return bits.window - (f32_exponent_min+1);
+  }
+  f64 window_start() {
+    return pow(2, bits.window - (f32_exponent_min+1));
+  };
+  f64 window_end() {
+    return pow(2, 1 + bits.window - (f32_exponent_min+1));
+  };
+  // returns the expected error range of this f32_obj
+  f64 precision() {
+    return (window_end() - window_start()) / f32_mantissa_max;
+  }
+  // calculates the value of this f32's components as a f64
+  f64 to_f64() {
+    return window_start() * (1.0 + f64(bits.offset) / f64(f32_mantissa_max));
+  }
 };
 
 // TODO need to test out these f32 & f64 constants
