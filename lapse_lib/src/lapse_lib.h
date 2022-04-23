@@ -75,8 +75,10 @@ struct f32_obj{
 
   f32_obj(f64 in) { value = in; };
   f32_obj(f32 in) { value = in; };
+  f32_obj(u32 in) { value = f32(in); };
+  f32_obj(i32 in) { value = f32(in); };
 
-  u32 window() {
+  u32 exponent() {
     return bits.window - (f32_exponent_min+1);
   }
   f64 window_start() {
@@ -85,6 +87,11 @@ struct f32_obj{
   f64 window_end() {
     return pow(2, 1 + bits.window - (f32_exponent_min+1));
   };
+  // returns percentage of where this number is in its window
+  //   so for 3.0f it returns 0.5 because it's in the middle of the 2..4 window
+  f64 window_portion() {
+    return f64(bits.offset) / f64(f32_mantissa_max);
+  }
   // returns the expected error range of this f32_obj
   f64 precision() {
     return (window_end() - window_start()) / f32_mantissa_max;
@@ -96,6 +103,9 @@ struct f32_obj{
 };
 
 // TODO need to test out these f32 & f64 constants
+
+// takes in a number 0..9 and returns it as a char
+char u32_to_ascii(u32 i) { return '0' + i; }
 
 }; // namespace
 

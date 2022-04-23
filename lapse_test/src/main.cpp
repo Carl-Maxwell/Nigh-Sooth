@@ -81,16 +81,24 @@ int main() {
       std::cout << "u32 1234567 to c_str: " << u32_to_c_str(1234567) << "\n";
 
       {
-        int i = 3;
-        // for (int i = 3; i < 100; i++) {
-          lapse::f32 f = lapse::f32(i);
-          std::cout << i << ".0f in base 2 exp form: " << lapse::f32_c_str_exp((lapse::f32_obj{lapse::f32(i)})) << "\n";
-        // }
+        // test f32_to_c_str_base2()
+
+        for (int i = 3; i < 100; i++) {
+          f32_obj num {i};
+          // std::cout << i << ".0f == (1.0 + " << num.window_portion() << ") * 2**" << num.exponent() << " == " << lapse::f32_to_c_str_base2(i) << "\n";
+        }
 
       }
 
       {
-        // testing f32_c_str()
+        // testing f32_to_c_str()
+
+        std::cout << 10'000'000'000.0f << " f32_to_c_str() == " << f32_to_c_str(10'000'000'000.0f) << "\n";
+
+        for (int i = 3; i < 100; i++) {
+          f32_obj num {i};
+          // std::cout << i << " == " << f32_to_c_str(i) << "\n";
+        }
 
         // std::cout << "321.0f   : " << lapse::f32_c_str(321.0f) << "\n";
         // std::cout << "123.0f   : " << lapse::f32_c_str(123.0f) << "\n";
