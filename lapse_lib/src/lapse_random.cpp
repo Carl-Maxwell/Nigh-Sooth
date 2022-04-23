@@ -39,7 +39,7 @@ u32 die(u32 sides) {
 
 u32 die(u32 n, u32 sides) {
   u32 sum = 0;
-  for (u32 i; i < n; i++) {
+  for (u32 i = 0; i < n; i++) {
     sum += (rand() % sides) + 1;
   }
   return sum;
