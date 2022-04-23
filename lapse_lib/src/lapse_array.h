@@ -127,7 +127,10 @@ struct array : public fixed_array<T>{
       for (u32 i = 0; i < length; i++) {
         elements[i] = old_elements[i];
       }
-      delete elements;
+
+      // TODO callback for reference stability?
+
+      delete old_elements;
       size = better_size;
     }
   }
