@@ -57,4 +57,6 @@ const u32 f32_bitmask_mantissa     = 0b0000'0000'0111'1111'1111'1111'1111'1111;
 
 const u64 f64_significant_digits   =  16;
 
+// TODO need to test out these f32 & f64 constants
+
 };

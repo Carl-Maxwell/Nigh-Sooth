@@ -6,12 +6,10 @@
 
 namespace lapse{
 
-// TODO need to test out these f32 & f64 constants
-
 // takes in a number 0..9 and returns it as a char
 char u32_to_ascii(u32 i) { return '0' + i; }
 
-}; // namespace
+};
 
 #include "lapse_lambda.h"
 
