@@ -1,5 +1,7 @@
 #pragma once
 
+#include "lapse_scalar.h"
+#include "lapse_array.h"
 #include "lapse_string.h"
 #include "lapse_lambda.h"
 

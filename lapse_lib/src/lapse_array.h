@@ -61,7 +61,6 @@ public:
     output = new char[length_sum];
 
     u32 str_pos = 0;
-    char* sub_str;
 
     for (u32 i = 0; i < length; i++) {
       char* sub_str = elements[i].to_c_str();
@@ -164,7 +163,7 @@ public:
     length++;
 
     if (length == size) {
-      reserve(u32(ceil_i(f32(size) * 1.5)));
+      reserve(u32(ceil_i(f32(size) * 1.5f)));
     }
   };
   void reserve(u32 better_size) {
