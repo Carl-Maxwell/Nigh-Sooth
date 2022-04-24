@@ -4,13 +4,6 @@
 
 #include "lapse_scalar.h"
 
-namespace lapse{
-
-// takes in a number 0..9 and returns it as a char
-char u32_to_ascii(u32 i) { return '0' + i; }
-
-};
-
 #include "lapse_lambda.h"
 
 #include "lapse_math.h"

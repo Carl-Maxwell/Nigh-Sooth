@@ -6,32 +6,10 @@ namespace lapse{
 // integer funcs
 //-----------------------------------------------------------------------------
 
-char* u32_to_c_str(u32 in) {
-  char* output;
+// takes in a number 0..9 and returns it as a char
+char u32_to_ascii(u32 i);
 
-  if (in == 0) { return (char*)"0"; }
-
-  u32 length = 0;
-  u32 tens = 1; // which tens place we're looking at
-  while (in/tens > 0) {
-    tens *= 10;
-    length++;
-  }
-
-  tens /= 10;
-
-  output = new char[length + 1]; // +1 accounts for null terminator
-  u32 i = 0;
-  
-  while (in > 0) {
-    output[i++] = '0' + in/tens;
-    in -= in/tens*tens;
-    tens /= 10;
-  }
-
-  output[i++] = '\0';
-
-  return output;
-}
+// convert u32 to c_str 123 -> "123\0"
+char* u32_to_c_str(u32 in);
 
 }
