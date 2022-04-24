@@ -22,7 +22,7 @@ char u32_to_ascii(u32 i) { return '0' + i; }
 #include "lapse_array.h"
 #include "lapse_string.h"
 
-#include "lapse_range.h"
+// #include "lapse_range.h"
 
 #include "lapse_random.h"
 
@@ -36,7 +36,7 @@ char u32_to_ascii(u32 i) { return '0' + i; }
 // TODO binary_tree
 // TODO slot_map (for UIDs)
 
-// math
+// various math types
 
 // TODO vec2, vec3, vec4, mat4x4
 // TODO euler, quaternion, etc

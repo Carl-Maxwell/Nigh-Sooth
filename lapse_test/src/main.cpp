@@ -3,6 +3,8 @@
 
 #include "lapse_lib.h"
 
+// #include "string_test.cpp"
+
 using namespace lapse;
 
 void print() {
@@ -356,6 +358,8 @@ int main() {
       std::cout << "test FAILED\n";
     }
   }
+
+  
 
   return 0;
 }
