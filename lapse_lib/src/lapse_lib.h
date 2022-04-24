@@ -5,6 +5,10 @@
 
 namespace lapse{
 
+//-----------------------------------------------------------------------------
+// Typedef scalar types
+//-----------------------------------------------------------------------------
+
 // signed integers
 
 typedef int8_t  i8;
@@ -37,25 +41,24 @@ typedef float f16;  // IEEE 754 16-bit half   precision (binary16)
 typedef float f32;  // IEEE 754 32-bit single precision (binary32)
 typedef double f64; // IEEE 754 64-bit double precision (binary64)
 
+// float constants:
+
 const u64 f32_significant_digits   =  7;
 const u64 f32_exponent_max         =  127;
 const u64 f32_exponent_min         =  126;
 const u64 f32_exponent_max_base_10 =  38;
 const i64 f32_exponent_min_base_10 = -37;
 
-const u64 f32_mantissa_max         = 8'388'608; // pow(2, 23)
-
-// 8388608
+const u64 f32_mantissa_max         = 8'388'608; // 2**23
 
 // f32 memory layout: 1 bit sign, 8 bits exponent, 23 bits mantissa
 
 const u64 f32_exponent_bits        = 8;
 const u64 f32_mantissa_bits        = 23;
 
-const u32 f32_sign_bit             = 0b1000'0000'0000'0000'0000'0000'0000'0000;
-const u32 f32_bitfield_exponent    = 0b0111'1111'1000'0000'0000'0000'0000'0000;
-const u32 f32_bitfield_mantissa    = 0b0000'0000'0111'1111'1111'1111'1111'1111;
-// const u32 f32_bitfield_mantissa    = 0b1111'1111'1111'1111'1111'1110'0000'0000;
+const u32 f32_bitmask_sign_bit     = 0b1000'0000'0000'0000'0000'0000'0000'0000;
+const u32 f32_bitmask_exponent    = 0b0111'1111'1000'0000'0000'0000'0000'0000;
+const u32 f32_bitmask_mantissa    = 0b0000'0000'0111'1111'1111'1111'1111'1111;
 
 const u64 f64_significant_digits   =  16;
 
@@ -81,10 +84,9 @@ char u32_to_ascii(u32 i) { return '0' + i; }
 
 #include "lapse_random.h"
 
-// TODO random, rng, etc
 // TODO uids
 
-// TODO lapse_file.h
+#include "lapse_file.h"
 
 // data structures
 
