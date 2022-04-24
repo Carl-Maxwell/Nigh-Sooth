@@ -28,7 +28,7 @@ typedef uint64_t u64;
 const u64 i8_max  = 128;                       // 2**8/2
 const u64 i16_max = 32'768;                    // 2**16/2
 const u64 i32_max = 2'147'483'648;             // 2**32/2
-const u64 i64_max = 9'223'372'036'854'775'808; // 2**64/2
+const u64 i64_max = 9'223'372'036'854'775'808; // 2**64/2 // TODO don't these need -1s?
 
 const u64 u8_max  = u8 (-1); // 2**8
 const u64 u16_max = u16(-1); // 2**16
@@ -86,7 +86,7 @@ char u32_to_ascii(u32 i) { return '0' + i; }
 
 // TODO uids
 
-#include "lapse_file.h"
+// #include "lapse_file.h"
 
 // data structures
 

@@ -14,4 +14,5 @@ f64 rand_range(f64 min, f64 max);
 u32 die(u32 sides);
 // roll {n}d{sides}
 u32 die(u32 n, u32 sides);
+
 }
