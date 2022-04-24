@@ -2,6 +2,8 @@
 
 #include "lapse_lib.h"
 
+#include "lapse_math.h"
+
 #include <initializer_list>
 
 namespace lapse{

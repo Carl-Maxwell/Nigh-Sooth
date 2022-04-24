@@ -1,7 +1,6 @@
 #pragma once
 
-#include "lapse_lib.h"
-
+#include "lapse_scalar.h"
 
 namespace lapse{
 
