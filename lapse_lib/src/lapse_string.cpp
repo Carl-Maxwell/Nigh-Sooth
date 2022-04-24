@@ -32,7 +32,7 @@ str& str::concat(const str& other) {
   return *this;
 }
 
-u32 str::length() { return m_characters.length; }
+u32 str::length() { return m_characters.length(); }
 
 str str::slice() { return *this;  }
 
@@ -55,16 +55,16 @@ array<str> str::split(str sep) {
 array<u8> str::to_array() { return m_characters; };
 
 char* str::to_c_str() { 
-  char* c = new char[m_characters.length+1];
-  for (u32 i = 0; i < m_characters.length; i++) {
+  char* c = new char[m_characters.length()+1];
+  for (u32 i = 0; i < m_characters.length(); i++) {
     c[i] = (char)m_characters[i];
   }
-  c[m_characters.length] = '\0';
+  c[m_characters.length()] = '\0';
   return c;
 };
 
 u32 str::to_c_str_estimate_length() {
-  return m_characters.length+1;
+  return m_characters.length() + 1;
 }
 
 f32 str::to_f32() { return 0; }
@@ -114,13 +114,13 @@ str& str::operator=(str right_value) {
 
 str& str::operator=(char* right_value) {
   clear();
-  u32 n_length = 0;
+  u32 better_length = 0;
   {
     u32 i = 0;
-    while (right_value[i++] != '\0') { n_length++; }
+    while (right_value[i++] != '\0') { better_length++; }
   }
 
-  m_characters.reserve(n_length);
+  m_characters.reserve(better_length);
 
   u32 i = 0;
   while (right_value[i] != '\0') { m_characters.push(right_value[i]); i++; }

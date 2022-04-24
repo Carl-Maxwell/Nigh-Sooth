@@ -4,7 +4,7 @@
 namespace lapse{
 
 void error(error_code code) {
-  LapseErrorQueue::the().queue_of_errors.push(code);
+  LapseErrorQueue::the().m_queue_of_errors.push(code);
 };
 
 };

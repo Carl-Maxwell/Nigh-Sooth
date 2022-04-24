@@ -88,6 +88,7 @@ public:
     return output;
   };
   */
+  u32 length() { return m_length; }
   // transform each elem with lambda : elem = lambda(elem)
   fixed_array& map(lapse_lambda(T, T) callback) {
     for (u32 i = 0; i < m_length; i++) {

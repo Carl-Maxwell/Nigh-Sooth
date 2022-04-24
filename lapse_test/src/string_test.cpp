@@ -23,5 +23,4 @@ bool string_test(){
 
   return good;
 }
-
 */

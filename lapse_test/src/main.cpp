@@ -141,7 +141,7 @@ int main() {
       lapse::fixed_array<lapse::i32> powers_of_two;
       powers_of_two = lapse::range(1, 10).map([](lapse::i32 a){ return pow(2, a); });
 
-      good &= powers_of_two[powers_of_two.length-1] && lapse::pow(2, 10);
+      good &= powers_of_two[powers_of_two.m_length-1] && lapse::pow(2, 10);
 
       std::cout << "log base 4 of 29: " << lapse::logarithm_i(4, 29) << "\n";
       std::cout << "log base 2 of 17: " << lapse::logarithm_i(2, 29) << "\n";
@@ -189,9 +189,9 @@ int main() {
 
     a_list.push(8);
 
-    good = a_list.front->value == 8;
+    good = a_list.m_front->value == 8;
 
-    a_list.remove(a_list.front);
+    a_list.remove(a_list.m_front);
 
     good &= a_list.is_empty();
 
@@ -200,19 +200,19 @@ int main() {
     a_list.push(3);
     a_list.push(4);
 
-    good &= a_list.front->next->next->next->value == 1;
+    good &= a_list.m_front->next->next->next->value == 1;
 
-    a_list.remove(a_list.front->next->next->next); // remove 1
+    a_list.remove(a_list.m_front->next->next->next); // remove 1
 
-    good &= a_list.front->next->next->next == nullptr;
+    good &= a_list.m_front->next->next->next == nullptr;
 
-    a_list.remove(a_list.front->next); // remove 3
+    a_list.remove(a_list.m_front->next); // remove 3
 
-    good &= a_list.front->next->value == 2;
+    good &= a_list.m_front->next->value == 2;
 
-    a_list.remove(a_list.front); // remove 4
+    a_list.remove(a_list.m_front); // remove 4
 
-    good &= a_list.front->value == 2;
+    good &= a_list.m_front->value == 2;
 
     good &= !a_list.is_empty();
 
@@ -301,13 +301,13 @@ int main() {
 
     // .clear()
 
-    good &= arr.size == 4 && arr.length == 4;
+    good &= arr.m_size == 4 && arr.m_length == 4;
 
     arr.clear();
 
-    good &= arr.size == 0 && arr.length == 0;
+    good &= arr.m_size == 0 && arr.m_length == 0;
 
-    good &= arr.elements == nullptr;
+    good &= arr.m_elements == nullptr;
 
     // .remove()
 
@@ -317,7 +317,7 @@ int main() {
 
     arr.remove(6);
 
-    good &= arr.size == 10 && arr.length == 9;
+    good &= arr.m_size == 10 && arr.m_length == 9;
     good &= arr[0] == 1 && arr[8] == 10;
 
     arr.clear();
@@ -330,7 +330,7 @@ int main() {
     arr.remove_at(1);
     good &= arr[2] == 2;
 
-    for (lapse::u32 i = 0; i < arr.length; i++) {
+    for (lapse::u32 i = 0; i < arr.m_length; i++) {
       std::cout << "array[" << i << "] " << arr[i] << "\n";
     }
 
