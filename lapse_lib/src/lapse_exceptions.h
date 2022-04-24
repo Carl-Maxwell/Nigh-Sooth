@@ -1,7 +1,5 @@
 #pragma once
 
-#include "lapse_lib.h"
-
 #include <functional>
 
 #include "iostream"
@@ -142,9 +140,7 @@ public:
 // TODO need to send in an error_struct like
 //   error({error_code::close_app, "Array overflow!"})
 
-void error(error_code code) {
-  LapseErrorQueue::the().queue_of_errors.push(code);
-};
+void error(error_code code);
 
 };
 
