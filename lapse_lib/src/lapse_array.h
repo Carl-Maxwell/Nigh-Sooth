@@ -15,9 +15,9 @@ namespace lapse{
 template<typename T>
 class fixed_array{
 public:
-  T* elements = nullptr; // contents of array
-  u32 size    = 0; // allocated space
-  u32 length  = 0; // count of elements inserted
+  T* m_elements = nullptr; // contents of array
+  u32 m_size    = 0; // allocated space
+  u32 m_length  = 0; // count of elements inserted
 
   fixed_array() {};
   fixed_array(u32 n) { reserve(n); };
@@ -29,18 +29,18 @@ public:
   };
   // returns elem, with safety check
   inline T& at(u32 i) const {
-    if (!size || i > size-1) {
+    if (!m_size || i > m_size-1) {
       error(error_code::breakpoint);
       return *(T*)nullptr;
     } else {
-      return elements[i];
+      return m_elements[i];
     }
   };
   // removes all elements
-  void clear() { delete elements; elements = nullptr; size = 0; length = 0; };
+  void clear() { delete m_elements; m_elements = nullptr; m_size = 0; m_length = 0; };
   bool contains(T elem) {
-    for (u32 i = 0; i < length; i++) {
-      if (elem == elements[i]) {
+    for (u32 i = 0; i < m_length; i++) {
+      if (elem == m_elements[i]) {
         return true;
       }
     }
@@ -50,23 +50,23 @@ public:
   char* join(const char* sep = ", ") {
     char* output;
     u32 length_sum = 0;
-    for (u32 i = 0; i < length; i++) {
-      length_sum += elements[i].to_c_str_estimate_length();
+    for (u32 i = 0; i < m_length; i++) {
+      length_sum += m_elements[i].to_c_str_estimate_length();
     }
 
     auto sep_length = 0;
     while (sep[sep_length++] != '\0') {}
-    length_sum += length-1 * sep_length;
+    length_sum += m_length-1 * sep_length;
 
     output = new char[length_sum];
 
     u32 str_pos = 0;
 
-    for (u32 i = 0; i < length; i++) {
-      char* sub_str = elements[i].to_c_str();
+    for (u32 i = 0; i < m_length; i++) {
+      char* sub_str = m_elements[i].to_c_str();
       u32 i2 = 0;
       while (sub_str[i2] != '\0') { output[str_pos++] = sub_str[i2]; }
-      if (i != length) { 
+      if (i != m_length) { 
         for (auto sep_pos = 0; sep_pos < sep_length; sep_pos++) {
           output[str_pos++] = sep[sep_pos];
         }
@@ -81,34 +81,34 @@ public:
     // TODO is there a more efficient way to do this? With a c_str for example?
     //   maybe each obj should have a estimate_str_len func? then we could reserve(sum)
     T_STR output = "";
-    for (u32 i = 0; i < length; i++) {
-     output += elements[i].to_str();
-     if (i != length) { output += sep; }
+    for (u32 i = 0; i < m_length; i++) {
+     output += m_elements[i].to_str();
+     if (i != m_length) { output += sep; }
     }
     return output;
   };
   */
   // transform each elem with lambda : elem = lambda(elem)
   fixed_array& map(lapse_lambda(T, T) callback) {
-    for (u32 i = 0; i < length; i++) {
-      elements[i] = callback(elements[i]);
+    for (u32 i = 0; i < m_length; i++) {
+      m_elements[i] = callback(m_elements[i]);
     }
 
     return *this;
   }
   // like .push_back(), add an element to the end of the array
   void push(T elem) {
-    at(length) = elem;
-    length++;
+    at(m_length) = elem;
+    m_length++;
 
-    if (length > size) {
+    if (m_length > m_size) {
       error(error_code::breakpoint);
     }
   };
   // remove all elements equal to argument,
   //   compacts array with each removal
   void remove(T elem) {
-    for (u32 i = 0; i < length; i++) {
+    for (u32 i = 0; i < m_length; i++) {
       if (at(i) == elem) {
         remove_at(i);
         return remove(elem);
@@ -118,15 +118,15 @@ public:
     }
   }
   void remove_at(u32 removal_i) {
-    for (u32 i = removal_i; i < length-1; i++) {
-      elements[i] = elements[i+1];
+    for (u32 i = removal_i; i < m_length-1; i++) {
+      m_elements[i] = m_elements[i+1];
     }
-    length--;
+    m_length--;
   }
   void reserve(u32 better_size) {
-    if (length == 0) {
-      elements = new T[better_size];
-      size = better_size;
+    if (m_length == 0) {
+      m_elements = new T[better_size];
+      m_size = better_size;
     } else {
       error(error_code::close_app);
     }
@@ -136,7 +136,7 @@ public:
     return at(i);
   };
   fixed_array<T>& operator=(std::initializer_list<T> i_list) {
-    if (size) {
+    if (m_size) {
       clear();
     }
     reserve(static_cast<u32>(i_list.size()));
@@ -152,44 +152,44 @@ public:
 template<class T>
 class array : public fixed_array<T>{
 public:
-  T* elements = nullptr; // contents of array
-  u32 size    = 0; // allocated space
-  u32 length  = 0; // count of elements inserted
+  T* m_elements = nullptr; // contents of array
+  u32 m_size    = 0; // allocated space
+  u32 m_length  = 0; // count of elements inserted
 
   array() {};
 
   void push(T elem) {
-    elements[length] = elem;
-    length++;
+    m_elements[m_length] = elem;
+    m_length++;
 
-    if (length == size) {
-      reserve(u32(ceil_i(f32(size) * 1.5f)));
+    if (m_length == m_size) {
+      reserve(u32(ceil_i(f32(m_size) * 1.5f)));
     }
   };
   void reserve(u32 better_size) {
-    if (length == 0) {
-      elements = new T[better_size];
-      size = better_size;
+    if (m_length == 0) {
+      m_elements = new T[better_size];
+      m_size = better_size;
     } else {
-      T* old_elements = elements;
-      elements = new T[better_size];
-      for (u32 i = 0; i < length; i++) {
-        elements[i] = old_elements[i];
+      T* old_elements = m_elements;
+      m_elements = new T[better_size];
+      for (u32 i = 0; i < m_length; i++) {
+        m_elements[i] = old_elements[i];
       }
 
       // TODO callback for reference stability?
 
       delete old_elements;
-      size = better_size;
+      m_size = better_size;
     }
   }
 
   array& operator+=(const array other) {
-    u32 total_length = length + other.length;
+    u32 total_length = m_length + other.m_length;
     reserve(total_length);
     
-    for (u32 i = length; i < total_length; i++) {
-      elements[i] = other[i];
+    for (u32 i = m_length; i < total_length; i++) {
+      m_elements[i] = other[i];
     }
     return *this;
   };

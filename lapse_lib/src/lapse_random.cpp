@@ -6,8 +6,8 @@ namespace lapse{
 
 class Random{
 public:
-  std::default_random_engine engine;
-  std::uniform_int_distribution<u64> dist;
+  std::default_random_engine m_engine;
+  std::uniform_int_distribution<u64> m_dist;
 
  static Random& the() {
     static Random* my_rng = nullptr;
@@ -19,7 +19,7 @@ public:
 };
 
 u64 rand_integer() {
-  return Random::the().dist(Random::the().engine);
+  return Random::the().m_dist(Random::the().m_engine);
 }
 
 f64 rand_float() {

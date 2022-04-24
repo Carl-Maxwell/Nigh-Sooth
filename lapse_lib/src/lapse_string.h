@@ -7,7 +7,7 @@
 namespace lapse{
 
 struct str{
-  array<u8> characters;
+  array<u8> m_characters;
 
   str();
   str(const char* c_str);

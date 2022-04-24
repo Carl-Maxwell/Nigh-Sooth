@@ -31,40 +31,40 @@ public:
       T value{0};
     };
 
-    list_node* front = nullptr;
-    list_node* last_node  = nullptr;
+    list_node* m_front = nullptr;
+    list_node* m_last_node  = nullptr;
 
     list_node* last() {
-      if (last_node) { return last_node; }
-      list_node* temp = front;
+      if (m_last_node) { return m_last_node; }
+      list_node* temp = m_front;
       while (temp->next != nullptr) {
         temp = temp->next;
       }
-      last_node = temp;
-      return last_node;
+      m_last_node = temp;
+      return m_last_node;
     };
     void push(T that_value) {
       list_node* a_node = new list_node;
       a_node->value = that_value;
 
-      if (!front) {
-        front = a_node;
+      if (!m_front) {
+        m_front = a_node;
       } else {
-        front ->prev = a_node;
-        a_node->next = front;
-        front = a_node;
+        m_front ->prev = a_node;
+        a_node->next = m_front;
+        m_front = a_node;
       }
     }
     void remove(list_node* bad_node) {
       // TODO edge case: bad_node isn't in list
 
-      last_node = nullptr; // break cache
+      m_last_node = nullptr; // break cache
       // TODO only need to break cache if bad_node == last_node I think?
 
-      if (bad_node == front && front->next) {
+      if (bad_node == m_front && m_front->next) {
         // bad_node is front & list has elements
-        front = front->next;
-        front->prev = nullptr;
+        m_front = m_front->next;
+        m_front->prev = nullptr;
       } else if (bad_node->prev && bad_node->next) {
         // bad_node is in the middle of the list somewhere
         bad_node->prev->next = bad_node->next;
@@ -73,11 +73,11 @@ public:
         // bad_node is at the end of the list
         bad_node->prev->next = nullptr;
         bad_node->prev = nullptr;
-      } else if (bad_node == front &&
+      } else if (bad_node == m_front &&
         (bad_node->prev == nullptr && bad_node->next == nullptr)
       ) {
         // bad_node is the only node
-        front = nullptr;
+        m_front = nullptr;
       }
 
       bad_node = nullptr; // TODO is this the right way to do this?
@@ -85,32 +85,32 @@ public:
       delete bad_node;
     }
     inline bool is_empty() {
-      return front == nullptr;
+      return m_front == nullptr;
     }
 
     // iterator
 
     struct iterator{
-      list_node* my_node = nullptr;
+      list_node* m_node = nullptr;
 
       // prefix ++ operator
-      iterator& operator++() { my_node = my_node->next; return *this; };
+      iterator& operator++() { m_node = m_node->next; return *this; };
       // unary * operator
-      list_node* operator*() { return my_node; };
+      list_node* operator*() { return m_node; };
       // ==
       inline bool operator==(iterator& right) {
-        return my_node == right.my_node;
+        return m_node == right.m_node;
       };
     };
 
-    iterator begin() { return iterator(front ); };
+    iterator begin() { return iterator(m_front ); };
     iterator end()   { return iterator{nullptr}; };
 
   };
 public:
-  noexcept_list<error_code> queue_of_errors;
+  noexcept_list<error_code> m_queue_of_errors;
 
-  std::function<void(error_code)> callback;
+  std::function<void(error_code)> m_callback;
 
   static LapseErrorQueue& the() {
     static LapseErrorQueue* my_error_queue = nullptr;
@@ -121,15 +121,15 @@ public:
   };
 
   void register_callback(std::function<void(error_code)> a_callback) {
-    callback = a_callback;
+    m_callback = a_callback;
     // TODO crash if this is called twice
   };
 
   void tick() {
-    if (callback && !queue_of_errors.is_empty()) {
-      for (auto err : queue_of_errors) {
-        callback(err->value);
-        queue_of_errors.remove(err);
+    if (m_callback && !m_queue_of_errors.is_empty()) {
+      for (auto err : m_queue_of_errors) {
+        m_callback(err->value);
+        m_queue_of_errors.remove(err);
         
         // TODO why isn't err an iterator? for some reason it's a list_node*
       }
