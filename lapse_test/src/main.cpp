@@ -3,7 +3,7 @@
 
 #include "lapse_lib.h"
 
-// #include "string_test.cpp"
+bool string_test();
 
 using namespace lapse;
 
@@ -359,7 +359,7 @@ int main() {
     }
   }
 
-  
+  string_test();
 
   return 0;
 }

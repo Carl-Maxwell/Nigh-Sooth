@@ -5,19 +5,27 @@
 
 namespace lapse{
 
-str::str() {}
+str::str() : m_characters(1) {}
 
 str::str(const char* c_str) {
+  u32 c_str_length = 0;
+  while (c_str[c_str_length++] != '\0') { }
+  m_characters.reserve(c_str_length);
+
   u32 i = 0;
   while (c_str[i] != '\0') { m_characters.push(c_str[i]); i++; }
 };
 
 str::str(char* c_str) {
+  u32 c_str_length = 0;
+  while (c_str[c_str_length++] != '\0') { }
+  m_characters.reserve(c_str_length);
+
   u32 i = 0;
   while (c_str[i] != '\0') { m_characters.push(c_str[i]); i++; }
 };
 
-str::str(char c_str) { m_characters.push(c_str); }
+str::str(char c_str) { m_characters.reserve(3); m_characters.push(c_str); }
 
 u64 str::as_binary() { return 0; }
 

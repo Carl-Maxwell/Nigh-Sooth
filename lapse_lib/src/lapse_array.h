@@ -158,6 +158,7 @@ public:
   u32 m_length  = 0; // count of elements inserted
 
   array() {};
+  array(u32 start_size) { reserve(start_size); };
 
   void push(T elem) {
     m_elements[m_length] = elem;

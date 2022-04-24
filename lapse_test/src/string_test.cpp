@@ -1,4 +1,4 @@
-/*
+
 #include "lapse_lib.h"
 
 using namespace lapse;
@@ -23,4 +23,4 @@ bool string_test(){
 
   return good;
 }
-*/
+
