@@ -1,0 +1,3 @@
+[submodule "sooth_engine/vendor/glfw"]
+	path = sooth_engine/vendor/glfw
+	url = https://github.com/Carl-Maxwell/glfw
