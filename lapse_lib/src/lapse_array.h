@@ -1,8 +1,9 @@
 #pragma once
 
-#include "lapse_lib.h"
-
+#include "lapse_scalar.h"
 #include "lapse_math.h"
+#include "lapse_lambda.h"
+#include "lapse_exceptions.h"
 
 #include <initializer_list>
 
