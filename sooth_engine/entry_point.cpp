@@ -31,13 +31,16 @@ int main(void)
     return -1;
 
   // window:
-  // int WIDTH = 1280, HEIGHT = 720;
-  int WIDTH = 1920, HEIGHT = 1080;
+  int WIDTH = 1280, HEIGHT = 720;
+  // int WIDTH = 1920, HEIGHT = 1080;
+
   glfw_window = glfwCreateWindow(WIDTH, HEIGHT, "Sooth Engine Test", NULL, NULL);
 
   // borderless window:
   // int WIDTH = 1920, HEIGHT = 1080;
   // window = glfwCreateWindow(WIDTH, HEIGHT, "Sooth Engine Test", glfwGetPrimaryMonitor(), NULL);
+
+  glfwWindowHint(GLFW_RESIZABLE, true);
 
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
@@ -100,4 +103,32 @@ void set_glfw_event_callbacks(GLFWwindow* glfw_window) {
       mouse.x = x_pos;
       mouse.y = y_pos;
   } );
+  
+  //
+  // Window events
+  //
+
+  glfwSetWindowPosCallback (glfw_window, 
+    [](GLFWwindow* glfw_window, i32 x_pos, i32 y_pos){
+      // std::cout << "Window position event x: " << x_pos << " y:" << y_pos << "\n";
+  } );
+
+  glfwSetWindowSizeCallback( glfw_window,
+    [](GLFWwindow* glfw_window, i32 width, i32 height){
+      std::cout << "window size event! ... this shouldn't realy happen" << "\n";
+      // TODO maybe throw an error?
+  } );
+
+  glfwSetWindowFocusCallback (glfw_window,
+    [](GLFWwindow* glfw_window, i32 focused){
+      std::cout
+        << "Event: window focus callback ... focused: " 
+        << (focused ? "focus gained!" : "focus lost : (") 
+        << "\n";
+  } );
+
+  glfwSetWindowRefreshCallback(glfw_window, [](GLFWwindow* glfw_window){
+    std::cout << "Event: window refresh event triggered\n";
+  });
+
 };
