@@ -1,9 +1,9 @@
 # Nigh Sooth
-Nigh Sooth is a game engine project I'm making from scratch (as much as I can). I'm working on it as a way of learning about game engine programming.
+Nigh Sooth is a game engine project. I'm working on it as a way of learning about game engine programming.
 
-It uses glfw & stb_image, but hopefully won't have other dependencies. It wasn't going to use the standard library (implementing basic functionality is helpful for learning purposes), but has ended up depending on more and more of it (std::function, std::initializer_list, etc). I hope to go back and implement that stuff properly from scratch in the future and I'm trying to limit how far that stuff reaches into the codebase.
+It uses glfw, glew, & stb_image, but I'm trying to avoid using external libraries as much as I can. It wasn't going to use the standard library (implementing basic functionality is helpful for learning purposes), but has ended up depending on more and more of it (std::function, std::initializer_list, etc). I hope to go back and implement that stuff properly from scratch in the future and I'm trying to limit how far that stuff reaches into the codebase.
 
-All the code in this repo is in the public domain, excepting any submodules, and the premake/ folder which contains the premake exe & license file.
+This project is in the public domain, I've included license.txt files in each of the source code folders specifying that. The libraries (the /vendor/ folders, premake folder, etc) are obviously their own various licenses.
 
 I plan for the project to be broken up into various sub projects:
 
