@@ -29,11 +29,6 @@
 // TODO binary_tree
 // TODO slot_map (for UIDs)
 
-// various math types
-
-// TODO vec2, vec3, vec4, mat4x4
-// TODO euler, quaternion, etc
-
 // logging utilities
 
 // TODO to_string

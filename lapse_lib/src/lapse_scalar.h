@@ -4,6 +4,10 @@
 
 namespace lapse{
 
+//-----------------------------------------------------------------------------
+// Basic Scalar types (ints & floats)
+//-----------------------------------------------------------------------------
+
 // signed integers
 
 typedef int8_t  i8;
@@ -32,8 +36,8 @@ const u64 u64_max = u64(-1); // 2**64
 
 // floats
 
-typedef float f16;  // IEEE 754 16-bit half   precision (binary16)
-typedef float f32;  // IEEE 754 32-bit single precision (binary32)
+// typedef float  f16;  // IEEE 754 16-bit half precision (binary16)
+typedef float  f32;  // IEEE 754 32-bit single precision (binary32)
 typedef double f64; // IEEE 754 64-bit double precision (binary64)
 
 // float constants:
@@ -55,8 +59,59 @@ const u32 f32_bitmask_sign_bit     = 0b1000'0000'0000'0000'0000'0000'0000'0000;
 const u32 f32_bitmask_exponent     = 0b0111'1111'1000'0000'0000'0000'0000'0000;
 const u32 f32_bitmask_mantissa     = 0b0000'0000'0111'1111'1111'1111'1111'1111;
 
-const u64 f64_significant_digits   =  16;
+const u64 f64_significant_digits   = 16;
 
 // TODO need to test out these f32 & f64 constants
+
+//-----------------------------------------------------------------------------
+// Algebraic vectors, also used for specifying colors
+//-----------------------------------------------------------------------------
+
+template<typename T=f32>
+struct vec2{
+  union { T x, r; };
+  union { T y, g; };
+};
+
+template<typename T=f32>
+struct vec3{
+  union { T x, r; };
+  union { T y, g; };
+  union { T z, b; };
+};
+
+template<typename T=f32>
+struct vec4{
+  union { T x, r; };
+  union { T y, g; };
+  union { T z, b; };
+  union { T w, a; };
+};
+
+// TODO need vector math funcs
+
+//-----------------------------------------------------------------------------
+// Angles
+//-----------------------------------------------------------------------------
+
+// describes a euler angle
+struct euler{
+  f32 pitch;
+  f32 yaw;
+  f32 roll;
+  // TODO euler funcs 
+};
+
+// used for 3D rotations
+struct quaternion{
+  vec4<> components;
+  // TODO quaternion funcs
+};
+
+//-----------------------------------------------------------------------------
+// Matrices
+//-----------------------------------------------------------------------------
+
+// TODO mat4x4
 
 };
