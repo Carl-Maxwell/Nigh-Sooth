@@ -153,45 +153,45 @@ public:
 template<class T>
 class array : public fixed_array<T>{
 public:
-  T* m_elements = nullptr; // contents of array
-  u32 m_size    = 0; // allocated space
-  u32 m_length  = 0; // count of elements inserted
+  // T* m_elements = nullptr; // contents of array
+  // u32 m_size    = 0; // allocated space
+  // u32 m_length  = 0; // count of elements inserted
 
   array() {};
   array(u32 start_size) { reserve(start_size); };
 
   void push(T elem) {
-    m_elements[m_length] = elem;
-    m_length++;
+    this->m_elements[this->m_length] = elem;
+    this->m_length++;
 
-    if (m_length == m_size) {
-      reserve(u32(ceil_i(f32(m_size) * 1.5f)));
+    if (this->m_length == this->m_size) {
+      reserve(u32(ceil_i(f32(this->m_size) * 1.5f)));
     }
   };
   void reserve(u32 better_size) {
-    if (m_length == 0) {
-      m_elements = new T[better_size];
-      m_size = better_size;
+    if (this->m_length == 0) {
+      this->m_elements = new T[better_size];
+      this->m_size = better_size;
     } else {
-      T* old_elements = m_elements;
-      m_elements = new T[better_size];
-      for (u32 i = 0; i < m_length; i++) {
-        m_elements[i] = old_elements[i];
+      T* old_elements = this->m_elements;
+      this->m_elements = new T[better_size];
+      for (u32 i = 0; i < this->m_length; i++) {
+        this->m_elements[i] = old_elements[i];
       }
 
       // TODO callback for reference stability?
 
       delete old_elements;
-      m_size = better_size;
+      this->m_size = better_size;
     }
   }
 
   array& operator+=(const array other) {
-    u32 total_length = m_length + other.m_length;
+    u32 total_length = this->m_length + other.m_length;
     reserve(total_length);
     
-    for (u32 i = m_length; i < total_length; i++) {
-      m_elements[i] = other[i];
+    for (u32 i = this->m_length; i < total_length; i++) {
+      this->m_elements[i] = other[i];
     }
     return *this;
   };

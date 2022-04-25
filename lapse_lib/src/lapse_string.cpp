@@ -42,7 +42,7 @@ str& str::concat(const str& other) {
 
 u32 str::length() { return m_characters.length(); }
 
-str str::slice() { return *this;  }
+str str::slice() { return *this; }
 
 str str::scrub() { return *this; }
 
@@ -62,7 +62,7 @@ array<str> str::split(str sep) {
 
 array<u8> str::to_array() { return m_characters; };
 
-char* str::to_c_str() { 
+char* str::to_c_str() {
   char* c = new char[m_characters.length()+1];
   for (u32 i = 0; i < m_characters.length(); i++) {
     c[i] = (char)m_characters[i];
