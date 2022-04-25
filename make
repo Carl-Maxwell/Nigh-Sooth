@@ -1,1 +1,1 @@
-./premake/premake5.exe vs2022
+./premake/premake5.exe --verbose vs2022
