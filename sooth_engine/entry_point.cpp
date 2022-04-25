@@ -15,9 +15,15 @@ struct mouse_obj{
   } buttons;
 } mouse;
 
+void set_glfw_event_callbacks(GLFWwindow* glfw_window);
+
 int main(void)
 {
   GLFWwindow* glfw_window;
+
+  glfwSetErrorCallback([](int error, const char* description) {
+    std::cout << "glfw error #" << error << ": " << description << "\n";
+  } );
 
   // initialize glfw
 
@@ -33,6 +39,8 @@ int main(void)
   // int WIDTH = 1920, HEIGHT = 1080;
   // window = glfwCreateWindow(WIDTH, HEIGHT, "Sooth Engine Test", glfwGetPrimaryMonitor(), NULL);
 
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
   if (!glfw_window) {
     glfwTerminate();
     return -1;
@@ -40,9 +48,29 @@ int main(void)
 
   glfwMakeContextCurrent(glfw_window);
 
+  set_glfw_event_callbacks(glfw_window);
+
+  while (!glfwWindowShouldClose(glfw_window)) {
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    glfwSwapBuffers(glfw_window);
+
+    glfwPollEvents();
+  }
+
+  glfwTerminate();
+  return 0;
+}
+
+
+void set_glfw_event_callbacks(GLFWwindow* glfw_window) {
   glfwSetKeyCallback(glfw_window,
     [](GLFWwindow* window, int glfw_key, int scancode, int action, int mods) {
       std::cout << "keyboard event!" << "\n";
+
+      if (glfw_key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE) {
+
+      }
   } );
   glfwSetMouseButtonCallback(glfw_window,
     [](GLFWwindow* glfw_window, int button, int action, int mods) {
@@ -72,15 +100,4 @@ int main(void)
       mouse.x = x_pos;
       mouse.y = y_pos;
   } );
-
-  while (!glfwWindowShouldClose(glfw_window)) {
-    glClear(GL_COLOR_BUFFER_BIT);
-
-    glfwSwapBuffers(glfw_window);
-
-    glfwPollEvents();
-  }
-
-  glfwTerminate();
-  return 0;
-}
+};
