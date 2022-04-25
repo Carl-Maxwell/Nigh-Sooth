@@ -62,16 +62,16 @@ int main(void)
   return 0;
 }
 
-
 void set_glfw_event_callbacks(GLFWwindow* glfw_window) {
   glfwSetKeyCallback(glfw_window,
-    [](GLFWwindow* window, int glfw_key, int scancode, int action, int mods) {
+    [](GLFWwindow* glfw_window, int glfw_key, int scancode, int action, int mods) {
       std::cout << "keyboard event!" << "\n";
 
       if (glfw_key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE) {
-
+        glfwSetWindowShouldClose(glfw_window, GLFW_TRUE);
       }
   } );
+
   glfwSetMouseButtonCallback(glfw_window,
     [](GLFWwindow* glfw_window, int button, int action, int mods) {
       bool pressed = action == GLFW_PRESS;
