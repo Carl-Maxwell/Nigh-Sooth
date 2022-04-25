@@ -1,3 +1,6 @@
+#define GLEW_STATIC
+#include <GL/glew.h>
+
 #include <GLFW/glfw3.h>
 
 #include "lapse_lib.h"
@@ -51,7 +54,34 @@ int main(void)
 
   glfwMakeContextCurrent(glfw_window);
 
+  //
+  // Initialize glew
+  //
+
+  {
+    GLenum glew_error = glewInit(); // GLenum is just a u32 typedef
+    if (glew_error != GLEW_OK) {
+      fprintf(stderr, "glew init error: %s\n", glewGetErrorString(glew_error));
+    }
+    fprintf(stdout, "Status: Using glew %s\n", glewGetString(GLEW_VERSION));
+    std::cout << glGetString(GL_VERSION) << "\n";
+  }
+
   set_glfw_event_callbacks(glfw_window);
+
+  // Shader
+
+  auto fragment_shader_text =
+      "#version 110"                       "\n"
+      "varying vec3 color;"                "\n"
+      "void main()"                        "\n"
+      "{"                                  "\n"
+      "  gl_FragColor = vec4(color, 1.0);" "\n"
+      "};"                                 "\n";
+
+  auto fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
+  glShaderSource(fragment_shader, 1, &fragment_shader_text, NULL);
+  glCompileShader(fragment_shader);
 
   while (!glfwWindowShouldClose(glfw_window)) {
     glClear(GL_COLOR_BUFFER_BIT);
