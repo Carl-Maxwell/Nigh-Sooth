@@ -19,6 +19,16 @@ struct mouse_obj{
 } mouse;
 
 void set_glfw_event_callbacks(GLFWwindow* glfw_window);
+void opengl_debug_callback(
+  u32 source,
+  u32 type,
+  u32 id,
+  u32 severity,
+  i32 length,
+  const char *message,
+  const void *userParam
+);
+void shaderCompileStatus(u32 shader_id, str name);
 
 int main(void)
 {
@@ -34,19 +44,23 @@ int main(void)
     return -1;
 
   // window:
-  int WIDTH = 1280, HEIGHT = 720;
-  // int WIDTH = 1920, HEIGHT = 1080;
+  i32 WIDTH = 1280, HEIGHT = 720;
+  // i32 WIDTH = 1920, HEIGHT = 1080;
 
   glfw_window = glfwCreateWindow(WIDTH, HEIGHT, "Sooth Engine Test", NULL, NULL);
 
   // borderless window:
-  // int WIDTH = 1920, HEIGHT = 1080;
+  // i32 WIDTH = 1920, HEIGHT = 1080;
   // window = glfwCreateWindow(WIDTH, HEIGHT, "Sooth Engine Test", glfwGetPrimaryMonitor(), NULL);
+
+  // unsigned casts
+  u32 WIDTH_U  = u32(WIDTH);
+  u32 HEIGHT_U = u32(HEIGHT);
 
   glfwWindowHint(GLFW_RESIZABLE, true);
 
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+  // glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+  // glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
   if (!glfw_window) {
     glfwTerminate();
     return -1;
@@ -64,32 +78,157 @@ int main(void)
       fprintf(stderr, "glew init error: %s\n", glewGetErrorString(glew_error));
     }
     fprintf(stdout, "Status: Using glew %s\n", glewGetString(GLEW_VERSION));
-    std::cout << glGetString(GL_VERSION) << "\n";
+    std::cout << "using opengl version: " << glGetString(GL_VERSION) << "\n";
   }
+
+  //
+  //
+  //
 
   set_glfw_event_callbacks(glfw_window);
 
+  //
+  // handle opengl errors
+  //
+
+  glEnable(GL_DEBUG_OUTPUT);
+  glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+  glDebugMessageCallback(opengl_debug_callback, NULL);
+  
+  //
+  //
+  //
+
+  float positions[] = {
+    // triangle one: 
+      -1.00f, -1.00f,
+       1.00f,  1.00f,
+       1.00f, -1.00f,
+
+    // triangle two:
+      -1.00f, -1.00f,
+      -1.00f,  1.00f,
+       1.00f,  1.00f
+  };
+
+  u32 buffer;
+  glGenBuffers(1, &buffer);
+  glBindBuffer(GL_ARRAY_BUFFER, buffer);
+  glBufferData(GL_ARRAY_BUFFER, 12 * sizeof(f32), positions, GL_STATIC_DRAW);
+
+  glEnableVertexAttribArray(0);
+  glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(f32) * 2, 0);
+
+  //
   // Shader
+  //
+
+  // vertex shader
+
+  auto vertex_shader_text =
+    "#version 400"                                       "\n"
+    "layout(location = 0) in vec4 position;"             "\n"
+    // "uniform mat4 MVP;"                               "\n"
+    // "in vec3 vCol;"                                      "\n"
+    // "in vec2 vPos;"                                      "\n"
+    // "out vec4 color;"                                    "\n"
+    "void main(){"                                       "\n"
+    // "  gl_Position = vec4(vPos, 0.0, 1.0);"              "\n"
+    "  gl_Position = position;"                           "\n"
+    // "  color = vec4(1.0f);"                             "\n"
+    "}\n";
+
+  u32 vertex_shader = glCreateShader(GL_VERTEX_SHADER);
+  glShaderSource(vertex_shader, 1, &vertex_shader_text, NULL);
+  glCompileShader(vertex_shader);
+
+  shaderCompileStatus(vertex_shader, "vertex");
+
+  // fragment shader
 
   auto fragment_shader_text =
-      "#version 110"                       "\n"
-      "varying vec3 color;"                "\n"
-      "void main()"                        "\n"
-      "{"                                  "\n"
-      "  gl_FragColor = vec4(color, 1.0);" "\n"
-      "};"                                 "\n";
+    "#version 400 core"                                     "\n"
+    "uniform sampler2D u_texture;"                          "\n"
+    "in vec4 gl_FragCoord;"                                 "\n"
+    "void main()"                                           "\n"
+    "{"                                                     "\n"
+    "  gl_FragColor = vec4(1.0f, 0.0f, 0.0f, 1.0f);"                          "\n"
+    // "  gl_FragColor = texture(u_texture, gl_FragCoord.xy);" "\n"
+    "};"                                                    "\n";
 
-  auto fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
-  glShaderSource(fragment_shader, 1, &fragment_shader_text, NULL);
+  u32 fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
+  glShaderSource(fragment_shader, 1, &fragment_shader_text, nullptr);
   glCompileShader(fragment_shader);
+
+  shaderCompileStatus(fragment_shader, "fragment");
+
+  // combine shaders into shader program
+
+  u32 program = glCreateProgram();
+  glAttachShader(program, vertex_shader);
+  glAttachShader(program, fragment_shader);
+  glLinkProgram(program);
+  glValidateProgram(program);
+
+  glDeleteShader(vertex_shader);
+  glDeleteShader(fragment_shader);
+
+  glUseProgram(program);
+
+  //
+  // creating a route to send pixels to opengl
+  //
+
+  // pixels
+
+  vec4<u8>* pixels = new vec4<u8>[WIDTH * HEIGHT];
+
+  // creating opengl texture
+
+  u32 opengl_pixel_buffer_id;
+
+  glGenTextures(1, &opengl_pixel_buffer_id);
+  glBindTexture(GL_TEXTURE_2D, opengl_pixel_buffer_id);
+
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, WIDTH, HEIGHT, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+  // glBindTexture(GL_TEXTURE_2D, 0);
+
+  glActiveTexture(GL_TEXTURE0);
+  // glBindTexture(GL_TEXTURE_2D, opengl_pixel_buffer_id);
+
+  i32 opengl_pixel_buffer_location = glGetUniformLocation(program, "u_texture");
+  glUniform1i(opengl_pixel_buffer_location, opengl_pixel_buffer_id);
 
   while (!glfwWindowShouldClose(glfw_window)) {
     glClear(GL_COLOR_BUFFER_BIT);
+
+    for (u32 x = 0; x < WIDTH_U; x++) {
+      for (u32 y = 0; y < HEIGHT_U; y++) {
+        pixels[x + y*WIDTH_U].r = die(256)-1;
+        pixels[x + y*WIDTH_U].g = die(256)-1;
+        pixels[x + y*WIDTH_U].b = die(256)-1;
+        pixels[x + y*WIDTH_U].a = 255;
+      }
+    }
+
+    // glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, WIDTH, HEIGHT, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+
+    // glUniformMatrix4fv(mvp_location, 1, GL_FALSE, (const GLfloat*) mvp);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
 
     glfwSwapBuffers(glfw_window);
 
     glfwPollEvents();
   }
+
+  glDeleteProgram(program);
+
+  glfwDestroyWindow(glfw_window);
 
   glfwTerminate();
   return 0;
@@ -162,3 +301,51 @@ void set_glfw_event_callbacks(GLFWwindow* glfw_window) {
   });
 
 };
+
+void opengl_debug_callback(
+  u32 source,
+  u32 type,
+  u32 id,
+  u32 severity,
+  i32 length,
+  const char *message,
+  const void *userParam
+) {
+  if (id == 131'185 && severity == 33'387) { return; }
+  std::cout 
+    << "opengl error: {"              "\n\t" 
+    << "source " << source << " "     "\n\t"
+    << "type " << type <<             "\n\t"
+    << "#" << id <<                   "\n\t"
+    << "severity: " << severity <<    "\n\t"
+    << "length: " << length <<        "\n\t"
+    << message <<                     "\n\t"
+    << "user param: " << userParam << "\n"
+    << "}\n";
+
+    __debugbreak();
+}
+
+void shaderCompileStatus(u32 shader_id, str name) {
+  i32 shader_compile_status;
+  glGetShaderiv(shader_id, GL_COMPILE_STATUS, &shader_compile_status);
+
+  if (shader_compile_status == GL_FALSE) {
+
+    std::cout
+      << "validating " << name.to_c_str() << " shader ... {\n\t"
+      << "shader program compile status: " << shader_compile_status << "\n\t";
+
+    i32 length;
+    glGetShaderiv(shader_id, GL_INFO_LOG_LENGTH, &length);
+    char* info_log = (char*)alloca(length * sizeof(char));
+    glGetShaderInfoLog(shader_id, length, &length, info_log);
+
+    std::cout 
+      << "\t info_log (length " << length << "): " << info_log
+      << "\n}\n";
+  } else {
+    std::cout << "opengl " << name.to_c_str() << " shader compiled successully (we hope)\n";
+  }
+
+}
