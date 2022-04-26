@@ -1,5 +1,6 @@
 
 #include "lapse_scalar.h"
+#include "lapse_math.h"
 
 namespace lapse{
 
@@ -10,25 +11,27 @@ char* u32_to_c_str(u32 in) {
 
   if (in == 0) { return (char*)"0"; }
 
-  u32 length = 0;
+  u32 length = logarithm_i(10, f32(in));
+
+  u32 str_pos = 0;
   u32 tens = 1; // which tens place we're looking at
-  while (in/tens > 0) {
+  while (str_pos < length) {
     tens *= 10;
-    length++;
+    str_pos++;
   }
 
-  tens /= 10;
+  length += 1;
 
   output = new char[length + 1]; // +1 accounts for null terminator
-  u32 i = 0;
+  str_pos = 0;
   
-  while (in > 0) {
-    output[i++] = '0' + in/tens;
+  while (str_pos < length) {
+    output[str_pos++] = '0' + in/tens;
     in -= in/tens*tens;
     tens /= 10;
   }
 
-  output[i++] = '\0';
+  output[str_pos++] = '\0';
 
   return output;
 };

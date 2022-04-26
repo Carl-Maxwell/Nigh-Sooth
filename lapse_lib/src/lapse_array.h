@@ -190,9 +190,11 @@ public:
     u32 total_length = this->m_length + other.m_length;
     reserve(total_length);
     
-    for (u32 i = this->m_length; i < total_length; i++) {
-      this->m_elements[i] = other[i];
+    for (u32 i = this->m_length, other_i = 0; i < total_length; i++) {
+      this->m_elements[i] = other[other_i++];
     }
+
+    this->m_length = total_length;
     return *this;
   };
 

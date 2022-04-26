@@ -46,6 +46,7 @@ str str::slice() { return *this; }
 
 str str::scrub() { return *this; }
 
+// not implemented yet
 array<str> str::split(str sep) {
   for (u32 i = 0; i < length(); i++) {
     __debugbreak();
@@ -104,11 +105,10 @@ yaml str::to_yaml() { return yaml{}; }
 
 str str::trim() { return str{}; }
 
-str& str::operator+(str right_value) {
+str str::operator+(str right_value) {
   str temp_str = *this;
   temp_str += right_value;
   return temp_str;
-  // TODO is this a lifetime issue? the compiler is saying that temp_str will be invalid once it leaves this func
 };
 
 str& str::operator+=(const str right_value) {

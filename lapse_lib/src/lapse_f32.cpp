@@ -6,6 +6,13 @@
 
 namespace lapse{
 
+f64 f32_obj::window_start() {
+  return pow(2, f32(exponent()));
+};
+f64 f32_obj::window_end() {
+  return pow(2, f32(1 + exponent()));
+};
+
 
 //-----------------------------------------------------------------------------
 // float funcs

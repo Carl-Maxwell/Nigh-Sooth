@@ -42,7 +42,7 @@ struct str{
   // remove leading and trailing whitespace
   str trim();
 
-  str& operator+(str right_value);
+  str  operator+(str right_value);
   str& operator+=(const str right_value);
   str& operator=(str right_value);
   str& operator=(char* right_value);

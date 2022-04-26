@@ -1,7 +1,8 @@
 #include "lapse_scalar.h"
 
-
 #include "intrin.h"
+
+#include "lapse_f32.h"
 
 namespace lapse{
 
@@ -67,7 +68,7 @@ f64 pow(f32 base, f32 exponent) {
 
   f64 temp = 1;
   for (int i = 0; i < exponent; i++) {
-    temp *= base;
+    temp *= f64(base);
   }
   return temp;
 }
@@ -76,9 +77,26 @@ f64 pow(f32 base, f32 exponent) {
 //   "log base 2 of 8 is asking, 2 to the what equals 8?"
 //   base**? = big_number
 i32 logarithm_i(f32 base, f32 big_number) {
-  i32 exponent = 1;
-  for ( ; pow(base, f32(exponent)) < big_number; exponent++ ) {}
-  return exponent;
+  i32 exponent    = 1;
+  f64 range_start = base;
+  f64 range_end   = base*base;
+
+  while (true) {
+    if (range_start <= big_number && big_number < range_end) {
+      return exponent;
+    }
+    exponent++;
+    range_start = pow(base, f32(exponent));
+    range_end   = pow(base, f32(exponent+1));
+
+    if (f32_obj(range_start).is_inf() || f32_obj(range_end).is_inf()) {
+      __debugbreak();
+    }
+
+    // TODO should probably do some asserts above to avoid infinite loops here
+  }
+
+  return i32_max;
 }
 
 f64 sqrt(f64 big_number) {

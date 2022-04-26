@@ -1,13 +1,15 @@
 #pragma once
 
 #include "lapse_scalar.h"
-#include "lapse_math.h"
 
 namespace lapse{
 
 //-----------------------------------------------------------------------------
 // f32_obj
 //-----------------------------------------------------------------------------
+
+// The terms window and offset were inspired by this article:
+//   https://fabiensanglard.net/floating_point_visually_explained/
 
 // f32 enriched with methods
 struct f32_obj{
@@ -18,7 +20,7 @@ struct f32_obj{
     //   each number below specifies the sizeof() that struct member in bits
     struct {
       unsigned int offset : f32_mantissa_bits; // mantissa
-      unsigned int window : f32_exponent_bits;  // exponent
+      unsigned int window : f32_exponent_bits; // exponent
       unsigned int sign   : 1;
     } bits;
   };
@@ -31,12 +33,8 @@ struct f32_obj{
   i32 exponent() {
     return bits.window - (f32_exponent_min+1);
   }
-  f64 window_start() {
-    return pow(2, f32(exponent()));
-  };
-  f64 window_end() {
-    return pow(2, f32(1 + exponent()));
-  };
+  f64 window_start();
+  f64 window_end();
   // returns percentage of where this number is in its window
   //   so for 3.0f it returns 0.5 because it's in the middle of the 2..4 window
   f64 window_portion() {
@@ -50,6 +48,11 @@ struct f32_obj{
   f64 to_f64() {
     return window_start() * (1.0 + f64(bits.offset) / f64(f32_mantissa_max));
   }
+  bool is_inf() {
+    return exponent() == 128 && bits.offset == 0;
+  };
+  bool if_finite() { return !is_inf(); };
+  bool is_nan() { return bits.sign == 0 && exponent() == 128 && bits.offset != 0; };
 };
 
 //-----------------------------------------------------------------------------

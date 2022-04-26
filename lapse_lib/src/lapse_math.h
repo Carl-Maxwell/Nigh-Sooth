@@ -15,7 +15,6 @@ f64 abs(f64 a);
 
 i64 floor_i(f64 whole);
 
-
 i32 floor_i(f32 whole);
 
 f32 floor_f(f32 whole);

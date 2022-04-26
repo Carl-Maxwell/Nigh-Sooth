@@ -90,7 +90,10 @@ int main() {
 
       std::cout << "37'822'859'361\n" << lapse::pow(21, 8) << "\n";
 
-      std::cout << "u32 1234567 to c_str: " << u32_to_c_str(1234567) << "\n";
+      std::cout << "u32 1000000 to c_str: " << u32_to_c_str(1'000'000) << "\n";
+      std::cout << "u32 1000001 to c_str: " << u32_to_c_str(1'000'001) << "\n";
+      std::cout << "u32 1002001 to c_str: " << u32_to_c_str(1'002'001) << "\n";
+      std::cout << "u32 1234567 to c_str: " << u32_to_c_str(1'234'567) << "\n";
 
       {
         // test f32_to_c_str_base2()
