@@ -11,12 +11,14 @@ project "sooth_engine"
     "entry_point.cpp",
     "src/**.h",
     "src/**.cpp",
+    "%{IncludeDir.stb_image}/**.cpp",
   }
 
   includedirs{
     "%{wks.location}/lapse_lib/src",
     "%{IncludeDir.glfw}/include",
-    "%{IncludeDir.glew}/include"
+    "%{IncludeDir.glew}/include",
+    "%{IncludeDir.stb_image}/",
   }
 
   libdirs{
