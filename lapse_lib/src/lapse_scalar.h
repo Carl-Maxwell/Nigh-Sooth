@@ -45,6 +45,7 @@ typedef double f64; // IEEE 754 64-bit double precision (binary64)
 const u64 f32_significant_digits   =  7;
 const u64 f32_exponent_max         =  127;
 const u64 f32_exponent_min         =  126;
+const u64 f32_exponent_bias        =  127;
 const u64 f32_exponent_max_base_10 =  38;
 const i64 f32_exponent_min_base_10 = -37;
 
@@ -59,7 +60,14 @@ const u32 f32_bitmask_sign_bit     = 0b1000'0000'0000'0000'0000'0000'0000'0000;
 const u32 f32_bitmask_exponent     = 0b0111'1111'1000'0000'0000'0000'0000'0000;
 const u32 f32_bitmask_mantissa     = 0b0000'0000'0111'1111'1111'1111'1111'1111;
 
-const u64 f64_significant_digits   = 16;
+// f64 constants
+
+const u64 f64_significant_digits   =  16; // 15 to 17
+const u64 f64_exponent_max         =  1023;
+const u64 f64_exponent_min         = -1022;
+const u64 f64_exponent_bias        =  1023;
+const u64 f64_exponent_max_base_10 =  38; // 307
+const i64 f64_exponent_min_base_10 = -37; // 307
 
 // TODO need to test out these f32 & f64 constants
 

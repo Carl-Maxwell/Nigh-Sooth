@@ -64,6 +64,10 @@ char* f32_to_c_str_base2(f32_obj in) {
 char* f32_to_c_str(f32_obj in) {
   char* output;
 
+  // TODO easy way to get around this problem: u256_obj and just calculate the exact whole
+  //   haven't thought about negative exponents yet
+
+
   // TODO handle edge cases, like 0, inf, NaN, etc
   // TODO handle large numbers
   // TODO handle signed numbers

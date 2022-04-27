@@ -31,7 +31,7 @@ struct f32_obj{
   f32_obj(i32 in) { value = f32(in); };
 
   i32 exponent() {
-    return bits.window - (f32_exponent_min+1);
+    return bits.window - f32_exponent_bias;
   }
   f64 window_start();
   f64 window_end();
