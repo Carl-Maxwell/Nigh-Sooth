@@ -47,11 +47,12 @@ using namespace lapse;
 namespace{
   PixelEngineApp* app;
   olc::rcode status;
+  i32 pixel_size = 4;
 };
 
-void initialize(u32 screen_width, u32 screen_height, bool fullscreen, str window_name) {
-  i32 pixel_size = 4;
+i32 get_pixel_size() { return pixel_size; }
 
+void initialize(u32 screen_width, u32 screen_height, bool fullscreen, str window_name) {
   app = new PixelEngineApp(window_name);
   status = app->Construct(i32(screen_width), i32(screen_height), pixel_size, pixel_size, fullscreen);
 
@@ -129,4 +130,9 @@ void draw_bitmap(
   }
 }
 
-};
+vec2<i32> get_mouse_pos() {
+  olc::vi2d temp = app->GetWindowMouse();
+  return vec2<i32>{temp.x, temp.y};
+}
+
+}; // end platform namespace

@@ -1,6 +1,8 @@
 
 #include "lapse_lib.h"
 
+#include "sooth_input.h"
+
 #include "platform_olc_pixel.h"
 
 #include "stb_image_namespace.h"
@@ -65,6 +67,8 @@ int main(void) {
     }
 
     platform::draw_bitmap(vec2<>{10, 10}, vec2<>{(f32)img_width, (f32)img_height}, pixels);
+
+    platform::plot(Input::Mouse::get_mouse_pos(), rand_vec3());
   } );
 
   return 0;
