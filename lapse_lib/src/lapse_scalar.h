@@ -119,6 +119,7 @@ struct vec3{
   vec3<T>& operator*=(f32 scalar) {
     x *= scalar;
     y *= scalar;
+    z *= scalar;
 
     return *this;
     // TODO check for lifetime issues

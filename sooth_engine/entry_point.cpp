@@ -64,7 +64,10 @@ int main(void) {
 
     for (f32 y = 0; y < platform::get_window_height(); y++) {
       for (f32 x = 0; x < platform::get_window_width(); x++) {
+        vec3<> color{1, 1, 1};
         // platform::plot(vec2<f32>{x, y}, rand_vec3());
+        color *= (x / platform::get_window_width());
+        platform::plot(vec2<f32>{x, y}, color);
       }
     }
 
