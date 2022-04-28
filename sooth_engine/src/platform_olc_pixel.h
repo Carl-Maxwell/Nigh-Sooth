@@ -10,14 +10,18 @@ void set_initialization_callback(lapse_lambda(void, void) arg_initialization_cal
 
 void set_main_loop_callback(lapse_lambda(void, lapse::f32) main_loop);
 
-lapse::u32 get_frame_count();
+lapse::u64 get_frame_count();
+
+lapse::u32 get_window_width();
+lapse::u32 get_window_height();
 
 void plot(lapse::vec2<> screen_coord, lapse::vec3<> color);
+void plot(lapse::vec2<> screen_coord, lapse::vec3<lapse::u8> color);
 
 void draw_bitmap(
   lapse::vec2<>  screen_coord,
   lapse::vec2<>  image_size,
-  lapse::vec3<>* pixels
+  lapse::vec3<lapse::u8>* pixels
 );
 
 }

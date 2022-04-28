@@ -27,20 +27,44 @@ int main(void) {
 
   // borderless window:
   // u32 WIDTH = 1920, HEIGHT = 1080;
-  // window = glfwCreateWindow(WIDTH, HEIGHT, "Sooth Engine Test", glfwGetPrimaryMonitor(), NULL);
 
   platform::initialize(WIDTH, HEIGHT, false, "Nigh Sooth Engine Test");
 
-  u32 frame_count = 0;
+  str path = "test_image_small.png";
+  i32 img_width, img_height, bytes_per_pixel;
 
-  platform::set_main_loop_callback([WIDTH, HEIGHT, frame_count](f32 delta){
+  unsigned char* raw_pixels = stb::stbi_load(
+    path.to_c_str(),
+    &img_width,
+    &img_height,
+    &bytes_per_pixel,
+    4
+  );
 
-    for (u32 x = 0; x < WIDTH; x++) {
-      for (u32 y = 0; y < HEIGHT; y++) {
-        platform::plot(vec2<f32>(), rand_vec3());
+  vec3<u8>* pixels = new vec3<u8>[img_width * img_height];
+
+  for (u32 i = 0; i < img_width * img_height; i++) {
+    pixels[i] = vec3<u8>{
+      raw_pixels[bytes_per_pixel*i+0],
+      raw_pixels[bytes_per_pixel*i+1],
+      raw_pixels[bytes_per_pixel*i+2]
+    };
+  }
+
+  std::cout << path.to_c_str() << " ,"
+    << " x: " << img_width
+    << " y: " << img_height
+    << " components: " << bytes_per_pixel
+    << "\n";
+
+  platform::set_main_loop_callback([img_width, img_height, pixels](f32 delta){
+    for (f32 y = 0; y < platform::get_window_height(); y++) {
+      for (f32 x = 0; x < platform::get_window_width(); x++) {
+        // platform::plot(vec2<f32>{x, y}, rand_vec3());
       }
     }
 
+    platform::draw_bitmap(vec2<>{10, 10}, vec2<>{(f32)img_width, (f32)img_height}, pixels);
   } );
 
   return 0;

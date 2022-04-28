@@ -14,6 +14,8 @@ class PixelEngineApp : public olc::PixelGameEngine
 {
 public:
   bool m_should_continue_running = true;
+  lapse::u64 frame_count = 0;
+
   PixelEngineApp(lapse::str name) {
     sAppName = name.to_c_str();
   }
@@ -26,12 +28,14 @@ public:
   }
 
   bool OnUserUpdate(float delta) override {
+    frame_count++;
+
     if (main_loop)
       main_loop(delta);
 
-    for (int x = 0; x < ScreenWidth(); x++)
-      for (int y = 0; y < ScreenHeight(); y++)
-        Draw(x, y, olc::Pixel(rand() % 256, rand() % 256, rand() % 256));
+    // for (int x = 0; x < ScreenWidth(); x++)
+    //   for (int y = 0; y < ScreenHeight(); y++)
+    //     Draw(x, y, olc::Pixel(rand() % 256, rand() % 256, rand() % 256));
     return m_should_continue_running;
   }
 };
@@ -72,35 +76,57 @@ void set_main_loop_callback(lapse_lambda(void, f32) arg_main_loop) {
   app->Start();
 };
 
-u32 get_frame_count() {
-  return app->nFrameCount;
+// returns number of frames since game start
+u64 get_frame_count() {
+  return app->frame_count;
 }
+
+lapse::u32 get_window_width()  { return app->ScreenWidth();  }
+lapse::u32 get_window_height() { return app->ScreenHeight(); }
 
 void plot(vec2<> screen_coord, vec3<> color) {
   app->Draw(
     screen_coord.x, screen_coord.y,
-    olc::Pixel(color.r*255, color.g*255, color.b*255)
+    olc::Pixel{u8(color.r*255), u8(color.g*255), u8(color.b*255)}
+  );
+}
+
+void plot(lapse::vec2<> screen_coord, lapse::vec3<u8> color) {
+  app->Draw(
+    screen_coord.x, screen_coord.y,
+    olc::Pixel{color.r, color.g, color.b}
   );
 }
 
 void draw_bitmap(
   vec2<>  screen_coord,
   vec2<>  image_size,
-  vec3<>* pixels
+  vec3<u8>* pixels
 ) {
-  vec2<> current_coord{0, 0};
+  vec2<> current_coord{screen_coord};
   vec2<> end_coord = screen_coord + image_size;
-  for (; current_coord.y < end_coord.y; current_coord.y++) {
-    for(; current_coord.x < end_coord.x; current_coord.x++) {
+
+  u32 image_width = (u32)image_size.x;
+
+  u32 image_x = 0;
+  u32 image_y = 0;
+
+  while (current_coord.y < end_coord.y) {
+    while(current_coord.x < end_coord.x) {
       plot(
         current_coord,
-        pixels[
-          i32(current_coord.x) + i32(current_coord.y)*app->ScreenWidth()
-        ]
+        pixels[image_y*image_width + image_x]
       );
-    }
-  }
 
+      image_x++;
+      current_coord.x++;
+    }
+    current_coord.x = screen_coord.x;
+    image_x = 0;
+
+    image_y++;
+    current_coord.y++;
+  }
 }
 
 };

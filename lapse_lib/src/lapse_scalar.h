@@ -82,6 +82,14 @@ struct vec2{
   union { T x, r; };
   union { T y, g; };
 
+  template<typename DisplayType=f32>
+  void std_cout() {
+    std::cout << " vec2 {\n"
+      << "\tx: " << (DisplayType)x << "\n"
+      << "\ty: " << (DisplayType)y << "\n"
+      << "}\n";
+  }
+
   vec2  operator+(vec2 right_value) {
     vec2 temp;
 
