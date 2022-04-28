@@ -15,20 +15,22 @@ project "sooth_engine"
   }
 
   includedirs{
+    "src/",
     "%{wks.location}/lapse_lib/src",
-    "%{IncludeDir.glfw}/include",
-    "%{IncludeDir.glew}/include",
+    -- "%{IncludeDir.glfw}/include",
+    -- "%{IncludeDir.glew}/include",
     "%{IncludeDir.stb_image}/",
+    "%{IncludeDir.pixel_game_engine}/"
   }
 
-  libdirs{
-    "%{IncludeDir.glew}/lib/Release/x64",
-  }
+  -- libdirs{
+  --   "%{IncludeDir.glew}/lib/Release/x64",
+  -- }
 
   links {
     "lapse_lib",    -- reference to vs project
-    "glfw",         -- reference to vs project
-    "glew32s",      -- reference to specific .lib
+    -- "glfw",         -- reference to vs project
+    -- "glew32s",      -- reference to specific .lib
     "opengl32.lib"  -- reference to specific .lib
   }
 

@@ -125,16 +125,7 @@ public:
     // TODO crash if this is called twice
   };
 
-  void tick() {
-    if (m_callback && !m_queue_of_errors.is_empty()) {
-      for (auto err : m_queue_of_errors) {
-        m_callback(err->value);
-        m_queue_of_errors.remove(err);
-        
-        // TODO why isn't err an iterator? for some reason it's a list_node*
-      }
-    }
-  }
+  void tick();
 };
 
 // TODO need to send in an error_struct like
