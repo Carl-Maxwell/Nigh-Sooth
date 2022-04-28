@@ -14,5 +14,7 @@ f64 rand_range(f64 min, f64 max);
 u32 die(u32 sides);
 // roll {n}d{sides}
 u32 die(u32 n, u32 sides);
+// returns a vec3<f32> with random values from 0..1
+vec3<> rand_vec3();
 
 }

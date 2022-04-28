@@ -1,5 +1,7 @@
 #include "lapse_random.h"
 
+#include "lapse_scalar.h"
+
 #include <random>
 
 namespace lapse{
@@ -43,6 +45,10 @@ u32 die(u32 n, u32 sides) {
     sum += (rand() % sides) + 1;
   }
   return sum;
+}
+
+vec3<> rand_vec3() {
+  return vec3<f32>{(f32)rand_float(), (f32)rand_float(), (f32)rand_float()};
 }
 
 }

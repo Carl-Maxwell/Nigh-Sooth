@@ -2,6 +2,8 @@
 
 #include <stdint.h>
 
+#include <iostream>
+
 namespace lapse{
 
 //-----------------------------------------------------------------------------
@@ -79,6 +81,16 @@ template<typename T=f32>
 struct vec2{
   union { T x, r; };
   union { T y, g; };
+
+  vec2  operator+(vec2 right_value) {
+    vec2 temp;
+
+    temp.x = x + right_value.x;
+    temp.y = y + right_value.y;
+
+    return temp;
+    // TODO check for lifetime issues
+  }
 };
 
 template<typename T=f32>
@@ -86,6 +98,15 @@ struct vec3{
   union { T x, r; };
   union { T y, g; };
   union { T z, b; };
+
+  template<typename DisplayType=f32>
+  void std_cout() {
+    std::cout << " vec3 {\n"
+      << "\tx: " << (DisplayType)x << "\n"
+      << "\ty: " << (DisplayType)y << "\n"
+      << "\tz: " << (DisplayType)z << "\n"
+      << "}\n";
+  }
 };
 
 template<typename T=f32>

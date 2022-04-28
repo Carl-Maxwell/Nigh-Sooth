@@ -18,8 +18,7 @@ struct mouse_obj{
 
 void set_event_callbacks();
 
-int main(void)
-{
+int main(void) {
 
   // window:
   u32 WIDTH = 1280/4, HEIGHT = 720/4;
@@ -36,11 +35,12 @@ int main(void)
 
   platform::set_main_loop_callback([WIDTH, HEIGHT, frame_count](f32 delta){
 
-    for (int x = 0; x < WIDTH; x++) {
-      for (int y = 0; y < HEIGHT; y++) {
-        platform::plot(vec2<f32>(), vec3<f32>{(f32)rand_float(), (f32)rand_float(), (f32)rand_float()});
+    for (u32 x = 0; x < WIDTH; x++) {
+      for (u32 y = 0; y < HEIGHT; y++) {
+        platform::plot(vec2<f32>(), rand_vec3());
       }
     }
+
   } );
 
   return 0;
