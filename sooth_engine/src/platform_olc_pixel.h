@@ -27,6 +27,12 @@ void draw_bitmap(
   lapse::vec3<lapse::u8>* pixels
 );
 
+void clear(lapse::vec3<> color);
+
+//
+// input functions
+//
+
 lapse::vec2<lapse::i32> get_mouse_pos();
 
 }

@@ -130,6 +130,15 @@ void draw_bitmap(
   }
 }
 
+void clear(lapse::vec3<> color) {
+  color *= 255;
+  app->Clear(olc::Pixel{(u8)color.r, (u8)color.g, (u8)color.b});
+}
+
+//-----------------------------------------------------------------------------
+// Input functions
+//-----------------------------------------------------------------------------
+
 vec2<i32> get_mouse_pos() {
   olc::vi2d temp = app->GetWindowMouse();
   return vec2<i32>{temp.x, temp.y};

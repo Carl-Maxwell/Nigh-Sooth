@@ -116,6 +116,14 @@ struct vec3{
   union { T y, g; };
   union { T z, b; };
 
+  vec3<T>& operator*=(f32 scalar) {
+    x *= scalar;
+    y *= scalar;
+
+    return *this;
+    // TODO check for lifetime issues
+  }
+
   template<typename DisplayType=f32>
   void std_cout() {
     std::cout << " vec3 {\n"

@@ -60,6 +60,8 @@ int main(void) {
     << "\n";
 
   platform::set_main_loop_callback([img_width, img_height, pixels](f32 delta){
+    platform::clear(vec3<>{0, 0, 0});
+
     for (f32 y = 0; y < platform::get_window_height(); y++) {
       for (f32 x = 0; x < platform::get_window_width(); x++) {
         // platform::plot(vec2<f32>{x, y}, rand_vec3());
