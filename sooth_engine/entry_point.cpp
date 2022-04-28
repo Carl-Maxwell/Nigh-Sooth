@@ -5,7 +5,7 @@
 
 #include "platform_olc_pixel.h"
 
-#include "stb_image_namespace.h"
+#include "sooth_image.h"
 
 using namespace lapse;
 
@@ -23,43 +23,16 @@ void set_event_callbacks();
 int main(void) {
 
   // window:
-  u32 WIDTH = 1280/4, HEIGHT = 720/4;
+  // u32 WIDTH = 1280/4, HEIGHT = 720/4;
   // u32 WIDTH = 1280, HEIGHT = 720;
-  // u32 WIDTH = 1920, HEIGHT = 1080;
-
-  // borderless window:
-  // u32 WIDTH = 1920, HEIGHT = 1080;
+  // u32 WIDTH = 1920/4 - 20, HEIGHT = 1080/4 - 20;
+  u32 WIDTH = 16*18+20, HEIGHT = 16*12+20;
 
   platform::initialize(WIDTH, HEIGHT, false, "Nigh Sooth Engine Test");
 
-  str path = "test_image_small.png";
-  i32 img_width, img_height, bytes_per_pixel;
+  auto grid_image = image("resources/grid.png");
 
-  unsigned char* raw_pixels = stb::stbi_load(
-    path.to_c_str(),
-    &img_width,
-    &img_height,
-    &bytes_per_pixel,
-    4
-  );
-
-  vec3<u8>* pixels = new vec3<u8>[img_width * img_height];
-
-  for (u32 i = 0; i < img_width * img_height; i++) {
-    pixels[i] = vec3<u8>{
-      raw_pixels[bytes_per_pixel*i+0],
-      raw_pixels[bytes_per_pixel*i+1],
-      raw_pixels[bytes_per_pixel*i+2]
-    };
-  }
-
-  std::cout << path.to_c_str() << " ,"
-    << " x: " << img_width
-    << " y: " << img_height
-    << " components: " << bytes_per_pixel
-    << "\n";
-
-  platform::set_main_loop_callback([img_width, img_height, pixels](f32 delta){
+  platform::set_main_loop_callback([grid_image](f32 delta){
     platform::clear(vec3<>{0, 0, 0});
 
     for (f32 y = 0; y < platform::get_window_height(); y++) {
@@ -71,9 +44,28 @@ int main(void) {
       }
     }
 
-    platform::draw_bitmap(vec2<>{10, 10}, vec2<>{(f32)img_width, (f32)img_height}, pixels);
+    platform::draw_bitmap(
+      vec2<>{10, 10},
+      vec2<>{
+        (f32)grid_image.m_width,
+        (f32)grid_image.m_height
+      },
+      grid_image.m_pixels
+    );
 
-    platform::plot(Input::Mouse::get_mouse_pos(), rand_vec3());
+    f32 grid_size = 16.0f;
+
+    f32 padding = platform::get_window_padding();
+
+    for (f32 y = 0; y < 12; y++) {
+      for (f32 x = 0; x < 18; x++) {
+        platform::draw_bitmap(
+          vec2<>{x*grid_size + padding, y*grid_size + padding},
+          grid_image
+        );
+      }
+    }
+    
   } );
 
   return 0;

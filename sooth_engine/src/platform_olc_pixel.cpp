@@ -3,6 +3,8 @@
 
 #include "platform_olc_pixel.h"
 
+#include "sooth_image.h"
+
 #include "lapse_lib.h"
 
 namespace{
@@ -51,6 +53,7 @@ namespace{
 };
 
 i32 get_pixel_size() { return pixel_size; }
+f32 get_window_padding() { return 10.0f; };
 
 void initialize(u32 screen_width, u32 screen_height, bool fullscreen, str window_name) {
   app = new PixelEngineApp(window_name);
@@ -117,6 +120,64 @@ void draw_bitmap(
       plot(
         current_coord,
         pixels[image_y*image_width + image_x]
+      );
+
+      image_x++;
+      current_coord.x++;
+    }
+    current_coord.x = screen_coord.x;
+    image_x = 0;
+
+    image_y++;
+    current_coord.y++;
+  }
+}
+
+void draw_bitmap(
+  vec2<>  screen_coord,
+  vec2<>  image_size,
+  vec3<>* pixels
+) {
+  vec2<> current_coord{screen_coord};
+  vec2<> end_coord = screen_coord + image_size;
+
+  u32 image_width = (u32)image_size.x;
+
+  u32 image_x = 0;
+  u32 image_y = 0;
+
+  while (current_coord.y < end_coord.y) {
+    while(current_coord.x < end_coord.x) {
+      plot(
+        current_coord,
+        pixels[image_y*image_width + image_x]
+      );
+
+      image_x++;
+      current_coord.x++;
+    }
+    current_coord.x = screen_coord.x;
+    image_x = 0;
+
+    image_y++;
+    current_coord.y++;
+  }
+}
+
+void draw_bitmap(vec2<>  screen_coord, image img) {
+  vec2<> current_coord{screen_coord};
+  vec2<> end_coord = screen_coord + img.m_resolution;
+
+  u32 image_width = (u32)img.m_resolution.x;
+
+  u32 image_x = 0;
+  u32 image_y = 0;
+
+  while (current_coord.y < end_coord.y) {
+    while(current_coord.x < end_coord.x) {
+      plot(
+        current_coord,
+        img.m_pixels[image_y*image_width + image_x]
       );
 
       image_x++;

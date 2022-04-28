@@ -2,6 +2,7 @@
 
 #include "lapse_scalar.h"
 #include "lapse_string.h"
+#include "sooth_image.h"
 
 namespace platform{
 
@@ -18,6 +19,8 @@ lapse::u64 get_frame_count();
 lapse::u32 get_window_width();
 lapse::u32 get_window_height();
 
+lapse::f32 get_window_padding();
+
 void plot(lapse::vec2<> screen_coord, lapse::vec3<> color);
 void plot(lapse::vec2<> screen_coord, lapse::vec3<lapse::u8> color);
 
@@ -26,6 +29,14 @@ void draw_bitmap(
   lapse::vec2<>  image_size,
   lapse::vec3<lapse::u8>* pixels
 );
+
+void draw_bitmap(
+  lapse::vec2<>  screen_coord,
+  lapse::vec2<>  image_size,
+  lapse::vec3<>* pixels
+);
+
+void draw_bitmap(lapse::vec2<>  screen_coord, image img);
 
 void clear(lapse::vec3<> color);
 
