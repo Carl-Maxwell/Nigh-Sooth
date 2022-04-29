@@ -9,17 +9,6 @@
 
 using namespace lapse;
 
-struct mouse_obj{
-  f64 x = 0;
-  f64 y = 0;
-  struct button_states{
-    bool left = false;
-    bool right = false;
-  } buttons;
-} mouse;
-
-void set_event_callbacks();
-
 namespace minesweeper{
 
 image* image_array = new image[11];
