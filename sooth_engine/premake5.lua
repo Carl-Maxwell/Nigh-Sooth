@@ -1,5 +1,5 @@
 project "sooth_engine"
-  kind "ConsoleApp"
+  kind "StaticLib"
   language "C++"
   cppdialect "C++20"
 
@@ -8,7 +8,8 @@ project "sooth_engine"
 
   files
   {
-    "entry_point.cpp",
+    "sooth.cpp",
+    "sooth.h",
     "src/**.h",
     "src/**.cpp",
     "%{IncludeDir.stb_image}/**.cpp",

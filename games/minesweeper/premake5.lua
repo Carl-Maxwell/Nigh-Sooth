@@ -8,6 +8,19 @@ project "minesweeper"
 
   files
   {
+    "entry_point.cpp",
     "src/**.h",
     "src/**.cpp",
+  }
+
+  includedirs{
+    "src/",
+    "%{wks.location}/lapse_lib/src",
+    "%{wks.location}/sooth_engine",
+    "%{wks.location}/sooth_engine/src"
+  }
+
+  links {
+    "lapse_lib",
+    "sooth_engine"
   }

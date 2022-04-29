@@ -17,7 +17,6 @@ image::image(str path) {
 }
 
 bool image::load_image() {
-  std::cout << "loading image: " << m_path.to_c_str() << "\n";
   unsigned char* raw_pixels = stb::stbi_load(
     m_path.to_c_str(),
     &m_width,
@@ -26,7 +25,11 @@ bool image::load_image() {
     4
   );
 
-  if (!raw_pixels) return false;
+  if (!raw_pixels) {
+    std::cout << "faiiled to load image: \"" << m_path.to_c_str() << "\"\n";
+    return false;
+  }
+
 
   m_pixels = new vec3<>[m_width * m_height];
 
@@ -40,7 +43,7 @@ bool image::load_image() {
 
   m_resolution = {(f32)m_width, (f32)m_height};
 
-  std::cout << m_path.to_c_str() << " ,"
+  std::cout << "loaded image: " << m_path.to_c_str() << " ,"
     << " x: " << m_width
     << " y: " << m_height
     << " components: " << m_bytes_per_pixel
