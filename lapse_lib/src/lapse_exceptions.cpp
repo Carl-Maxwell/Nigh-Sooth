@@ -6,6 +6,7 @@ namespace lapse{
 void assert(bool value) {
   if (!value) {
     error(error_code::breakpoint);
+    __debugbreak();
   }
 }
 

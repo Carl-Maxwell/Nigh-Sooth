@@ -75,6 +75,10 @@ void set_initialization_callback(lapse_lambda(void, void) arg_initialization_cal
   initialization_callback = arg_initialization_callback;
 }
 
+void close_application() {
+  app->m_should_continue_running = false;
+}
+
 void set_main_loop_callback(lapse_lambda(void, f32) arg_main_loop) {
   main_loop = arg_main_loop;
   app->Start();

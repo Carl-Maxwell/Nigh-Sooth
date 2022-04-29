@@ -39,6 +39,17 @@ enum class grid_tile{
 
 int main(void) {
 
+  lapse::LapseErrorQueue::the().register_callback([](lapse::error_code err){
+    std::cout << "Lapse Error! " << (int)err;
+    switch(err){
+      case lapse::error_code::undefined:  __debugbreak(); break;
+      case lapse::error_code::failure:    __debugbreak(); break;
+      case lapse::error_code::success:    __debugbreak(); break;
+      case lapse::error_code::close_app:  platform::close_application(); break;
+      case lapse::error_code::breakpoint: __debugbreak(); break;
+    }
+  });
+
   // window:
   // u32 WIDTH = 1280/4, HEIGHT = 720/4;
   // u32 WIDTH = 1280, HEIGHT = 720;
@@ -75,10 +86,11 @@ int main(void) {
         if ((u32)grid[y2*grid_width + x2] <= (u32)minesweeper::grid_tile::number_5) {
           // it's already adjacent to a mine or mines
           reinterpret_cast<u32&>(grid[y2*grid_width + x2]) += 1;
-        } else {
+          assert((u32)grid[y2*grid_width + x2] <= (u32)minesweeper::grid_tile::number_5);
+        } else if (grid[y2*grid_width + x2] == minesweeper::grid_tile::hidden) {
           grid[y2*grid_width + x2] = minesweeper::grid_tile::number_1;
+          assert((u32)grid[y2*grid_width + x2] <= (u32)minesweeper::grid_tile::number_5);
         }
-        assert((u32)grid[y2*grid_width + x2] <= (u32)minesweeper::grid_tile::number_5);
       }
     }
   }
@@ -97,6 +109,8 @@ int main(void) {
 
   platform::set_main_loop_callback([&image_array, &grid, grid_width, grid_height](f32 delta){
     platform::clear(vec3<>{0, 0, 0});
+
+    lapse::LapseErrorQueue::the().tick();
 
     for (f32 y = 0; y < platform::get_window_height(); y++) {
       for (f32 x = 0; x < platform::get_window_width(); x++) {
