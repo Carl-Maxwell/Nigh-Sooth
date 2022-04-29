@@ -180,13 +180,13 @@ int main(void) {
     f32 grid_size = 16.0f;
     f32 padding = platform::get_window_padding();
 
-    u32 mouse_x = (u32)Mouse::get_mouse_pos().x - padding;
-    u32 mouse_y = (u32)Mouse::get_mouse_pos().y - padding;
+    i32 mouse_x = (i32)Mouse::get_mouse_pos().x - padding;
+    i32 mouse_y = (i32)Mouse::get_mouse_pos().y - padding;
     mouse_x /= grid_size;
     mouse_y /= grid_size;
     minesweeper::tile_obj* mouse_tile = nullptr;
 
-    if (mouse_x > 0 && mouse_y > 0 && mouse_x < grid_width && mouse_y < grid_height) {
+    if (mouse_x >= 0 && mouse_y >= 0 && mouse_x < grid_width && mouse_y < grid_height) {
       mouse_tile = &grid[mouse_y * grid_width + mouse_x];
     }
 
