@@ -9,6 +9,8 @@
 
 namespace lapse{
 
+void assert(bool);
+
 enum class error_code{
   undefined = 0,
   failure,

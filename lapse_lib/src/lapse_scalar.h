@@ -90,7 +90,8 @@ struct vec2{
       << "}\n";
   }
 
-  vec2  operator+(vec2 right_value) {
+  //vector operations
+  vec2 operator+(vec2 right_value) {
     vec2 temp;
 
     temp.x = x + right_value.x;
@@ -99,6 +100,34 @@ struct vec2{
     return temp;
     // TODO check for lifetime issues
   }
+  vec2 operator-(vec2 right_value) {
+    vec2 temp;
+
+    temp.x = x - right_value.x;
+    temp.y = y - right_value.y;
+
+    return temp;
+    // TODO check for lifetime issues
+  }
+  bool operator<(vec2 right_value) {
+    bool temp = true;
+
+    temp &= x < right_value.x;
+    temp &= y < right_value.y;
+
+    return temp;
+    // TODO check for lifetime issues
+  }
+  bool operator>(vec2 right_value) {
+    bool temp = true;
+
+    temp &= x > right_value.x;
+    temp &= y > right_value.y;
+
+    return temp;
+    // TODO check for lifetime issues
+  }
+  // scalar operations
   vec2 operator/(f32 scalar) {
     vec2 temp = *this;
 

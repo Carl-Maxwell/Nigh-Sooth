@@ -20,6 +20,10 @@ public:
   };
 };
 
+u64 rand_integer(u64 end) {
+  return (u64)rand_range(0, (f64)end);
+}
+
 u64 rand_integer() {
   return Random::the().m_dist(Random::the().m_engine);
 }

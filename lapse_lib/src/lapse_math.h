@@ -23,6 +23,14 @@ i32 ceil_i(f32 whole);
 
 f32 ceil_f(f32 whole);
 
+i32 max(i32 a, i32 b);
+
+u32 max(u32 a, u32 b);
+
+i32 min(i32 a, i32 b);
+
+u32 min(u32 a, u32 b);
+
 // TODO need to account for floats larger than i32 max
 
 f64 round(f64 whole);

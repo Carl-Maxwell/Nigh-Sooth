@@ -6,6 +6,8 @@ namespace lapse{
 
 // return a random u64 from 0 to u64_max
 u64 rand_integer();
+// return a random u64 from 0 to end
+u64 rand_integer(u64 end);
 // returns a number from 0..1
 f64 rand_float();
 // returns a number in range min..max

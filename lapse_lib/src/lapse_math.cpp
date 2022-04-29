@@ -45,6 +45,22 @@ f32 ceil_f(f32 whole) {
   return whole > 0 ? f32(i32(whole)+1) : f32(i32(whole));
 };
 
+i32 max(i32 a, i32 b) {
+  return a > b ? a : b;
+}
+
+u32 max(u32 a, u32 b) {
+  return a > b ? a : b;
+}
+
+i32 min(i32 a, i32 b) {
+  return a < b ? a : b;
+}
+
+u32 min(u32 a, u32 b) {
+  return a < b ? a : b;
+}
+
 // TODO need to account for floats larger than i32 max
 
 f64 round(f64 whole) {

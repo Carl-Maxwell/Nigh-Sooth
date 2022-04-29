@@ -7,12 +7,17 @@
 
 using namespace lapse;
 
+image::image() {
+  m_path = "";
+}
+
 image::image(str path) {
   m_path = path;
   load_image();
 }
 
 bool image::load_image() {
+  std::cout << "loading image: " << m_path.to_c_str() << "\n";
   unsigned char* raw_pixels = stb::stbi_load(
     m_path.to_c_str(),
     &m_width,

@@ -20,19 +20,82 @@ struct mouse_obj{
 
 void set_event_callbacks();
 
+namespace minesweeper{
+
+enum class grid_tile{
+  number_1 = 1,
+  number_2 = 2,
+  number_3 = 3,
+  number_4 = 4,
+  number_5 = 5,
+  hidden   = 0,
+  hovered  = 9,
+  revealed = 6,
+  mined    = 8,
+  flagged  = 7
+};
+
+}
+
 int main(void) {
 
   // window:
   // u32 WIDTH = 1280/4, HEIGHT = 720/4;
   // u32 WIDTH = 1280, HEIGHT = 720;
   // u32 WIDTH = 1920/4 - 20, HEIGHT = 1080/4 - 20;
-  u32 WIDTH = 16*18+20, HEIGHT = 16*12+20;
+  i32 WIDTH = 16*18+20, HEIGHT = 16*12+20;
 
   platform::initialize(WIDTH, HEIGHT, false, "Nigh Sooth Engine Test");
 
-  auto grid_image = image("resources/grid.png");
+  const i32 grid_width  = 18;
+  const i32 grid_height = 12;
 
-  platform::set_main_loop_callback([grid_image](f32 delta){
+  // 18 x 12
+
+  minesweeper::grid_tile* grid = new minesweeper::grid_tile[grid_width * grid_height];
+
+  for (u32 y = 0; y < grid_height; y++) {
+    for (u32 x = 0; x < grid_width; x++) {
+      grid[y * grid_width + x] = minesweeper::grid_tile::hidden;
+    }
+  }
+
+  for (u32 n = 0; n < 18; n++) {
+    auto x = (i32)rand_integer(grid_width);
+    auto y = (i32)rand_integer(grid_height);
+
+    grid[y * grid_width + x] = minesweeper::grid_tile::mined;
+
+    for (auto y2 = max(y-1, 0); y2 <= min(y+1, grid_height); y2++) {
+      for (auto x2 = max(x-1, 0); x2 <= min(x+1, grid_width); x2++) {
+        // if (x2 < 0 || y2 < 0 || x2 > grid_width || y2 > grid_height) {
+        //   continue;
+        // }
+        if (x2 == x && y2 == y) { continue; }
+        if ((u32)grid[y2*grid_width + x2] <= (u32)minesweeper::grid_tile::number_5) {
+          // it's already adjacent to a mine or mines
+          reinterpret_cast<u32&>(grid[y2*grid_width + x2]) += 1;
+        } else {
+          grid[y2*grid_width + x2] = minesweeper::grid_tile::number_1;
+        }
+        assert((u32)grid[y2*grid_width + x2] <= (u32)minesweeper::grid_tile::number_5);
+      }
+    }
+  }
+
+  image* image_array = new image[10];
+
+  image_array[ (u32)minesweeper::grid_tile::number_1 ] = image("resources/number_1.png");
+  image_array[ (u32)minesweeper::grid_tile::number_2 ] = image("resources/number_2.png");
+  image_array[ (u32)minesweeper::grid_tile::number_3 ] = image("resources/number_3.png");
+  image_array[ (u32)minesweeper::grid_tile::number_4 ] = image("resources/number_4.png");
+  image_array[ (u32)minesweeper::grid_tile::number_5 ] = image("resources/number_5.png");
+  image_array[ (u32)minesweeper::grid_tile::hidden ]   = image("resources/grid.png");
+  image_array[ (u32)minesweeper::grid_tile::hovered ]  = image("resources/grid_highlighted.png");
+  image_array[ (u32)minesweeper::grid_tile::mined ]    = image("resources/bomb.png");
+  image_array[ (u32)minesweeper::grid_tile::flagged ]  = image("resources/flag.png");
+
+  platform::set_main_loop_callback([&image_array, &grid, grid_width, grid_height](f32 delta){
     platform::clear(vec3<>{0, 0, 0});
 
     for (f32 y = 0; y < platform::get_window_height(); y++) {
@@ -44,25 +107,22 @@ int main(void) {
       }
     }
 
-    platform::draw_bitmap(
-      vec2<>{10, 10},
-      vec2<>{
-        (f32)grid_image.m_width,
-        (f32)grid_image.m_height
-      },
-      grid_image.m_pixels
-    );
-
     f32 grid_size = 16.0f;
-
     f32 padding = platform::get_window_padding();
 
-    for (f32 y = 0; y < 12; y++) {
-      for (f32 x = 0; x < 18; x++) {
-        platform::draw_bitmap(
-          vec2<>{x*grid_size + padding, y*grid_size + padding},
-          grid_image
-        );
+    for (f32 y = 0; y < grid_height; y++) {
+      for (f32 x = 0; x < grid_width; x++) {
+        vec2<> screen_pos{x*grid_size + padding, y*grid_size + padding};
+        minesweeper::grid_tile tile = grid[u32(y*grid_width + x)];
+        bool hovering =
+          Input::Mouse::get_mouse_pos() > screen_pos &&
+          Input::Mouse::get_mouse_pos() < screen_pos+vec2<>{grid_size, grid_size};
+        image img = image_array[(u32)tile];
+        if (hovering && tile == minesweeper::grid_tile::hidden) {
+          img = image_array[(u32)minesweeper::grid_tile::hovered];
+        }
+
+        platform::draw_bitmap(screen_pos, img);
       }
     }
     

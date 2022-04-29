@@ -3,6 +3,12 @@
 
 namespace lapse{
 
+void assert(bool value) {
+  if (!value) {
+    error(error_code::breakpoint);
+  }
+}
+
 void error(error_code code) {
   LapseErrorQueue::the().m_queue_of_errors.push(code);
 };
