@@ -21,4 +21,7 @@ IncludeDir["pixel_game_engine"] = "%{wks.location}/sooth_engine/vendor/olcPixelG
 include "lapse_lib"
 include "lapse_test"
 include "sooth_engine"
-include "games/minesweeper"
+
+group "games"
+  include "games/minesweeper"
+group ""
