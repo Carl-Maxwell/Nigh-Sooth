@@ -25,6 +25,7 @@ public:
 
 public:
   bool OnUserCreate() override {
+    std::cout << "calling OnUserCreate()\n";
     if (initialization_callback)
       initialization_callback();
     return true;

@@ -1,4 +1,6 @@
 
+#include "sooth.h"
+
 #include "lapse_lib.h"
 
 #include "sooth_input.h"
@@ -96,6 +98,8 @@ void initialize() {
 }
 
 int main() {
+  sooth::initialize_engine();
+
   using minesweeper::grid_height;
   using minesweeper::grid_width;
 
@@ -112,7 +116,7 @@ int main() {
   for (i32 y = 0; y < grid_height; y++) {
     for (i32 x = 0; x < grid_width; x++) {
       grid[y*grid_width + x].m_coordinates = {x, y};
-      grid[y*grid_width + x].grid = grid;
+      grid[y*grid_width + x].grid = grid; // TODO stop copying this pointer around
     }
   }
 
