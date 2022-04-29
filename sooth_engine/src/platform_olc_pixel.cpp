@@ -4,6 +4,7 @@
 #include "platform_olc_pixel.h"
 
 #include "sooth_image.h"
+#include "sooth_input.h"
 
 #include "lapse_lib.h"
 
@@ -203,6 +204,16 @@ void clear(lapse::vec3<> color) {
 //-----------------------------------------------------------------------------
 // Input functions
 //-----------------------------------------------------------------------------
+
+// returns true if mouse hit event happened this frame
+bool is_mouse_left_button_hit() {
+  return app->GetMouse(olc::Mouse::LEFT).bPressed;
+}
+
+// returns true if mouse hit event happened this frame
+bool is_mouse_right_button_hit() {
+  return app->GetMouse(olc::Mouse::RIGHT).bPressed;
+}
 
 vec2<i32> get_mouse_pos() {
   olc::vi2d temp = app->GetWindowMouse();

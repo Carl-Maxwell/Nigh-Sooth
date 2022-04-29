@@ -46,6 +46,9 @@ void clear(lapse::vec3<> color);
 // input functions
 //
 
+bool is_mouse_left_button_hit();
+bool is_mouse_right_button_hit();
+
 lapse::vec2<lapse::i32> get_mouse_pos();
 
 }
