@@ -51,7 +51,12 @@ namespace{
   PixelEngineApp* app;
   olc::rcode status;
   i32 pixel_size = 4;
+  f64 application_startup_time = get_timestamp();
 };
+
+f64 get_application_start_time() {
+  return application_startup_time;
+}
 
 i32 get_pixel_size() { return pixel_size; }
 f32 get_window_padding() { return 10.0f; };

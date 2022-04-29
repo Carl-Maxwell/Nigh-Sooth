@@ -17,6 +17,8 @@
 
 // #include "lapse_range.h"
 
+#include "lapse_time.h"
+
 #include "lapse_random.h"
 
 // TODO uids

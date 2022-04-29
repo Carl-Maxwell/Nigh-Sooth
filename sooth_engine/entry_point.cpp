@@ -121,6 +121,8 @@ int main(void) {
     }
   });
 
+  lapse::seed_rng(platform::get_application_start_time());
+
   // window:
   // u32 WIDTH = 1280/4, HEIGHT = 720/4;
   // u32 WIDTH = 1280, HEIGHT = 720;

@@ -4,6 +4,9 @@
 
 namespace lapse{
 
+
+// seed the random number generator
+void seed_rng(u64 seed);
 // return a random u64 from 0 to u64_max
 u64 rand_integer();
 // return a random u64 from 0 to end

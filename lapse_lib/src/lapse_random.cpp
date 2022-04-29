@@ -11,14 +11,21 @@ public:
   std::default_random_engine m_engine;
   std::uniform_int_distribution<u64> m_dist;
 
- static Random& the() {
+ static Random& the(u64 rngseed = 0) {
     static Random* my_rng = nullptr;
     if (!my_rng) {
       my_rng = new Random;
     }
+    if (rngseed) {
+      my_rng->m_engine.seed(rngseed);
+    }
     return *my_rng;
   };
 };
+
+void seed_rng(u64 seed) {
+  Random::the(seed);
+}
 
 u64 rand_integer(u64 end) {
   return (u64)rand_range(0, (f64)end);
