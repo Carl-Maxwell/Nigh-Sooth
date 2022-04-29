@@ -125,6 +125,12 @@ int main() {
     auto x = (i32)rand_integer(grid_width);
     auto y = (i32)rand_integer(grid_height);
 
+    // if it's already mined, find a fresh spot
+    while (grid[y*grid_width + x].m_mined) {
+      x = (i32)rand_integer(grid_width);
+      y = (i32)rand_integer(grid_height);
+    }
+
     grid[y*grid_width + x].m_mined = true;
 
     // update adjacent mine count in adjacent squares
@@ -170,13 +176,18 @@ int main() {
     }
 
     if (Mouse::left_mouse_hit()) {
-      if (mouse_tile && mouse_tile->m_hidden) {
+      if (mouse_tile && mouse_tile->m_hidden && !mouse_tile->m_flagged) {
         mouse_tile->reveal();
       }
     } else if (Mouse::right_mouse_hit()) {
       if (mouse_tile && mouse_tile->m_hidden) {
-        mouse_tile->m_tile_state = minesweeper::grid_tile::flagged;
-        mouse_tile->m_flagged = true;
+        if (!mouse_tile->m_flagged) {
+          mouse_tile->m_tile_state = minesweeper::grid_tile::flagged;
+          mouse_tile->m_flagged = true;
+        } else {
+          mouse_tile->m_tile_state = minesweeper::grid_tile::hidden;
+          mouse_tile->m_flagged = false;
+        }
       }
     }
 
