@@ -15,6 +15,7 @@ struct minesweeper_run{
 
   void initialize_run(lapse::i32 n_width = 18, lapse::i32 n_height = 12);
   void start_main_loop();
+  void main_loop(lapse::f32 delta);
 
   // dimensions for next window's width & height
   lapse::vec2<lapse::i32> next_window_size = {16*18+20, 16*12+20};

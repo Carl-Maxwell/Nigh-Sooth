@@ -3,6 +3,7 @@
 #include "lapse_scalar.h"
 #include "lapse_string.h"
 #include "sooth_image.h"
+#include "sooth_input.h"
 
 namespace platform{
 
@@ -23,6 +24,7 @@ lapse::u64 get_frame_count();
 
 lapse::u32 get_window_width();
 lapse::u32 get_window_height();
+lapse::vec2<> get_window_size();
 
 lapse::f32 get_window_padding();
 
@@ -51,7 +53,8 @@ void clear(lapse::vec3<> color);
 
 bool is_mouse_left_button_hit();
 bool is_mouse_right_button_hit();
-
 lapse::vec2<lapse::i32> get_mouse_pos();
+
+KeyState get_key_state(keycode code);
 
 }

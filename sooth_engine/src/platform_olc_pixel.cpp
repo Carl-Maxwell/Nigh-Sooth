@@ -105,8 +105,14 @@ u64 get_frame_count() {
   return app->frame_count;
 }
 
-lapse::u32 get_window_width()  { return app->ScreenWidth();  }
-lapse::u32 get_window_height() { return app->ScreenHeight(); }
+u32 get_window_width()  { return app->ScreenWidth();  }
+u32 get_window_height() { return app->ScreenHeight(); }
+vec2<> get_window_size() {
+  return vec2<>{
+    (f32)app->ScreenWidth(),
+    (f32)app->ScreenHeight()
+  };
+}
 
 void plot(vec2<> screen_coord, vec3<> color) {
   app->Draw(
@@ -233,6 +239,23 @@ bool is_mouse_right_button_hit() {
 vec2<i32> get_mouse_pos() {
   olc::vi2d temp = app->GetWindowMouse();
   return vec2<i32>{temp.x, temp.y};
+}
+
+olc::Key translate_keycode(keycode code) {
+  assert(code == keycode::escape);
+  return olc::Key::ESCAPE;
+}
+
+KeyState get_key_state(keycode code) {
+  KeyState temp;
+
+  auto pixel_key = app->GetKey(translate_keycode(code));
+
+  temp.m_key_hit  = pixel_key.bPressed;
+  temp.m_key_up   = pixel_key.bReleased;
+  temp.m_key_down = pixel_key.bHeld;
+
+  return temp;
 }
 
 }; // end platform namespace

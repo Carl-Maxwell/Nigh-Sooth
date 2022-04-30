@@ -12,11 +12,17 @@ using namespace lapse;
 namespace minesweeper{
 
 void minesweeper_session::start_session() {
-  // game session loop
+  // activate game session
   while (m_state != session_state::application_shutdown) {
     switch(m_state) {
-      // case session_state::application_startup:
-      // break;
+      case session_state::application_startup:
+        // TODO load images & whatnot
+        m_state = session_state::main_menu;
+      break;
+      case session_state::main_menu:
+        if (!main_menu) main_menu = new minesweeper_main_menu;
+        
+      break;
       case session_state::game_run_startup:
         std::cout << "\n\n//\n// starting up a new game run ...\n//\n\n";
         if (run) delete run;
@@ -29,10 +35,18 @@ void minesweeper_session::start_session() {
         // if the main loop has ended, then:
         m_state = session_state::game_run_startup;
       break;
-      // case session_state::main_menu:
-      // break;
       default: std::cout << "Error! Bad game session state: " << (u32)m_state;
     }
+  }
+}
+
+void minesweeper_session::main_loop(f32 delta) {
+  switch(m_state) {
+    case session_state::game_run_main_loop: run->main_loop(delta);       break;
+    case session_state::main_menu:          main_menu->main_loop(delta); break;
+    default:
+      std::cout << "\n\nError! Bad minesweeper_session::main_loop() call \n\n";
+      __debugbreak();
   }
 }
 

@@ -1,9 +1,8 @@
 #pragma once
 
-#include "lapse_lib.h"
+#include "lapse_scalar.h"
 
 namespace lapse{
-
 
 // seed the random number generator
 void seed_rng(u64 seed);
@@ -19,6 +18,8 @@ f64 rand_range(f64 min, f64 max);
 u32 die(u32 sides);
 // roll {n}d{sides}
 u32 die(u32 n, u32 sides);
+// returns a vec3<f32> with random values from 0..1
+vec2<> rand_vec2();
 // returns a vec3<f32> with random values from 0..1
 vec3<> rand_vec3();
 

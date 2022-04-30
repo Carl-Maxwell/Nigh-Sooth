@@ -109,6 +109,15 @@ struct vec2{
     return temp;
     // TODO check for lifetime issues
   }
+  vec2 operator*(vec2 right_value) {
+    vec2 temp;
+
+    temp.x = x * right_value.x;
+    temp.y = y * right_value.y;
+
+    return temp;
+    // TODO check for lifetime issues
+  }
   bool operator<(vec2 right_value) {
     bool temp = true;
 

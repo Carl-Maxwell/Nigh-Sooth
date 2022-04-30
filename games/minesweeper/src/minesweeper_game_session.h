@@ -2,6 +2,7 @@
 
 #include <sooth_image.h>
 #include "minesweeper_game_run.h"
+#include "minesweeper_main_menu.h"
 
 namespace minesweeper{
 
@@ -18,6 +19,7 @@ struct minesweeper_session{
   session_state m_state = session_state::game_run_startup;
   image* image_array = new image[11];
   minesweeper_run* run = nullptr;
+  minesweeper_main_menu* main_menu = nullptr;
   
   // returns singleton
   static minesweeper_session& the() {
@@ -30,6 +32,7 @@ struct minesweeper_session{
 
   void start_session();
   void initialize_game_session();
+  void main_loop(lapse::f32 delta);
 };
 
 }

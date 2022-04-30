@@ -15,3 +15,21 @@ struct Mouse{
   static lapse::vec2<> get_mouse_pos();
 };
 
+enum class keycode{
+  escape = 27
+};
+
+struct KeyState{
+  bool m_key_hit  = false;
+  bool m_key_up   = false;
+  bool m_key_down = false;
+
+  // returns true if the key hit event happened this frame
+  bool is_hit();
+  // returns true if the key up event happened this frame
+  bool is_up();
+  // returns true if the key is held down
+  bool is_down();
+};
+
+KeyState key(keycode code);

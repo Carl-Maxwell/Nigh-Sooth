@@ -58,6 +58,10 @@ u32 die(u32 n, u32 sides) {
   return sum;
 }
 
+vec2<> rand_vec2() {
+  return vec2<f32>{(f32)rand_float(), (f32)rand_float()};
+}
+
 vec3<> rand_vec3() {
   return vec3<f32>{(f32)rand_float(), (f32)rand_float(), (f32)rand_float()};
 }
