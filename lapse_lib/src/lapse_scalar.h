@@ -90,7 +90,18 @@ struct vec2{
       << "}\n";
   }
 
-  //vector operations
+  // special vector funcs
+
+  // returns the absolute value of the distance covered by this vector
+  f32 length() {
+    return (f32)sqrt(x*x + y*y);
+  }
+  // returns this vector normlized to a length of 1.0
+  vec2 normalize() {
+    return (*this)/length();
+  }
+
+  // vector vector operations
   vec2 operator+(vec2 right_value) {
     vec2 temp;
 
@@ -99,6 +110,12 @@ struct vec2{
 
     return temp;
     // TODO check for lifetime issues
+  }
+  vec2& operator+=(vec2 right_value) {
+    x += right_value.x;
+    y += right_value.y;
+
+    return *this;
   }
   vec2 operator-(vec2 right_value) {
     vec2 temp;
@@ -136,7 +153,7 @@ struct vec2{
     return temp;
     // TODO check for lifetime issues
   }
-  // scalar operations
+  // vector scalar operations
   vec2 operator/(f32 scalar) {
     vec2 temp = *this;
 

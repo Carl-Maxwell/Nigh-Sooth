@@ -3,6 +3,7 @@
 #include <sooth_image.h>
 #include "minesweeper_game_run.h"
 #include "minesweeper_main_menu.h"
+#include "lapse_scalar.h"
 
 namespace minesweeper{
 
@@ -20,6 +21,7 @@ struct minesweeper_session{
   image* image_array = new image[11];
   minesweeper_run* run = nullptr;
   minesweeper_main_menu* main_menu = nullptr;
+  lapse::vec2<lapse::i32>* next_grid_size = nullptr;
   
   // returns singleton
   static minesweeper_session& the() {

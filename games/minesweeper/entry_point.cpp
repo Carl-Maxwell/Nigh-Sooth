@@ -8,6 +8,7 @@
 #include "platform_olc_pixel.h"
 
 #include <sooth_image.h>
+#include <mui/mui_context.h>
 
 #include "minesweeper_game_session.h"
 #include "minesweeper_game_run.h"
@@ -22,6 +23,7 @@ void main_loop_callback(f32 delta) {
   auto& session = minesweeper_session::the();
 
   platform::clear(vec3<>{0, 0, 0});
+  mui::Context::the().reset();
 
   lapse::LapseErrorQueue::the().tick();
 

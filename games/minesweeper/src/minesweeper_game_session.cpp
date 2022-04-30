@@ -21,19 +21,28 @@ void minesweeper_session::start_session() {
       break;
       case session_state::main_menu:
         if (!main_menu) main_menu = new minesweeper_main_menu;
-        
+        main_menu->start_main_loop();
       break;
       case session_state::game_run_startup:
         std::cout << "\n\n//\n// starting up a new game run ...\n//\n\n";
         if (run) delete run;
         run = new minesweeper_run();
-        run->initialize_run();
+        if (next_grid_size) {
+          run->initialize_run(next_grid_size->x, next_grid_size->y);
+        } else {
+          run->initialize_run();
+        }
         m_state = session_state::game_run_main_loop;
       break;
       case session_state::game_run_main_loop:
+        std::cout << "\n\n//\n// entering main loop\n//\n\n";
         run->start_main_loop();
+        std::cout << "\n\n//\n// exiting main loop\n//\n\n";
         // if the main loop has ended, then:
         m_state = session_state::game_run_startup;
+      break;
+      case session_state::application_shutdown:
+        // platform::close_application();
       break;
       default: std::cout << "Error! Bad game session state: " << (u32)m_state;
     }
@@ -44,6 +53,7 @@ void minesweeper_session::main_loop(f32 delta) {
   switch(m_state) {
     case session_state::game_run_main_loop: run->main_loop(delta);       break;
     case session_state::main_menu:          main_menu->main_loop(delta); break;
+    case session_state::application_shutdown : return; break;
     default:
       std::cout << "\n\nError! Bad minesweeper_session::main_loop() call \n\n";
       __debugbreak();

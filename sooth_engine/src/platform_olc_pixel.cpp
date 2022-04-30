@@ -40,9 +40,6 @@ public:
     if (main_loop)
       main_loop(delta);
 
-    // for (int x = 0; x < ScreenWidth(); x++)
-    //   for (int y = 0; y < ScreenHeight(); y++)
-    //     Draw(x, y, olc::Pixel(rand() % 256, rand() % 256, rand() % 256));
     return m_should_continue_running;
   }
 };
@@ -66,6 +63,8 @@ i32 get_pixel_size() { return pixel_size; }
 f32 get_window_padding() { return 10.0f; };
 
 void initialize(u32 screen_width, u32 screen_height, bool fullscreen, str window_name) {
+  // TODO so each time we call this we're creating a new app ... and not deleting the old one
+  //   so memory use probably goes up a bit after a few games
   app = new PixelEngineApp(window_name);
   status = app->Construct(i32(screen_width), i32(screen_height), pixel_size, pixel_size, fullscreen);
 
@@ -125,6 +124,36 @@ void plot(lapse::vec2<> screen_coord, lapse::vec3<u8> color) {
   app->Draw(
     screen_coord.x, screen_coord.y,
     olc::Pixel{color.r, color.g, color.b}
+  );
+}
+
+void draw_line(vec2<> start, vec2<> end, vec3<> color) {
+  f32 distance = (start-end).length(); 
+  vec2<> dir = (end-start).normalize();
+  for (vec2<> offset = {0, 0}; offset.length() < distance; offset += dir) {
+    plot(start+offset, color);
+  }
+}
+
+void draw_rect(vec2<> start, vec2<> size, vec3<> color) {
+  auto top_right_point    = start; top_right_point.x   += size.x;
+  auto bottom_left_point  = start; bottom_left_point.y += size.y;
+  auto bottom_right_point = start + size;
+
+  draw_line(start, top_right_point);
+  draw_line(top_right_point, bottom_right_point);
+  draw_line(bottom_right_point, bottom_left_point);
+  draw_line(bottom_left_point, start);
+}
+
+void draw_text(str text, vec2<> position, vec3<> color) {
+  // TODO font size
+  // TODO color
+
+  app->DrawString(
+    olc::vi2d{(i32)position.x, (i32)position.y},
+    text.to_c_str(),
+    olc::WHITE
   );
 }
 
