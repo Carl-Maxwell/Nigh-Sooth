@@ -22,7 +22,7 @@ void minesweeper_session::start_session() {
         m_state = session_state::main_menu;
       break;
       case session_state::main_menu:
-        if (!main_menu) main_menu = new minesweeper_main_menu;
+        // TODO this line is never hit
         main_menu->start_main_loop();
       break;
       case session_state::game_run_startup:
@@ -62,6 +62,8 @@ void minesweeper_session::main_loop(f32 delta) {
 
 // Initialize graphics (called once on application startup)
 void minesweeper_session::initialize_game_session() {
+  main_menu = new minesweeper_main_menu;
+
   image_array[ (u32)grid_tile::number_1 ] = image("resources/number_1.png");
   image_array[ (u32)grid_tile::number_2 ] = image("resources/number_2.png");
   image_array[ (u32)grid_tile::number_3 ] = image("resources/number_3.png");
