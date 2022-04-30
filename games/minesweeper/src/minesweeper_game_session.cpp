@@ -12,6 +12,8 @@ using namespace lapse;
 namespace minesweeper{
 
 void minesweeper_session::start_session() {
+  // TODO this needs a better name
+
   // activate game session
   while (m_state != session_state::application_shutdown) {
     switch(m_state) {
@@ -38,8 +40,6 @@ void minesweeper_session::start_session() {
         std::cout << "\n\n//\n// entering main loop\n//\n\n";
         run->start_main_loop();
         std::cout << "\n\n//\n// exiting main loop\n//\n\n";
-        // if the main loop has ended, then:
-        m_state = session_state::game_run_startup;
       break;
       case session_state::application_shutdown:
         // platform::close_application();
@@ -72,6 +72,11 @@ void minesweeper_session::initialize_game_session() {
   image_array[ (u32)grid_tile::hovered ]  = image("resources/grid_highlighted.png");
   image_array[ (u32)grid_tile::mined ]    = image("resources/bomb.png");
   image_array[ (u32)grid_tile::flagged ]  = image("resources/flag.png");
+}
+
+void minesweeper_session::restart_run() {
+  m_state = session_state::game_run_startup;
+  platform::close_application();
 }
 
 } // end namespace

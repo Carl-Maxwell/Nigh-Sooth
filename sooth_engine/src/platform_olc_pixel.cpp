@@ -86,6 +86,8 @@ void set_game_session_initialization_callback(lapse_lambda(void, void) arg_initi
 
 void close_application() {
   app->m_should_continue_running = false;
+
+  // note that this just ends the main loop, causing it to fall back to session::start_session()
 }
 
 void start_application() {

@@ -35,6 +35,7 @@ struct minesweeper_session{
   void start_session();
   void initialize_game_session();
   void main_loop(lapse::f32 delta);
+  void restart_run();
 };
 
 }

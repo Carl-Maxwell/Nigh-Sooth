@@ -19,7 +19,8 @@ image tile_obj::get_image(bool hovered) {
 void tile_obj::reveal(bool chance_of_chain) {
   if (m_mined) {
     m_tile_state = grid_tile::mined;
-    platform::close_application();
+    auto& session = minesweeper_session::the();
+    session.restart_run();
   } else if (m_adjacent_mines > 0) {
     m_tile_state = grid_tile(u32(grid_tile::hidden)+m_adjacent_mines);
   } else {
