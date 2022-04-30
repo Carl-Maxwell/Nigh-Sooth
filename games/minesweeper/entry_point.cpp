@@ -18,6 +18,8 @@ image* image_array = new image[11];
 const i32 grid_width  = 18;
 const i32 grid_height = 12;
 
+// TODO those variables should be allocated inside the game session initialization callback
+
 enum class grid_tile{
   number_1 = 1,
   number_2 = 2,
@@ -48,9 +50,18 @@ struct tile_obj{
       return image_array[(u32)m_tile_state];
     }
   }
+  void reset() {
+    m_adjacent_mines = 0;
+    m_coordinates = {0, 0};
+    m_mined   = false;
+    m_hidden  = true;
+    m_flagged = false;
+    m_tile_state = minesweeper::grid_tile::hidden;
+  }
   void reveal(bool chance_of_chain = true) {
     if (m_mined) {
       m_tile_state = grid_tile::mined;
+      platform::close_application();
     } else if (m_adjacent_mines > 0) {
       m_tile_state = grid_tile(u32(grid_tile::hidden)+m_adjacent_mines);
     } else {
@@ -63,8 +74,8 @@ struct tile_obj{
     m_hidden = false;
   }
   void chain_reaction() {
-    std::cout << "chain reaction: ";
-    m_coordinates.std_cout();
+    // std::cout << "chain reaction: ";
+    // m_coordinates.std_cout();
     if (!m_hidden || m_mined || m_flagged) { return; }
     reveal(false);
     i32 x = m_coordinates.x;
@@ -82,7 +93,10 @@ struct tile_obj{
   }
 };
 
-void initialize() {
+minesweeper::tile_obj* grid = new minesweeper::tile_obj[grid_width * grid_height];
+
+// Initialize graphics (called once on application startup)
+void initialize_game_session() {
   image_array[ (u32)grid_tile::number_1 ] = image("resources/number_1.png");
   image_array[ (u32)grid_tile::number_2 ] = image("resources/number_2.png");
   image_array[ (u32)grid_tile::number_3 ] = image("resources/number_3.png");
@@ -95,26 +109,13 @@ void initialize() {
   image_array[ (u32)grid_tile::flagged ]  = image("resources/flag.png");
 }
 
-}
-
-int main() {
-  sooth::initialize_engine();
-
-  using minesweeper::grid_height;
-  using minesweeper::grid_width;
-
-  // window:
-  // u32 WIDTH = 1280/4, HEIGHT = 720/4;
-  // u32 WIDTH = 1280, HEIGHT = 720;
-  // u32 WIDTH = 1920/4 - 20, HEIGHT = 1080/4 - 20;
-  i32 WIDTH = 16*18+20, HEIGHT = 16*12+20;
-
+// called each time we need to setup a new map to play
+void initialize_game_run() {
   // 18 x 12
-
-  minesweeper::tile_obj* grid = new minesweeper::tile_obj[grid_width * grid_height];
 
   for (i32 y = 0; y < grid_height; y++) {
     for (i32 x = 0; x < grid_width; x++) {
+      grid[y*grid_width + x].reset();
       grid[y*grid_width + x].m_coordinates = {x, y};
       grid[y*grid_width + x].grid = grid; // TODO stop copying this pointer around
     }
@@ -142,67 +143,112 @@ int main() {
       }
     }
   }
+}
 
-  platform::set_initialization_callback([](){
-    minesweeper::initialize();
+void main_loop_callback() {
+  platform::clear(vec3<>{0, 0, 0});
+
+  lapse::LapseErrorQueue::the().tick();
+
+  f32 grid_size = 16.0f;
+  f32 padding = platform::get_window_padding();
+
+  i32 mouse_x = (i32)Mouse::get_mouse_pos().x - padding;
+  i32 mouse_y = (i32)Mouse::get_mouse_pos().y - padding;
+  mouse_x /= grid_size;
+  mouse_y /= grid_size;
+  minesweeper::tile_obj* mouse_tile = nullptr;
+
+  if (mouse_x >= 0 && mouse_y >= 0 && mouse_x < grid_width && mouse_y < grid_height) {
+    mouse_tile = &grid[mouse_y * grid_width + mouse_x];
+  }
+
+  if (Mouse::left_mouse_hit()) {
+    if (mouse_tile && mouse_tile->m_hidden && !mouse_tile->m_flagged) {
+      mouse_tile->reveal();
+    }
+  } else if (Mouse::right_mouse_hit()) {
+    if (mouse_tile && mouse_tile->m_hidden) {
+      if (!mouse_tile->m_flagged) {
+        mouse_tile->m_tile_state = minesweeper::grid_tile::flagged;
+        mouse_tile->m_flagged = true;
+      } else {
+        mouse_tile->m_tile_state = minesweeper::grid_tile::hidden;
+        mouse_tile->m_flagged = false;
+      }
+    }
+  }
+
+  for (f32 y = 0; y < grid_height; y++) {
+    for (f32 x = 0; x < grid_width; x++) {
+      vec2<> screen_pos{x*grid_size + padding, y*grid_size + padding};
+      auto& tile = grid[u32(y*grid_width + x)];
+      bool hovering = mouse_tile && mouse_tile == &tile;
+      image img = tile.get_image(hovering);
+
+      platform::draw_bitmap(screen_pos, img);
+    }
+  }
+}
+
+} // end minesweeper namespace
+
+int main() {
+  sooth::initialize_engine();
+
+  using minesweeper::grid_height;
+  using minesweeper::grid_width;
+
+  // window:
+  // u32 WIDTH = 1280/4, HEIGHT = 720/4;
+  // u32 WIDTH = 1280, HEIGHT = 720;
+  // u32 WIDTH = 1920/4 - 20, HEIGHT = 1080/4 - 20;
+  i32 WIDTH = 16*18+20, HEIGHT = 16*12+20;
+
+  platform::set_game_session_initialization_callback([](){
+    minesweeper::initialize_game_session();
   });
 
-  platform::initialize(WIDTH, HEIGHT, false, "Nigh Sooth Engine Test");
-
-  platform::set_main_loop_callback([&grid](f32 delta){
-    platform::clear(vec3<>{0, 0, 0});
-
-    lapse::LapseErrorQueue::the().tick();
-
-    for (f32 y = 0; y < platform::get_window_height(); y++) {
-      for (f32 x = 0; x < platform::get_window_width(); x++) {
-        vec3<> color{1, 1, 1};
-        color *= (x / platform::get_window_width());
-        platform::plot(vec2<f32>{x, y}, color);
-      }
-    }
-
-    f32 grid_size = 16.0f;
-    f32 padding = platform::get_window_padding();
-
-    i32 mouse_x = (i32)Mouse::get_mouse_pos().x - padding;
-    i32 mouse_y = (i32)Mouse::get_mouse_pos().y - padding;
-    mouse_x /= grid_size;
-    mouse_y /= grid_size;
-    minesweeper::tile_obj* mouse_tile = nullptr;
-
-    if (mouse_x >= 0 && mouse_y >= 0 && mouse_x < grid_width && mouse_y < grid_height) {
-      mouse_tile = &grid[mouse_y * grid_width + mouse_x];
-    }
-
-    if (Mouse::left_mouse_hit()) {
-      if (mouse_tile && mouse_tile->m_hidden && !mouse_tile->m_flagged) {
-        mouse_tile->reveal();
-      }
-    } else if (Mouse::right_mouse_hit()) {
-      if (mouse_tile && mouse_tile->m_hidden) {
-        if (!mouse_tile->m_flagged) {
-          mouse_tile->m_tile_state = minesweeper::grid_tile::flagged;
-          mouse_tile->m_flagged = true;
-        } else {
-          mouse_tile->m_tile_state = minesweeper::grid_tile::hidden;
-          mouse_tile->m_flagged = false;
-        }
-      }
-    }
-
-    for (f32 y = 0; y < grid_height; y++) {
-      for (f32 x = 0; x < grid_width; x++) {
-        vec2<> screen_pos{x*grid_size + padding, y*grid_size + padding};
-        auto& tile = grid[u32(y*grid_width + x)];
-        bool hovering = mouse_tile && mouse_tile == &tile;
-        image img = tile.get_image(hovering);
-
-        platform::draw_bitmap(screen_pos, img);
-      }
-    }
-    
+  platform::set_main_loop_callback([](f32 delta){
+    minesweeper::main_loop_callback();
   } );
+
+  //
+  // Start the game
+  //
+
+  enum class game_session_state{
+    application_shutdown = 0, // entire program is shutting down
+    application_startup,      // application is starting up
+    main_menu,                // game's main menu
+    game_run_startup,         // loading level 1, setting up the game
+    game_run_main_loop,       // main loop of the game
+  };
+
+  auto game_session = game_session_state::game_run_startup; // TODO should be game_session_state::application_startup
+
+  // game session loop
+  while (game_session != game_session_state::application_shutdown) {
+    switch(game_session) {
+      // case game_session_state::application_startup:
+      //   game_session = game_session_state::game_run_main_loop;
+      // break;
+      case game_session_state::game_run_startup:
+        minesweeper::initialize_game_run();
+        game_session = game_session_state::game_run_main_loop;
+      break;
+      case game_session_state::game_run_main_loop:
+        platform::initialize(WIDTH, HEIGHT, false, "Nigh Sooth Engine Test");
+        platform::start_application();
+        // if the main loop has ended, then:
+        game_session = game_session_state::game_run_startup;
+      break;
+      // case game_session_state::main_menu:
+      //   game_session = game_session_state::game_run_main_loop;
+      // break;
+      // default: std::cout << "Error! Bad game session state: " << (u32)game_session;
+    }
+  }
 
   return 0;
 }

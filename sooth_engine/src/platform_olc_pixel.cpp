@@ -9,7 +9,8 @@
 #include "lapse_lib.h"
 
 namespace{
-  lapse_lambda(void, void) initialization_callback;
+  lapse_lambda(void, void) game_session_initialization_callback;
+  bool game_session_started = false;
   lapse_lambda(void, lapse::f32) main_loop;
 }
 
@@ -25,9 +26,11 @@ public:
 
 public:
   bool OnUserCreate() override {
-    std::cout << "calling OnUserCreate()\n";
-    if (initialization_callback)
-      initialization_callback();
+    std::cout << "\n// calling OnUserCreate()\n\n";
+    if (game_session_initialization_callback && !game_session_started) {
+      game_session_initialization_callback();
+      game_session_started = true;
+    }
     return true;
   }
 
@@ -72,23 +75,29 @@ void initialize(u32 screen_width, u32 screen_height, bool fullscreen, str window
     case olc::rcode::FAIL:    std::cout << "olc::rcode::FAIL";    break;
     case olc::rcode::OK:      std::cout << "olc::rcode::OK";      break;
     case olc::rcode::NO_FILE: std::cout << "olc::rcode::NO_FILE"; break;
-    default: std::cout << "olc::rode not recognized"; break;
+    default: std::cout << "olc::rcode not recognized"; break;
   }
   
   std::cout << "\n";
 }
 
-void set_initialization_callback(lapse_lambda(void, void) arg_initialization_callback) {
-  initialization_callback = arg_initialization_callback;
+void set_game_session_initialization_callback(lapse_lambda(void, void) arg_initialization_callback) {
+  game_session_initialization_callback = arg_initialization_callback;
 }
 
 void close_application() {
   app->m_should_continue_running = false;
 }
 
+void start_application() {
+  std::cout << "\n\n//\n// start of start_application\n//\n\n";
+  olc::rcode code = app->Start();
+  // TODO look at rcode
+  std::cout << "\n\n//\n//end of start_application\n//\n\n";
+}
+
 void set_main_loop_callback(lapse_lambda(void, f32) arg_main_loop) {
   main_loop = arg_main_loop;
-  app->Start();
 };
 
 // returns number of frames since game start

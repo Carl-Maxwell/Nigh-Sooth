@@ -13,8 +13,9 @@ lapse::i32 get_pixel_size();
 void initialize(lapse::u32 screen_width, lapse::u32 screen_height, bool fullscreen, lapse::str window_name);
 
 void close_application();
+void start_application();
 
-void set_initialization_callback(lapse_lambda(void, void) arg_initialization_callback);
+void set_game_session_initialization_callback(lapse_lambda(void, void) arg_initialization_callback);
 
 void set_main_loop_callback(lapse_lambda(void, lapse::f32) main_loop);
 
