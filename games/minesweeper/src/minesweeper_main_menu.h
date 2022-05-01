@@ -2,14 +2,17 @@
 
 #include "lapse_scalar.h"
 
-namespace minesweeper{
-
-struct minesweeper_main_menu{
-  enum class menu_location {
+namespace mui{
+  enum class page {
     main_menu,
     new_game_menu
   };
-  menu_location current_menu = menu_location::main_menu;
+};
+
+namespace minesweeper{
+
+struct minesweeper_main_menu{
+  mui::page current_menu = mui::page::main_menu;
 
   void main_loop(lapse::f32 delta);
   void start_main_loop();

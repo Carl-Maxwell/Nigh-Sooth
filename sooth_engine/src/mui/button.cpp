@@ -1,6 +1,6 @@
 #include "button.h"
 
-#include "lapse_lib.h"
+#include <lapse_lib.h>
 
 #include "platform_olc_pixel.h"
 

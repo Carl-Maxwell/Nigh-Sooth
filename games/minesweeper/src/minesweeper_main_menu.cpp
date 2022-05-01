@@ -8,6 +8,7 @@
 #include "platform_olc_pixel.h"
 #include "minesweeper_game_session.h"
 
+#include "mui/mui_div.h"
 #include "mui/button.h"
 
 using namespace lapse;
@@ -25,13 +26,23 @@ void minesweeper_main_menu::main_loop(f32 delta) {
   }
 
   switch (current_menu) {
-    case menu_location::main_menu: main_menu(); break;
-    case menu_location::new_game_menu: new_game_menu(); break;
+    case mui::page::main_menu: main_menu(); break;
+    case mui::page::new_game_menu: new_game_menu(); break;
   }
 }
 
 void minesweeper_main_menu::main_menu() {
   auto& session = minesweeper_session::the();
+
+  {
+    mui::params div_params;
+
+    div_params.border = {1};
+    div_params.background_color = {0, 0 ,0};
+    div_params.size = {100, 100};
+
+    mui::open_div(div_params);
+  }
 
   if (session.run) {
     if (mui::button("continue game")) {
@@ -40,13 +51,15 @@ void minesweeper_main_menu::main_menu() {
   }
 
   if (mui::button("New Game")) {
-    current_menu = menu_location::new_game_menu;
+    current_menu = mui::page::new_game_menu;
   }
 
   if (mui::button("Exit Minesweeper")) {
     session.m_state = session_state::application_shutdown;
     platform::close_application();
   }
+
+  mui::close_div();
 }
 
 void minesweeper_main_menu::new_game_menu() {
@@ -56,18 +69,18 @@ void minesweeper_main_menu::new_game_menu() {
     session.next_grid_size = new vec2<i32>{18, 12};
     session.m_state = session_state::game_run_startup;
     platform::close_application();
-    current_menu = menu_location::main_menu;
+    current_menu = mui::page::main_menu;
   }
 
   if (mui::button("hard game")) {
     session.next_grid_size = new vec2<i32>{27, 16};
     session.m_state = session_state::game_run_startup;
     platform::close_application();
-    current_menu = menu_location::main_menu;
+    current_menu = mui::page::main_menu;
   }
 
   if (mui::button("back")) {
-    current_menu = menu_location::main_menu;
+    current_menu = mui::page::main_menu;
   }
 }
 

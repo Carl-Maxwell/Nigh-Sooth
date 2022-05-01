@@ -44,6 +44,8 @@ typedef double f64; // IEEE 754 64-bit double precision (binary64)
 
 // float constants:
 
+const f32 f32_almost_inf = 3.4028235e38f;
+
 const u64 f32_significant_digits   =  7;
 const u64 f32_exponent_max         =  127;
 const u64 f32_exponent_min         =  126;
@@ -96,7 +98,7 @@ struct vec2{
   f32 length() {
     return (f32)sqrt(x*x + y*y);
   }
-  // returns this vector normlized to a length of 1.0
+  // returns this vector normalized to a length of 1.0
   vec2 normalize() {
     return (*this)/length();
   }
@@ -125,6 +127,12 @@ struct vec2{
 
     return temp;
     // TODO check for lifetime issues
+  }
+  vec2& operator-=(vec2 right_value) {
+    x -= right_value.x;
+    y -= right_value.y;
+
+    return *this;
   }
   vec2 operator*(vec2 right_value) {
     vec2 temp;
@@ -171,6 +179,13 @@ struct vec3{
   union { T y, g; };
   union { T z, b; };
 
+  bool operator!=(vec3<T> right_value) const {
+    return
+         x != right_value.x
+      && y != right_value.y
+      && z != right_value.z;
+  }
+
   vec3<T>& operator*=(f32 scalar) {
     x *= scalar;
     y *= scalar;
@@ -196,6 +211,16 @@ struct vec4{
   union { T y, g; };
   union { T z, b; };
   union { T w, a; };
+
+  f32& operator[](i32 index) {
+    switch(index) {
+      case 0: return x; break;
+      case 1: return y; break;
+      case 2: return z; break;
+      case 3: return w; break;
+      default: __debugbreak(); "Error! Index out of bounds";
+    }
+  };
 };
 
 // TODO need vector math funcs

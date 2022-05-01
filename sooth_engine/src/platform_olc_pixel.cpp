@@ -3,6 +3,8 @@
 
 #include "platform_olc_pixel.h"
 
+#include "lapse_geometry.h"
+
 #include "sooth_image.h"
 #include "sooth_input.h"
 
@@ -115,6 +117,11 @@ vec2<> get_window_size() {
   };
 }
 
+// convert our vec3<> colors to olc pixel vi2d u8 colors
+olc::Pixel vec3_to_color(vec3<> color) {
+  return olc::Pixel{u8(color.r*255), u8(color.g*255), u8(color.b*255)};
+}
+
 void plot(vec2<> screen_coord, vec3<> color) {
   app->Draw(
     screen_coord.x, screen_coord.y,
@@ -146,6 +153,23 @@ void draw_rect(vec2<> start, vec2<> size, vec3<> color) {
   draw_line(top_right_point, bottom_right_point);
   draw_line(bottom_right_point, bottom_left_point);
   draw_line(bottom_left_point, start);
+}
+
+void draw_rect(rect box, vec3<> color) {
+  draw_line(box.top_left_point(),     box.top_right_point());
+  draw_line(box.top_right_point(),    box.bottom_right_point());
+  draw_line(box.bottom_right_point(), box.bottom_left_point());
+  draw_line(box.bottom_left_point(),  box.top_left_point());
+}
+
+void fill_rect(rect box, vec3<> color) {
+  vec2<> point = box.top_left_point();
+  for (; point.y < box.bottom_right_point().y; point.y++) {
+    for (; point.x < box.bottom_right_point().x; point.x++) {
+      plot(point, color);
+    }
+    point.x = box.top_left_point().x;
+  }
 }
 
 void draw_text(str text, vec2<> position, vec3<> color) {

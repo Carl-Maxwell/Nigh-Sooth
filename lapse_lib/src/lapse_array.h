@@ -88,6 +88,7 @@ public:
     return output;
   };
   */
+  u32 last_index() { return m_length-1; }
   u32 length() { return m_length; }
   // transform each elem with lambda : elem = lambda(elem)
   fixed_array& map(lapse_lambda(T, T) callback) {
@@ -160,8 +161,15 @@ public:
   array() {};
   array(u32 start_size) { reserve(start_size); };
 
+  T& pop() {
+    assert(this->m_length > 0);
+    this->m_length -= 1;
+    return this->m_elements[this->m_length];
+  };
   void push(T elem) {
     this->m_elements[this->m_length] = elem;
+    // note: you need to call reserve() or use the constructor before pushing elements
+    //   otherwise you get an exception on that line above this comment
     this->m_length++;
 
     if (this->m_length == this->m_size) {
