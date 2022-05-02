@@ -157,7 +157,7 @@ void minesweeper_run::generate_safe_spaces(tile_obj* start_tile) {
     auto& tile = frontier->sample();
     frontier->remove(tile);
     safe_spaces.push(tile.m_coordinates);
-    auto* adjacents = tile.adjacent_tiles();
+    auto* adjacents = tile.adjacent_tiles_cardinal();
     for (auto i = 0; i < adjacents->length(); i++) {
       auto& adj_tile = (*adjacents)[i]; 
       if (safe_spaces.contains(adj_tile.m_coordinates)) { continue; }

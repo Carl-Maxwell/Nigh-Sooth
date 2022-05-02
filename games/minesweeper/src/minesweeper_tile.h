@@ -33,6 +33,7 @@ struct tile_obj{
   // minesweeper::tile_obj* grid;
 
   lapse::array<tile_obj>* adjacent_tiles();
+  lapse::array<tile_obj>* adjacent_tiles_cardinal();
   lapse::i32 calculate_adjacent_mines();
   image get_image(bool hovered = false);
   void reset() {

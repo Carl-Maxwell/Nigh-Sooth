@@ -6,6 +6,7 @@ using namespace lapse;
 
 namespace minesweeper{
 
+// returns adjacent tiles
 array<tile_obj>* tile_obj::adjacent_tiles() {
   auto& session = minesweeper_session::the();
   auto& run = *session.run;
@@ -23,6 +24,42 @@ array<tile_obj>* tile_obj::adjacent_tiles() {
 
   return adjacents;
 }
+
+// returns adjacent tiles, but not diagonally adjacent
+array<tile_obj>* tile_obj::adjacent_tiles_cardinal() {
+  auto& session = minesweeper_session::the();
+  auto& run = *session.run;
+
+  auto x = m_coordinates.x;
+  auto y = m_coordinates.y;
+
+  array<tile_obj>* adjacents = new array<tile_obj>(8);
+  for (auto y2 = max(y-1, 0); y2 < min(y+2, run.grid_height); y2++) {
+    for (auto x2 = max(x-1, 0); x2 < min(x+2, run.grid_width); x2++) {
+      if (x2 == x && y2 == y) { continue; }
+      if (x2 != x && y2 != y) { continue; }
+      adjacents->push(run.grid[y2*run.grid_width + x2]);
+    }
+  }
+
+  // we want these:
+  // 0 1 0
+  // 1 0 1
+  // 0 1 0
+
+  // so if tile position: 11, 11
+  // then adjacent positions range from: (10, 10) to (12, 12)
+
+  // so all we have to do is make sure either coord is 11:
+
+  // 10, 10x  11, 10    12, 10x
+  // 10, 11   11, 11x   12, 11
+  // 10, 12x  11, 12    12, 12x
+  // here x indicates eliminating a point
+
+  return adjacents;
+}
+
 // returns the count of how many mines are are in adjacent tiles
 i32 tile_obj::calculate_adjacent_mines() {
   auto& session = minesweeper_session::the();
