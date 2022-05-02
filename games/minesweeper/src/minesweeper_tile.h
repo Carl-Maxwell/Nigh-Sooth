@@ -31,6 +31,7 @@ struct tile_obj{
   grid_tile m_tile_state = minesweeper::grid_tile::hidden;
   // minesweeper::tile_obj* grid;
 
+  lapse::i32 calculate_adjacent_mines();
   image get_image(bool hovered = false);
   void reset() {
     m_adjacent_mines = 0;

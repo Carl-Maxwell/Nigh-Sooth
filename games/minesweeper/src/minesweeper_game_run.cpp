@@ -30,7 +30,13 @@ void minesweeper_run::main_loop(f32 delta) {
 
   if (Mouse::left_mouse_hit()) {
     if (mouse_tile && mouse_tile->m_hidden && !mouse_tile->m_flagged) {
-      mouse_tile->reveal();
+      if (m_first_click) {
+        m_first_click = false;
+        
+
+      } else {
+        mouse_tile->reveal();
+      }
     }
   } else if (Mouse::right_mouse_hit()) {
     if (mouse_tile && mouse_tile->m_hidden) {
@@ -85,26 +91,31 @@ void minesweeper_run::initialize_run(i32 n_width, i32 n_height) {
     }
   }
 
+  auto num_mines = (grid_width * grid_height)/4; // 18
+
   // generate mines
-  for (u32 n = 0; n < 18; n++) {
+  for (u32 n = 0; n < num_mines; n++) {
     auto x = (i32)rand_integer(grid_width);
     auto y = (i32)rand_integer(grid_height);
 
     // if it's already mined, find a fresh spot
-    while (grid[y*grid_width + x].m_mined) {
+    while (
+      grid[y*grid_width + x].m_mined ||
+      grid[y*grid_width + x].calculate_adjacent_mines() > 5
+    ) {
       x = (i32)rand_integer(grid_width);
       y = (i32)rand_integer(grid_height);
     }
 
     grid[y*grid_width + x].m_mined = true;
+    grid[y*grid_width + x].m_adjacent_mines =
+      grid[y*grid_width + x].calculate_adjacent_mines();
+  }
 
-    // update adjacent mine count in adjacent squares
-    for (auto y2 = max(y-1, 0); y2 < min(y+2, grid_height); y2++) {
-      for (auto x2 = max(x-1, 0); x2 < min(x+2, grid_width); x2++) {
-        if (x2 == x && y2 == y) { continue; }
-        grid[y2*grid_width + x2].m_adjacent_mines++;
-        assert(grid[y2*grid_width + x2].m_adjacent_mines <= 5);
-      }
+  for (i32 y = 0; y < grid_height; y++) {
+    for (i32 x = 0; x < grid_width; x++) {
+      auto& tile = grid[y*grid_width + x];
+      tile.m_adjacent_mines = tile.calculate_adjacent_mines();
     }
   }
 }
