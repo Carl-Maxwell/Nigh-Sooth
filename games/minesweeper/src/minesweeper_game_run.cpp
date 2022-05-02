@@ -167,7 +167,6 @@ void minesweeper_run::generate_safe_spaces(tile_obj* start_tile) {
   }
 
   delete frontier;
-  
 }
 
 // place mines on the map
