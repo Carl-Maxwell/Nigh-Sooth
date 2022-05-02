@@ -143,6 +143,11 @@ struct vec2{
     return temp;
     // TODO check for lifetime issues
   }
+
+  // boolean operators
+  bool operator==(vec2 right_value){
+    return x == right_value.x && y == right_value.y;
+  }
   bool operator<(vec2 right_value) {
     bool temp = true;
 

@@ -32,8 +32,12 @@ void minesweeper_run::main_loop(f32 delta) {
     if (mouse_tile && mouse_tile->m_hidden && !mouse_tile->m_flagged) {
       if (m_first_click) {
         m_first_click = false;
-        
-
+        generate_safe_spaces(mouse_tile);
+        generate_mines();
+        for (i32 i = 0; i < safe_spaces.length(); i++) {
+          auto& safe_tile = grid[safe_spaces[i].y * grid_width + safe_spaces[i].x];
+          safe_tile.reveal();
+        }
       } else {
         mouse_tile->reveal();
       }
@@ -90,26 +94,69 @@ void minesweeper_run::initialize_run(i32 n_width, i32 n_height) {
       // grid[y*grid_width + x].grid = grid; // TODO stop copying this pointer around
     }
   }
+}
 
-  auto num_mines = (grid_width * grid_height)/4; // 18
+//
+void minesweeper_run::generate_safe_spaces(tile_obj* start_tile) {
+  safe_spaces.reserve(9 + 6);
+  safe_spaces.push(start_tile->m_coordinates);
 
-  // generate mines
+  // add adjacent tiles
+  array<tile_obj>* adjacents = start_tile->adjacent_tiles();
+  for (i32 i = 0; i < adjacents->length(); i++) {
+    safe_spaces.push((*adjacents)[i].m_coordinates);
+  }
+  
+  // TODO: add 1d6 adjacent tiles into the safe area
+  //   finding tiles that are adjacent to the 3x3 safe area 
+
+  // find the "frontier" -- the tiles adjacent to the 3x3 safe area
+  // array<tile_obj>* frontier = new array<tile_obj>(3*3*8);
+  // for (i32 i = 0; i < adjacents->length(); i++) {
+  //   frontier->push((*adjacents)[i]);
+  //   array<tile_obj>* sub_adjacents = (*adjacents)[i].adjacent_tiles();
+  //   *frontier += *sub_adjacents; // push each elem onto frontier
+  //   delete sub_adjacents;
+  // }
+  // frontier->do_sort();
+  // frontier->do_unique(true);
+  // TODO foreach over frontier and remove safe spaces from it
+  // TODO then the frontier is finally calculated.
+  //   So, sample 1d6 elems from it and add them to safe_spaces
+
+  // simpler approach: just loop from x-1, y-1, to x+1, y+1 from the safe area's top left to bottom left...
+  //   then just skip if the coord is inside the 3x3 area.
+  // That gives us the starting frontier, so then just sample it...
+  //   but then you have to grow the frontier to tiles adjacent to that new space.
+
+  // delete frontier;
+  delete adjacents;
+}
+
+// place mines on the map
+void minesweeper_run::generate_mines(i32 num_mines) {
+  if (!num_mines) {
+    num_mines = (grid_width * grid_height)/4;
+  }
+
   for (u32 n = 0; n < num_mines; n++) {
-    auto x = (i32)rand_integer(grid_width);
-    auto y = (i32)rand_integer(grid_height);
+    i32 x;
+    i32 y;
+    bool bad_spot = true;
 
     // if it's already mined, find a fresh spot
-    while (
-      grid[y*grid_width + x].m_mined ||
-      grid[y*grid_width + x].calculate_adjacent_mines() > 5
-    ) {
+    while (bad_spot) {
       x = (i32)rand_integer(grid_width);
       y = (i32)rand_integer(grid_height);
+
+      bad_spot = grid[y*grid_width + x].m_mined;
+      bad_spot = bad_spot || grid[y*grid_width + x].calculate_adjacent_mines() > 5;
+      bad_spot = bad_spot || safe_spaces.contains(vec2<i32>{x,y});
     }
 
-    grid[y*grid_width + x].m_mined = true;
-    grid[y*grid_width + x].m_adjacent_mines =
-      grid[y*grid_width + x].calculate_adjacent_mines();
+    auto& tile = grid[y*grid_width + x];
+    tile.m_mined = true;
+    tile.m_adjacent_mines = tile.calculate_adjacent_mines();
   }
 
   for (i32 y = 0; y < grid_height; y++) {

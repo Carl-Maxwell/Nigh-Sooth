@@ -193,6 +193,19 @@ public:
       this->m_size = better_size;
     }
   }
+  array& do_unique(bool is_sorted = false) {
+    if (is_sorted) {
+      // TODO remove non-unique elements. The array is sorted so that's pretty easy.
+      //   for (elem in arr)
+      //     if elem == previous elem, then remove elem.
+      // ... should probably use a sortof 'tombstone' system, .remove() isn't really the most efficient implementation at the moment
+    } else {
+      assert(false);
+      // TODO remove non-unique elements in place without sorting ... maybe with a hash?
+      //   or just make a sorted array and use that for the unique checks?
+      //  ... though that wouldn't be an in place algorithm.
+    }
+  }
 
   array& operator+=(const array other) {
     u32 total_length = this->m_length + other.m_length;

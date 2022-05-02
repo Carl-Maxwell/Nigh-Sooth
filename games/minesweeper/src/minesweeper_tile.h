@@ -31,18 +31,22 @@ struct tile_obj{
   grid_tile m_tile_state = minesweeper::grid_tile::hidden;
   // minesweeper::tile_obj* grid;
 
+  lapse::array<tile_obj>* adjacent_tiles();
   lapse::i32 calculate_adjacent_mines();
   image get_image(bool hovered = false);
   void reset() {
     m_adjacent_mines = 0;
-    m_coordinates = {0, 0};
-    m_mined   = false;
-    m_hidden  = true;
-    m_flagged = false;
-    m_tile_state = minesweeper::grid_tile::hidden;
+    m_coordinates    = {0, 0};
+    m_mined          = false;
+    m_hidden         = true;
+    m_flagged        = false;
+    m_tile_state     = minesweeper::grid_tile::hidden;
   }
   void reveal(bool chance_of_chain = true);
   void chain_reaction();
+  bool operator==(tile_obj right) {
+    return m_coordinates == right.m_coordinates;
+  }
 };
 
 } // end namespace
