@@ -138,7 +138,18 @@ void minesweeper_run::generate_safe_spaces(tile_obj* start_tile) {
   // TODO should this be called "frontier" ? Could call it boundary, bounds, outer_edge,
   //   border, borderline, hedge, fence, limit, partition, rim, verge, marches,
 
-  // starting frontier is calculated, now add 1d6 random tiles to it
+  // At this point the frontier is like this:
+  // 1 1 1 1 1
+  // 1 0 0 0 1
+  // 1 0 0 0 1
+  // 1 0 0 0 1
+  // 1 1 1 1 1
+  // Where the 0s are the 3x3 of safe spaces
+
+  // starting frontier is calculated,
+  //   now add 1d6 random tiles to safe spaces from the frontier
+  //   expanding the frontier each time to include the new adjacent tiles
+  //   where those new tiles are not already safe or frontier
 
   auto extra_spaces = die(6);
 
@@ -154,9 +165,6 @@ void minesweeper_run::generate_safe_spaces(tile_obj* start_tile) {
       frontier->push(adj_tile);
     }
   }
-
-  // frontier->do_sort();
-  // frontier->do_unique(true);
 
   delete frontier;
   
@@ -179,8 +187,14 @@ void minesweeper_run::generate_mines(i32 num_mines) {
       y = (i32)rand_integer(grid_height);
 
       bad_spot = grid[y*grid_width + x].m_mined;
-      bad_spot = bad_spot || grid[y*grid_width + x].calculate_adjacent_mines() > 5;
+      bad_spot = bad_spot || grid[y*grid_width + x].calculate_adjacent_mines() >= 5;
       bad_spot = bad_spot || safe_spaces.contains(vec2<i32>{x,y});
+
+      auto* adjacents = grid[y*grid_width + x].adjacent_tiles();
+      for (i32 i = 0; i < adjacents->length(); i++) {
+        bad_spot = bad_spot || (*adjacents)[i].calculate_adjacent_mines() >= 5;
+      }
+      delete adjacents;
     }
 
     auto& tile = grid[y*grid_width + x];
@@ -192,6 +206,7 @@ void minesweeper_run::generate_mines(i32 num_mines) {
     for (i32 x = 0; x < grid_width; x++) {
       auto& tile = grid[y*grid_width + x];
       tile.m_adjacent_mines = tile.calculate_adjacent_mines();
+      assert(tile.m_adjacent_mines <= 5);
     }
   }
 }
