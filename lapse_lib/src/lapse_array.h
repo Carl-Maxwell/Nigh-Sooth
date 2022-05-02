@@ -4,6 +4,7 @@
 #include "lapse_math.h"
 #include "lapse_lambda.h"
 #include "lapse_exceptions.h"
+#include "lapse_random.h"
 
 #include <initializer_list>
 
@@ -133,6 +134,14 @@ public:
       error(error_code::close_app);
     }
   }
+  // returns n random elements
+  T& sample(i32 n=1) {
+    assert(m_length > 0);
+    assert(n == 1); // TODO implement loop
+    auto r = rand_integer(m_length-1);
+    assert(r < length()-1 && r >= 0);
+    return m_elements[r];
+  }
 
   inline T& operator[](u32 i) const {
     return at(i);
@@ -171,6 +180,10 @@ public:
     // note: you need to call reserve() or use the constructor before pushing elements
     //   otherwise you get an exception on that line above this comment
     this->m_length++;
+
+    // TODO currently this grows the array allocation when you hit the size ...
+    //   shouldn't it instead grow only if you try to push past the size?
+    //   Otherwise you'll always be allocating more than you actually use.
 
     if (this->m_length == this->m_size) {
       reserve(u32(ceil_i(f32(this->m_size) * 1.5f)));
@@ -226,7 +239,6 @@ public:
   // TODO .search(elem), .search(lambda)
   // TODO .count(elem), .count(lambda)
   // TODO iterator, range based for loop compatibility
-  // TODO .sample(n) -- returns n random elements
   // TODO .slice() 
   // TODO .select(lambda) -- returns a sub array where each lambda(elem) returns true
   // TODO .shuffle(start), .shuffle(start, length)

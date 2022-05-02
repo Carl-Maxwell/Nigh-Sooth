@@ -35,8 +35,8 @@ void plot(lapse::vec2<> screen_coord, lapse::vec3<lapse::u8> color);
 void draw_line(lapse::vec2<> start, lapse::vec2<> end, lapse::vec3<> color = {1.0, 1.0, 1.0});
 void draw_text(lapse::str text, lapse::vec2<> position, lapse::vec3<> color = {1.0, 1.0, 1.0});
 void draw_rect(lapse::vec2<> start, lapse::vec2<> size, lapse::vec3<> color = {1.0, 1.0, 1.0});
-void draw_rect(lapse::rect box, lapse::vec3<> color);
-void fill_rect(lapse::rect box, lapse::vec3<> color);
+void draw_rect(lapse::rect<> box, lapse::vec3<> color);
+void fill_rect(lapse::rect<> box, lapse::vec3<> color);
 
 void draw_bitmap(
   lapse::vec2<>  screen_coord,

@@ -155,14 +155,14 @@ void draw_rect(vec2<> start, vec2<> size, vec3<> color) {
   draw_line(bottom_left_point, start);
 }
 
-void draw_rect(rect box, vec3<> color) {
+void draw_rect(rect<> box, vec3<> color) {
   draw_line(box.top_left_point(),     box.top_right_point());
   draw_line(box.top_right_point(),    box.bottom_right_point());
   draw_line(box.bottom_right_point(), box.bottom_left_point());
   draw_line(box.bottom_left_point(),  box.top_left_point());
 }
 
-void fill_rect(rect box, vec3<> color) {
+void fill_rect(rect<> box, vec3<> color) {
   vec2<> point = box.top_left_point();
   for (; point.y < box.bottom_right_point().y; point.y++) {
     for (; point.x < box.bottom_right_point().x; point.x++) {

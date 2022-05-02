@@ -1,6 +1,7 @@
 #pragma once
 
 #include <lapse_scalar.h>
+#include <lapse_geometry.h>
 
 #include <sooth_image.h>
 
@@ -44,6 +45,7 @@ struct tile_obj{
   }
   void reveal(bool chance_of_chain = true);
   void chain_reaction();
+  lapse::rect<lapse::i32> to_rect();
   bool operator==(tile_obj right) {
     return m_coordinates == right.m_coordinates;
   }

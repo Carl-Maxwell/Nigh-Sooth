@@ -101,36 +101,65 @@ void minesweeper_run::generate_safe_spaces(tile_obj* start_tile) {
   safe_spaces.reserve(9 + 6);
   safe_spaces.push(start_tile->m_coordinates);
 
-  // add adjacent tiles
-  array<tile_obj>* adjacents = start_tile->adjacent_tiles();
-  for (i32 i = 0; i < adjacents->length(); i++) {
-    safe_spaces.push((*adjacents)[i].m_coordinates);
+  // grid space rectangular coords of safe area
+  rect<i32> safe_3x3{{i32_max, i32_max}, {3, 3}};
+
+  {
+    // add adjacent tiles
+    array<tile_obj>* adjacents = start_tile->adjacent_tiles();
+    for (i32 i = 0; i < adjacents->length(); i++) {
+      safe_spaces.push((*adjacents)[i].m_coordinates);
+      
+      // find the top left coord
+      safe_3x3.position.x = min(safe_3x3.position.x, (*adjacents)[i].m_coordinates.x);
+      safe_3x3.position.y = min(safe_3x3.position.y, (*adjacents)[i].m_coordinates.y);
+    }
+    delete adjacents;
   }
-  
+
   // TODO: add 1d6 adjacent tiles into the safe area
   //   finding tiles that are adjacent to the 3x3 safe area 
 
   // find the "frontier" -- the tiles adjacent to the 3x3 safe area
-  // array<tile_obj>* frontier = new array<tile_obj>(3*3*8);
-  // for (i32 i = 0; i < adjacents->length(); i++) {
-  //   frontier->push((*adjacents)[i]);
-  //   array<tile_obj>* sub_adjacents = (*adjacents)[i].adjacent_tiles();
-  //   *frontier += *sub_adjacents; // push each elem onto frontier
-  //   delete sub_adjacents;
-  // }
+  array<tile_obj>* frontier = new array<tile_obj>(5*5 - 3*3 + 1);
+
+  auto x    = safe_3x3.top_left_point().x;
+  auto y    = safe_3x3.top_left_point().y;
+  auto br_x = safe_3x3.bottom_right_point().x;
+  auto br_y = safe_3x3.bottom_right_point().y;
+
+  for (auto y2 = max(y-1, 0); y2 < min(br_y+1, grid_height); y2++) {
+    for (auto x2 = max(x-1, 0); x2 < min(br_x+1, grid_width); x2++) {
+      if (x2 >= x && y2 >= y && x2 < br_x && y2 < br_y) { continue; }
+      frontier->push(grid[y2*grid_width + x2]);
+    }
+  }
+
+  // TODO should this be called "frontier" ? Could call it boundary, bounds, outer_edge,
+  //   border, borderline, hedge, fence, limit, partition, rim, verge, marches,
+
+  // starting frontier is calculated, now add 1d6 random tiles to it
+
+  auto extra_spaces = die(6);
+
+  for (auto i = 0; i < extra_spaces; i++) {
+    auto& tile = frontier->sample();
+    frontier->remove(tile);
+    safe_spaces.push(tile.m_coordinates);
+    auto* adjacents = tile.adjacent_tiles();
+    for (auto i = 0; i < adjacents->length(); i++) {
+      auto& adj_tile = (*adjacents)[i]; 
+      if (safe_spaces.contains(adj_tile.m_coordinates)) { continue; }
+      if (frontier->contains(adj_tile)) { continue; }
+      frontier->push(adj_tile);
+    }
+  }
+
   // frontier->do_sort();
   // frontier->do_unique(true);
-  // TODO foreach over frontier and remove safe spaces from it
-  // TODO then the frontier is finally calculated.
-  //   So, sample 1d6 elems from it and add them to safe_spaces
 
-  // simpler approach: just loop from x-1, y-1, to x+1, y+1 from the safe area's top left to bottom left...
-  //   then just skip if the coord is inside the 3x3 area.
-  // That gives us the starting frontier, so then just sample it...
-  //   but then you have to grow the frontier to tiles adjacent to that new space.
-
-  // delete frontier;
-  delete adjacents;
+  delete frontier;
+  
 }
 
 // place mines on the map

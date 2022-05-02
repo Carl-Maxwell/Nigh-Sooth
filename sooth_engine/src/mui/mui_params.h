@@ -5,15 +5,37 @@
 // mui's layout is based on the css box model,
 //   though it uses the box-sizing: border-box idea
 
+#include <initializer_list>
+
 namespace mui{
 
 const lapse::f32 mui_auto = 3.4028235e+38f; // almost inf, used for optional params
 // transparent here actually means "no color", as in, don't draw this thing
 const lapse::vec3<> transparent = {mui_auto, mui_auto, mui_auto}; 
 
-struct mui_size{
-  lapse::vec2<> actual_size = {0, 0};
-  bool auto_size     = true;
+struct mui_size : public lapse::vec2<>{
+  mui_size() { x = 0; y = 0; };
+  mui_size(std::initializer_list<lapse::f32> i_list) {
+    lapse::i32 i = 0;
+    for (auto elem : i_list) {
+      if (i == 0) {
+        x = elem;
+      } else if (i == 1){
+        y = elem;
+      } else {
+        return;
+      }
+      i++;
+    }
+
+    // TODO for some reason you can't just do:
+    // x = i_list[0];
+    // y = i_list[1];
+    // with std::initializer_list
+    // Dunno if there's some more sane way of getting two elements out of an iterator.
+  };
+
+  bool auto_size = true;
 };
 
 struct box_property{
@@ -44,7 +66,7 @@ struct box_property{
 
 struct params{
   lapse::vec2<> position = {0, 0};
-  lapse::vec2<> size     = {0, 0}; // width & height of entire box
+  mui_size size; // width & height of entire box
 
   box_property  margin{0};  // white space outside the box
   box_property  padding{0}; // white space inside the box (reduces content_area)
@@ -52,9 +74,9 @@ struct params{
 
   lapse::vec3<> background_color = transparent;
 
-  lapse::rect box_area() { return lapse::rect{position, size}; };
-  lapse::rect content_area() {
-    return lapse::rect{
+  lapse::rect<> box_area() { return lapse::rect<>{position, size}; };
+  lapse::rect<> content_area() {
+    return lapse::rect<>{
       position,
       size - padding.to_vec2() - border.to_vec2()
     };

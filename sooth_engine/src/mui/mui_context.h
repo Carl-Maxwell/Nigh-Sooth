@@ -36,7 +36,7 @@ struct Context{
   };
 
   // TODO push_element? push_node?
-  void push_element(lapse::rect box) {
+  void push_element(lapse::rect<> box) {
     current_position.y += box.size.y;
     // TODO margins
     for (lapse::i32 i = dom_stack.last_index(); i >= 0; i--) {

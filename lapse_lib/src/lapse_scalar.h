@@ -26,15 +26,17 @@ typedef uint64_t u64;
 
 // integer limits
 
-const u64 i8_max  = 128;                       // 2**8/2
-const u64 i16_max = 32'768;                    // 2**16/2
-const u64 i32_max = 2'147'483'648;             // 2**32/2
-const u64 i64_max = 9'223'372'036'854'775'808; // 2**64/2 // TODO don't these need -1s?
+const u64 i8_max  = 127;                       // 2**8/2  -1
+const u64 i16_max = 32'767;                    // 2**16/2 -1
+const u64 i32_max = 2'147'483'647;             // 2**32/2 -1
+const u64 i64_max = 9'223'372'036'854'775'807; // 2**64/2 -1
 
-const u64 u8_max  = u8 (-1); // 2**8
-const u64 u16_max = u16(-1); // 2**16
-const u64 u32_max = u32(-1); // 2**32
-const u64 u64_max = u64(-1); // 2**64
+const u64 u8_max  = u8 (-1); // 2**8  -1
+const u64 u16_max = u16(-1); // 2**16 -1
+const u64 u32_max = u32(-1); // 2**32 -1
+const u64 u64_max = u64(-1); // 2**64 -1
+
+// I believe these -1s come from 0 being included in the range
 
 // floats
 
@@ -53,7 +55,7 @@ const u64 f32_exponent_bias        =  127;
 const u64 f32_exponent_max_base_10 =  38;
 const i64 f32_exponent_min_base_10 = -37;
 
-const u64 f32_mantissa_max         = 8'388'608; // 2**23
+const u64 f32_mantissa_max         = 8'388'608; // 2**23 // TODO does this need a -1?
 
 // f32 memory layout: 1 bit sign, 8 bits exponent, 23 bits mantissa
 
@@ -148,6 +150,7 @@ struct vec2{
   bool operator==(vec2 right_value){
     return x == right_value.x && y == right_value.y;
   }
+  // x < x and y < y
   bool operator<(vec2 right_value) {
     bool temp = true;
 
@@ -156,6 +159,15 @@ struct vec2{
 
     return temp;
     // TODO check for lifetime issues
+  }
+  // x < x or y < y
+  bool less_than_or(vec2 right_value) {
+    bool temp = false;
+
+    temp |= x < right_value.x;
+    temp |= y < right_value.y;
+
+    return temp;
   }
   bool operator>(vec2 right_value) {
     bool temp = true;
