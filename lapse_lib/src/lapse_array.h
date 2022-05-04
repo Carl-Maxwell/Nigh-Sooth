@@ -30,13 +30,13 @@ public:
   };
   // returns elem, with safety check
   inline T& at(i32 i) const {
-    assert(m_size && i < m_size-1 && i >= 0);
+    assert(m_size && i < m_size && i >= 0);
     return m_elements[i];
   };
   // returns elem at index = length+i
   //   so you use this if you're sending in a negative number
   inline T& at_reverse(i32 i) const {
-    assert(m_size && m_length + i >= 0 && m_length + i < m_size - 1);
+    assert(m_size && m_length + i >= 0 && m_length + i < m_size);
     return m_elements[m_length + i];
   };
   // removes all elements
