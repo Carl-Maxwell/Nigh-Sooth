@@ -178,7 +178,26 @@ struct vec2{
     return temp;
     // TODO check for lifetime issues
   }
+
   // vector scalar operations
+  vec2 operator+(f32 scalar) {
+    vec2 temp = *this;
+
+    temp.x += scalar;
+    temp.y += scalar;
+
+    return temp;
+    // TODO check for lifetime issues
+  }
+  vec2 operator*(f32 scalar) {
+    vec2 temp = *this;
+
+    temp.x *= scalar;
+    temp.y *= scalar;
+
+    return temp;
+    // TODO check for lifetime issues
+  }
   vec2 operator/(f32 scalar) {
     vec2 temp = *this;
 

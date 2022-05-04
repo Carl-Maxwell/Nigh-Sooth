@@ -23,7 +23,6 @@ struct str{
   void clear();
   // add str onto the end of this str
   str& concat(const str& other);
-  // TODO length is not a function in array containers, this is an inconsistency in the API
   u32 length();
   str slice();
   // remove non-ascii characters from string

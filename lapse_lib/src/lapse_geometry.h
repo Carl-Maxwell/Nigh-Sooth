@@ -21,6 +21,11 @@ struct rect{
     return temp;
   }
   vec2<T> bottom_right_point() { return position + size; }
+
+  bool is_point_inside(vec2<> point) {
+    return point > position &&
+      point < (position + size);
+  }
 };
 
 }
