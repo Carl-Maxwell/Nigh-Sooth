@@ -36,8 +36,8 @@ array<tile_obj>* tile_obj::adjacent_tiles_cardinal() {
   array<tile_obj>* adjacents = new array<tile_obj>(8);
   for (auto y2 = max(y-1, 0); y2 < min(y+2, run.grid_height); y2++) {
     for (auto x2 = max(x-1, 0); x2 < min(x+2, run.grid_width); x2++) {
-      if (x2 == x && y2 == y) { continue; }
-      if (x2 != x && y2 != y) { continue; }
+      if (x2 == x && y2 == y) { continue; } // skip center
+      if (x2 != x && y2 != y) { continue; } // skip diagonals
       adjacents->push(run.grid[y2*run.grid_width + x2]);
     }
   }
