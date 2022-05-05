@@ -59,18 +59,19 @@ struct box_property{
   lapse::f32& bottom() { return prop[2]; };
   lapse::f32& left()   { return prop[3]; };
 
-  lapse::vec2<> top_left()     { return lapse::vec2<>{top(),    left() }; };
-  lapse::vec2<> bottom_right() { return lapse::vec2<>{bottom(), right()}; };
+  lapse::vec2<> top_left()     { return lapse::vec2<>{left(),    top() }; };
+  lapse::vec2<> bottom_right() { return lapse::vec2<>{right(), bottom()}; };
 
   // returns the sum of the properties, so for {margin: 10px;} this would be 20px, 20px
-  lapse::vec2<> to_vec2() { return lapse::vec2<>{top() + bottom(), right() + left()}; };
+  lapse::vec2<> to_vec2() { return lapse::vec2<>{right() + left(), top() + bottom()}; };
 
   inline bool operator!() const { return !((prop.x + prop.y + prop.z + prop.w) > 0); };
 };
 
 struct params{
+  mui_size m_size; // width & height of entire box
+
   lapse::vec2<> m_position = {0, 0}; // context.current_position at params creation time
-  mui_size size; // width & height of entire box
 
   box_property margin{0};  // white space outside the box
   box_property padding{0}; // white space inside the box (reduces content_area)
@@ -82,20 +83,26 @@ struct params{
   const static lapse::i32 has_no_index = lapse::i32_min;
   lapse::i32 index = has_no_index;
 
+  lapse::vec3<> font_color = default_color;
+
   params* parent();
   lapse::vec2<> position();
+  mui_size size();
 
-  lapse::rect<> box_area() { return lapse::rect<>{position(), size}; };
+  lapse::rect<> box_area() { return lapse::rect<>{position(), m_size}; };
+
   lapse::rect<> margin_area() {
     auto output = box_area();
     output.position -= margin.top_left();
     output.size += margin.to_vec2();
+
     return output;
   };
+
   lapse::rect<> content_area() {
     return lapse::rect<>{
-      position() + padding.top_left(),
-      size - padding.to_vec2() - border.to_vec2()
+      position() + padding.top_left() + border.top_left(),
+      m_size - padding.to_vec2() - border.to_vec2()
     };
   };
 };

@@ -179,7 +179,7 @@ void draw_text(str text, vec2<> position, vec3<> color) {
   app->DrawString(
     olc::vi2d{(i32)position.x, (i32)position.y},
     text.to_c_str(),
-    olc::WHITE
+    vec3_to_color(color)
   );
 }
 

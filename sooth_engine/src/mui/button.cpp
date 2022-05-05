@@ -5,29 +5,41 @@
 #include "platform_olc_pixel.h"
 #include "mui/mui_context.h"
 #include "mui/mui_draw.h"
+#include "mui/mui_div.h"
 
 using namespace lapse;
 
 namespace mui{
 
-bool button(lapse::str label) {
+mui_size text_size(str label) {
+  return {f32(label.length() * 8), 10.0f};
+}
+
+bool button(lapse::str label, bool debug) {
   auto& context = Context::the();
 
-  f32 padding = 10.0f;
-
-  params box = {{0, 0}, {padding*2 + label.length() * 8, 20}};
+  params box;
   box.padding = {10};
+  box.border  = {1};
 
-  context.open_element(box);
+  mui::open_div(box);
 
-  if (!context.is_hovering()) {
-    mui::draw_rect(box);
+  params text = {text_size(label)};
+  text.padding = {1, 0, 0, 0};
+  text.border = {1};
+
+  context.open_element(text);
+  mui::draw_text(label, text);
+  context.close_element();
+
+  if (context.is_hovering()) {
+    // TODO highlight button or underline text or whatever
+    mui::draw_rect(text);
   }
-  mui::draw_text(label, box);
 
   bool active = context.is_active();
 
-  context.close_element();
+  mui::close_div();
 
   return active;
 }

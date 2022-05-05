@@ -42,7 +42,12 @@ void draw_text(str text, params args) {
     [](DrawCall& call){
       auto& context = Context::the();
       auto args = context.dom_stack[call.element_index];
-      platform::draw_text(call.text, args.content_area().top_left_point());
+      if (args.font_color != default_color) {
+        platform::draw_text(call.text, args.content_area().top_left_point(), args.font_color);
+      } else {
+        platform::draw_text(call.text, args.content_area().top_left_point());
+      }
+
 
       // TODO args.font_color
     },

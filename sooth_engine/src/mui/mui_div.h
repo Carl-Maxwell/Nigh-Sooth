@@ -4,7 +4,7 @@
 
 namespace mui{
 
-void open_div(params args);
+void open_div(params& args);
 void close_div();
 
 } // end namespace
