@@ -53,6 +53,11 @@ u32 max(u32 a, u32 b) {
   return a > b ? a : b;
 }
 
+f32 max(f32 a, f32 b) {
+  return a > b ? a : b;
+}
+
+
 i32 min(i32 a, i32 b) {
   return a < b ? a : b;
 }

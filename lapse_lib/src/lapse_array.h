@@ -97,7 +97,7 @@ public:
     return output;
   };
   */
-  u32 last_index() { return m_length-1; }
+  i32 last_index() { return m_length-1; }
   u32 length() { return m_length; }
   // transform each elem with lambda : elem = lambda(elem)
   fixed_array& map(lapse_lambda(T, T) callback) {

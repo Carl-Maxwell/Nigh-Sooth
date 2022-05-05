@@ -26,10 +26,13 @@ typedef uint64_t u64;
 
 // integer limits
 
-const u64 i8_max  = 127;                       // 2**8/2  -1
-const u64 i16_max = 32'767;                    // 2**16/2 -1
-const u64 i32_max = 2'147'483'647;             // 2**32/2 -1
-const u64 i64_max = 9'223'372'036'854'775'807; // 2**64/2 -1
+const u64 i8_max  =  127;                       //  2**8/2  -1
+const u64 i16_max =  32'767;                    //  2**16/2 -1
+const u64 i32_max =  2'147'483'647;             //  2**32/2 -1
+const u64 i64_max =  9'223'372'036'854'775'807; //  2**64/2 -1
+
+// lowest value representable by a 32 bit signed integer
+const u64 i32_min = -2'147'483'648;             // -2**32/2
 
 const u64 u8_max  = u8 (-1); // 2**8  -1
 const u64 u16_max = u16(-1); // 2**16 -1
