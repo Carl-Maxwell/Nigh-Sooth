@@ -40,7 +40,13 @@ public:
     return m_elements[m_length + i];
   };
   // removes all elements
-  void clear() { delete m_elements; m_elements = nullptr; m_size = 0; m_length = 0; };
+  void clear() {
+    assert(m_size);
+    delete[] m_elements;
+    m_elements = nullptr;
+    m_size = 0;
+    m_length = 0;
+  };
   bool contains(T elem) {
     for (u32 i = 0; i < m_length; i++) {
       if (elem == m_elements[i]) {
@@ -178,9 +184,13 @@ public:
     return this->m_elements[this->m_length];
   };
   void push(T elem) {
-    this->m_elements[this->m_length] = elem;
+    assert(this->m_size);
+
     // note: you need to call reserve() or use the constructor before pushing elements
-    //   otherwise you get an exception on that line above this comment
+    //   otherwise you get an exception here
+
+    this->m_elements[this->m_length] = elem;
+    
     this->m_length++;
 
     // TODO currently this grows the array allocation when you hit the size ...
@@ -204,7 +214,7 @@ public:
 
       // TODO callback for reference stability?
 
-      delete old_elements;
+      delete[] old_elements;
       this->m_size = better_size;
     }
   }

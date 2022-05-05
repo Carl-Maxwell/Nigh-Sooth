@@ -178,6 +178,15 @@ struct vec2{
     return temp;
     // TODO check for lifetime issues
   }
+  // x > x or y > y
+  bool greater_than_or(vec2 right_value) {
+    bool temp = false;
+
+    temp |= x > right_value.x;
+    temp |= y > right_value.y;
+
+    return temp;
+  }
 
   // vector scalar operations
   vec2 operator+(f32 scalar) {
