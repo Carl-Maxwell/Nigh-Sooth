@@ -1,54 +1,70 @@
 #pragma once
 
-#include "lapse_scalar.h"
+#include <lapse_scalar.h>
+#include <lapse_exceptions.h>
+
 #include "mui/mui_params.h"
+#include "sooth_input.h"
 
 namespace mui{
 
 struct Context{
   lapse::vec2<> current_position = {0, 0};
   lapse::array<params> dom_stack;
-  // TODO active element? Is it just the end of dom_stack?
+  lapse::i32 current_container_index = params::has_no_parent;
 
   // returns singleton
   static Context& the() {
     static Context* my_context = nullptr;
     if (!my_context) {
       my_context = new Context;
-      my_context->dom_stack.reserve(4); // lapse::arrays don't allocate until told to
+      my_context->dom_stack.reserve(4); // lapse arrays don't allocate until told to
     }
     return *my_context;
   };
 
-  void reset() {
-    current_position = {0, 0};
-  }
-  void push_container(params args) {
+  void reset();
+  void push_container(params& args) {
+    args.m_position += current_position;
+    if (current_container_index != params::has_no_parent) {
+      args.parent_index = current_container_index;
+    }
     dom_stack.push(args);
+    auto index = dom_stack.last_index();
+    current_container_index = index;
+    dom_stack[index].index = index;
+    args.index = index;
+
     current_position += args.padding.top_left();
     // TODO margins
   };
-  params& pop_container() {
-    auto& args = dom_stack.pop();
-    current_position -= args.padding.bottom_right();
+  params& get_current_container() {
+    lapse::assert(dom_stack.last_index() >= current_container_index);
+
+    auto& args = dom_stack[current_container_index];
+    // TODO update current_position
     // TODO margins
     return args;
   };
-
-  // TODO push_element? push_node?
-  void push_element(lapse::rect<> box) {
-    current_position.y += box.size.y;
-    // TODO margins
-    for (lapse::i32 i = dom_stack.last_index(); i >= 0; i--) {
-      // if (dom_stack[i].size.x == mui_auto) {
-        // if (dom_stack[i].content_area()) {
-
-        // }
-      // }
-      // if (dom_stack[i].size.y == mui_auto) {
-
-      // }
+  void open_element(params& args) {
+    args.m_position += current_position;
+    if (current_container_index != params::has_no_parent) {
+      args.parent_index = current_container_index;
     }
+    dom_stack.push(args);
+    auto index = dom_stack.last_index();
+    dom_stack[index].index = index;
+    args.index = index;
+  };
+  void close_element() {
+    current_position.y += dom_stack.at_reverse(-1).size.y;
+  };
+  bool is_hovering() {
+    auto mouse_pos = Mouse::get_mouse_pos();
+    return dom_stack.at_reverse(-1).box_area().is_point_inside(mouse_pos);
+  };
+  bool is_active() {
+    return is_hovering() && Mouse::left_mouse_hit();
   };
 };
 

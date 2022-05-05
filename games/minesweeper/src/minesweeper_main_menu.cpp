@@ -1,15 +1,15 @@
-
 #include "minesweeper_main_menu.h"
 
 #include "platform_olc_pixel.h"
 
-#include "lapse_lib.h"
+#include <lapse_lib.h>
 
 #include "platform_olc_pixel.h"
 #include "minesweeper_game_session.h"
 
 #include "mui/mui_div.h"
 #include "mui/button.h"
+#include "mui/mui_draw.h"
 
 using namespace lapse;
 
@@ -21,6 +21,8 @@ void minesweeper_main_menu::start_main_loop() {
 }
 
 void minesweeper_main_menu::main_loop(f32 delta) {
+  // std::cout << "main menu start of frame " << frame_count << "\n";
+
   for (i32 i = 0; i < 10'000; i++) {
     platform::plot(rand_vec2() * platform::get_window_size(), rand_vec3());
   }
@@ -29,6 +31,11 @@ void minesweeper_main_menu::main_loop(f32 delta) {
     case mui::page::main_menu: main_menu(); break;
     case mui::page::new_game_menu: new_game_menu(); break;
   }
+
+  mui::draw();
+
+  // std::cout << "main menu end of frame " << frame_count << "\n";
+  frame_count++;
 }
 
 void minesweeper_main_menu::main_menu() {
@@ -38,8 +45,8 @@ void minesweeper_main_menu::main_menu() {
     mui::params div_params;
 
     div_params.border = {1};
-    div_params.background_color = {0, 0 ,0};
-    div_params.size = {100, 100};
+    div_params.padding = {10};
+    div_params.background_color = {0, 0, 255};
 
     mui::open_div(div_params);
   }

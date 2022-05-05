@@ -13,8 +13,11 @@ void minesweeper_run::start_main_loop() {
   platform::start_application();
 }
 
+// main loop of gameplay
 void minesweeper_run::main_loop(f32 delta) {
   platform::clear(vec3<>{0, 0, 0});
+
+  platform::poll_key_toggles();
 
   lapse::LapseErrorQueue::the().tick();
 
@@ -72,6 +75,16 @@ void minesweeper_run::main_loop(f32 delta) {
     auto& session = minesweeper_session::the();
     session.m_state = session_state::main_menu;
   }
+
+  if (key(keycode::number_1).is_toggled()) {
+    for (i32 i = 0; i < safe_spaces.length(); i++) {
+      platform::draw_rect(
+        vec2<>{f32(safe_spaces[i].x), f32(safe_spaces[i].y)} * grid_size_vec2() + (f32)window_padding,
+        grid_size_vec2(),
+        vec3<>{0, 0.75, 0}
+      );
+    }
+  }
 }
 
 // called each time we need to setup a new map to play
@@ -102,23 +115,41 @@ void minesweeper_run::generate_safe_spaces(tile_obj* start_tile) {
   safe_spaces.push(start_tile->m_coordinates);
 
   // grid space rectangular coords of safe area
-  rect<i32> safe_3x3{{i32_max, i32_max}, {3, 3}};
+  rect<i32> safe_3x3{
+    start_tile->m_coordinates - vec2<i32>{1, 1},
+    {3, 3}
+  };
+
+  //
+  // keep the safe_3x3 within the game board
+  //
+
+  // if position is off the edge of the game board, snap it back on, and reduce size accordingly
+  if (safe_3x3.top_left_point().x < 0) {
+    safe_3x3.position.x += 1;
+    safe_3x3.size.x -= 1;
+  }
+  if (safe_3x3.top_left_point().y < 0) {
+    safe_3x3.position.y += 1;
+    safe_3x3.size.y -= 1;
+  }
+
+  // if size would push it past the edge of the game board, snap it back
+  if (safe_3x3.bottom_right_point().x > grid_width) {
+    safe_3x3.size.x -= 1;
+  }
+  if (safe_3x3.bottom_right_point().y > grid_height) {
+    safe_3x3.size.y -= 1;
+  }
 
   {
     // add adjacent tiles
     array<tile_obj>* adjacents = start_tile->adjacent_tiles();
     for (i32 i = 0; i < adjacents->length(); i++) {
       safe_spaces.push((*adjacents)[i].m_coordinates);
-      
-      // find the top left coord
-      safe_3x3.position.x = min(safe_3x3.position.x, (*adjacents)[i].m_coordinates.x);
-      safe_3x3.position.y = min(safe_3x3.position.y, (*adjacents)[i].m_coordinates.y);
     }
     delete adjacents;
   }
-
-  // TODO: add 1d6 adjacent tiles into the safe area
-  //   finding tiles that are adjacent to the 3x3 safe area 
 
   // find the "frontier" -- the tiles adjacent to the 3x3 safe area
   array<tile_obj>* frontier = new array<tile_obj>(5*5 - 3*3 + 1);
@@ -151,7 +182,7 @@ void minesweeper_run::generate_safe_spaces(tile_obj* start_tile) {
   //   expanding the frontier each time to include the new adjacent tiles
   //   where those new tiles are not already safe or frontier
 
-  auto extra_spaces = die(6);
+  auto extra_spaces = die(6, 5);
 
   for (auto i = 0; i < extra_spaces; i++) {
     auto& tile = frontier->sample();

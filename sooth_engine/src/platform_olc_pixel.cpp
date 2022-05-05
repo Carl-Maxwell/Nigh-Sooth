@@ -297,12 +297,17 @@ vec2<i32> get_mouse_pos() {
 }
 
 olc::Key translate_keycode(keycode code) {
-  assert(code == keycode::escape);
-  return olc::Key::ESCAPE;
+  assert(keycode_list().contains(code));
+  switch(code) {
+    case keycode::escape : return olc::Key::ESCAPE;
+    case keycode::number_1 : return olc::Key::K1;
+  }
+
+  assert(false);
 }
 
 KeyState get_key_state(keycode code) {
-  KeyState temp;
+  KeyState temp{code};
 
   auto pixel_key = app->GetKey(translate_keycode(code));
 
@@ -311,6 +316,17 @@ KeyState get_key_state(keycode code) {
   temp.m_key_down = pixel_key.bHeld;
 
   return temp;
+}
+
+void poll_key_toggles() {
+  auto codes = keycode_list();
+  for (i32 i = 0; i < codes.length(); i++) {
+    auto key_state = key(codes[i]);
+    if (key_state.is_hit()) {
+      key_state.toggle();
+      std::cout << "toggling " << (u32)codes[i] << "\n";
+    }
+  }
 }
 
 }; // end platform namespace

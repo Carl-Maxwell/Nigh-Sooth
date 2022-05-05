@@ -3,8 +3,8 @@
 #include <lapse_lib.h>
 
 #include "platform_olc_pixel.h"
-
 #include "mui/mui_context.h"
+#include "mui/mui_draw.h"
 
 using namespace lapse;
 
@@ -15,34 +15,21 @@ bool button(lapse::str label) {
 
   f32 padding = 10.0f;
 
-  vec2<> drawing_area_start = {10, 10};
-  vec2<> drawing_area_size  = {padding*2 + label.length() * 8, 20};
+  params box = {{0, 0}, {padding*2 + label.length() * 8, 20}};
+  box.padding = {10};
 
-  drawing_area_start += context.current_position;
-  // drawing_area_end   += context.current_position;
+  context.open_element(box);
 
-  auto mouse_pos = Mouse::get_mouse_pos();
-  
-  bool hovering =
-    mouse_pos > drawing_area_start && 
-    mouse_pos < (drawing_area_start + drawing_area_size);
-  bool active = hovering && Mouse::left_mouse_hit();
-
-  if (!hovering) {
-    platform::draw_rect(
-      drawing_area_start,
-      drawing_area_size
-    );
+  if (!context.is_hovering()) {
+    mui::draw_rect(box);
   }
-  platform::draw_text(label, vec2<>{10 + padding, 20} + context.current_position);
+  mui::draw_text(label, box);
 
-  context.current_position.y += 30.0f;
+  bool active = context.is_active();
 
-  if (active) {
-    return true;
-  }
+  context.close_element();
 
-  return false;
+  return active;
 }
 
 } // end namespace

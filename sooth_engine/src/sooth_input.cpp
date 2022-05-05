@@ -36,10 +36,23 @@ vec2<> Mouse::get_mouse_pos() {
 // Keyboard
 //
 
-bool KeyState::is_hit() { return m_key_hit; }
-bool KeyState::is_up() { return m_key_up; }
-bool KeyState::is_down() { return m_key_down; }
+namespace {
+  bool key_toggled[500] = {false};
+}
+
+bool KeyState::is_hit()     { return m_key_hit; }
+bool KeyState::is_up()      { return m_key_up; }
+bool KeyState::is_down()    { return m_key_down; }
+bool KeyState::is_toggled() { return key_toggled[(i32)code]; }
+void KeyState::toggle()     { key_toggled[(i32)code] = !key_toggled[(i32)code]; }
 
 KeyState key(keycode code) {
   return platform::get_key_state(code);
+}
+
+lapse::fixed_array<keycode> keycode_list() {
+  return lapse::fixed_array<keycode>{
+    keycode::escape,
+    keycode::number_1
+  };
 }

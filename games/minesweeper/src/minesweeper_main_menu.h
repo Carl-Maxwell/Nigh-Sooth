@@ -13,6 +13,7 @@ namespace minesweeper{
 
 struct minesweeper_main_menu{
   mui::page current_menu = mui::page::main_menu;
+  lapse::i32 frame_count = 0;
 
   void main_loop(lapse::f32 delta);
   void start_main_loop();

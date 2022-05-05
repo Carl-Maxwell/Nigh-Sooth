@@ -1,6 +1,7 @@
 #pragma once
 
 #include <lapse_scalar.h>
+#include <lapse_array.h>
 
 struct Input{
 };
@@ -15,11 +16,20 @@ struct Mouse{
   static lapse::vec2<> get_mouse_pos();
 };
 
+// for whatever reason I've decided to set this enum equal to the javascript keycodes
+
 enum class keycode{
-  escape = 27
+  none     = 0,
+  escape   = 27,
+  number_1 = 48
+  // note: if you add something here you need to add it to keycode_list() in cpp
 };
 
+// returns a list of all keycodes
+lapse::fixed_array<keycode> keycode_list();
+
 struct KeyState{
+  keycode code = keycode::none;
   bool m_key_hit  = false;
   bool m_key_up   = false;
   bool m_key_down = false;
@@ -30,6 +40,10 @@ struct KeyState{
   bool is_up();
   // returns true if the key is held down
   bool is_down();
+  // returns true if key has been hit an odd number of times
+  bool is_toggled();
+  // 
+  void toggle();
 };
 
 KeyState key(keycode code);
