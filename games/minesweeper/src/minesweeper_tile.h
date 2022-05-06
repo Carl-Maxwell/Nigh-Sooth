@@ -22,7 +22,9 @@ enum class grid_tile{
   revealed = 6,
   mined    = 8,
   flagged  = 7,
-  empty    = 10
+  empty    = 10,
+  bad_flag = 11
+  // TODO these numbers are not necessary anymore, remove them
 };
 
 struct tile_obj{

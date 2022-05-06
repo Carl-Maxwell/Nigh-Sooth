@@ -94,6 +94,8 @@ image tile_obj::get_image(game_state_enum game_state, bool hovered) {
   case game_state_enum::lost:
     if (m_mined) {
       return session.image_array[(u32)grid_tile::mined];
+    } else if (!m_mined && m_flagged && m_hidden) {
+      return session.image_array[(u32)grid_tile::bad_flag];
     } else {
       return session.image_array[(u32)m_tile_state];
     }
