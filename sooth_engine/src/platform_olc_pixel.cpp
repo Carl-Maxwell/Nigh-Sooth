@@ -49,7 +49,9 @@ public:
   }
 
   bool OnUserDestroy() {
-    force_quit();
+    if (this->bForceQuitEvent) {
+      force_quit();
+    }
     return true;
   }
 };
