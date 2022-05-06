@@ -15,6 +15,7 @@ void minesweeper_run::start_main_loop() {
 
 // main loop of gameplay
 void minesweeper_run::main_loop(f32 delta) {
+  auto& session = minesweeper_session::the();
   platform::clear(vec3<>{0, 0, 0});
 
   platform::poll_key_toggles();
@@ -31,30 +32,39 @@ void minesweeper_run::main_loop(f32 delta) {
     mouse_tile = &grid[mouse_y * grid_width + mouse_x];
   }
 
-  if (Mouse::left_mouse_hit()) {
-    if (mouse_tile && mouse_tile->m_hidden && !mouse_tile->m_flagged) {
-      if (m_first_click) {
-        m_first_click = false;
-        generate_safe_spaces(mouse_tile);
-        generate_mines();
-        for (i32 i = 0; i < safe_spaces.length(); i++) {
-          auto& safe_tile = grid[safe_spaces[i].y * grid_width + safe_spaces[i].x];
-          safe_tile.reveal();
+  switch (game_state){
+  case game_state_enum::in_progress:
+    if (Mouse::left_mouse_hit()) {
+      if (mouse_tile && mouse_tile->m_hidden && !mouse_tile->m_flagged) {
+        if (m_first_click) {
+          m_first_click = false;
+          generate_safe_spaces(mouse_tile);
+          generate_mines();
+          for (i32 i = 0; i < safe_spaces.length(); i++) {
+            auto& safe_tile = grid[safe_spaces[i].y * grid_width + safe_spaces[i].x];
+            safe_tile.reveal();
+          }
+        } else {
+          mouse_tile->reveal();
         }
-      } else {
-        mouse_tile->reveal();
+      }
+    } else if (Mouse::right_mouse_hit()) {
+      if (mouse_tile && mouse_tile->m_hidden) {
+        if (!mouse_tile->m_flagged) {
+          mouse_tile->m_tile_state = minesweeper::grid_tile::flagged;
+          mouse_tile->m_flagged = true;
+        } else {
+          mouse_tile->m_tile_state = minesweeper::grid_tile::hidden;
+          mouse_tile->m_flagged = false;
+        }
       }
     }
-  } else if (Mouse::right_mouse_hit()) {
-    if (mouse_tile && mouse_tile->m_hidden) {
-      if (!mouse_tile->m_flagged) {
-        mouse_tile->m_tile_state = minesweeper::grid_tile::flagged;
-        mouse_tile->m_flagged = true;
-      } else {
-        mouse_tile->m_tile_state = minesweeper::grid_tile::hidden;
-        mouse_tile->m_flagged = false;
-      }
+  break;
+  case game_state_enum::lost:
+    if (Mouse::left_mouse_hit()) {
+      session.restart_run();
     }
+  break;
   }
 
   for (f32 y = 0; y < grid_height; y++) {
@@ -64,17 +74,19 @@ void minesweeper_run::main_loop(f32 delta) {
         y*grid_size + window_padding
       };
       auto& tile = grid[u32(y*grid_width + x)];
-      bool hovering = mouse_tile && mouse_tile == &tile;
-      image img = tile.get_image(hovering);
+      bool hovering = mouse_tile && mouse_tile == &tile && game_state == game_state_enum::in_progress;
+      image img = tile.get_image(game_state, hovering);
 
       platform::draw_bitmap(screen_pos, img);
     }
   }
 
+  // open main menu if esc is hit
   if (key(keycode::escape).is_hit()) {
-    auto& session = minesweeper_session::the();
     session.m_state = session_state::main_menu;
   }
+
+  // debugging stuff:
 
   if (key(keycode::number_1).is_toggled()) {
     for (i32 i = 0; i < safe_spaces.length(); i++) {
@@ -111,6 +123,30 @@ void minesweeper_run::initialize_run(i32 n_width, i32 n_height) {
       // grid[y*grid_width + x].grid = grid; // TODO stop copying this pointer around
     }
   }
+}
+
+bool minesweeper_run::is_game_won() {
+  for (i32 y = 0; y < grid_height; y++) {
+    for (i32 x = 0; x < grid_width; x++) {
+      if (grid[y*grid_width + x].m_mined && !grid[y*grid_width + x].m_flagged) {
+        return false;
+      } else if (grid[y*grid_width + x].m_flagged && !grid[y*grid_width + x].m_mined) {
+        return false;
+      } else if (grid[y*grid_width + x].m_hidden) {
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
+void minesweeper_run::win_game() {}
+
+void minesweeper_run::lose_game() {
+  auto& session = minesweeper_session::the();
+
+  // TODO start animation
+  game_state = game_state_enum::lost;
 }
 
 //

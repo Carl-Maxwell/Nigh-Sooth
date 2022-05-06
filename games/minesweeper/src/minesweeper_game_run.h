@@ -6,6 +6,12 @@
 
 namespace minesweeper{
 
+enum class game_state_enum{
+  lost,
+  in_progress,
+  won
+};
+
 struct minesweeper_run{
   lapse::i32 grid_width  = 18;
   lapse::i32 grid_height = 12;
@@ -16,6 +22,8 @@ struct minesweeper_run{
   const lapse::i32 window_padding = 10.0f; // pixels of padding around the window edge
   bool m_first_click = true;
 
+  game_state_enum game_state{game_state_enum::in_progress};
+
   lapse::vec2<> grid_size_vec2() {
     return lapse::vec2<>{(lapse::f32)grid_size, (lapse::f32)grid_size};
   }
@@ -25,6 +33,9 @@ struct minesweeper_run{
   void generate_safe_spaces(tile_obj* start_tile);
   void start_main_loop();
   void main_loop(lapse::f32 delta);
+  bool is_game_won();
+  void win_game();
+  void lose_game();
 
   // dimensions for next window's width & height
   lapse::vec2<lapse::i32> next_window_size = {16*18+20, 16*12+20};

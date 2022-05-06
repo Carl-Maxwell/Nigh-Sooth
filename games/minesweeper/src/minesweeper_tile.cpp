@@ -80,13 +80,24 @@ i32 tile_obj::calculate_adjacent_mines() {
   return mine_count;
 }
 
-image tile_obj::get_image(bool hovered) {
+image tile_obj::get_image(game_state_enum game_state, bool hovered) {
   auto& session = minesweeper_session::the();
 
-  if (hovered && m_hidden && !m_flagged) {
-    return session.image_array[(u32)grid_tile::hovered];
-  } else {
-    return session.image_array[(u32)m_tile_state];
+  switch (game_state) {
+  case game_state_enum::in_progress:
+    if (hovered && m_hidden && !m_flagged) {
+      return session.image_array[(u32)grid_tile::hovered];
+    } else {
+      return session.image_array[(u32)m_tile_state];
+    }
+  break;
+  case game_state_enum::lost:
+    if (m_mined) {
+      return session.image_array[(u32)grid_tile::mined];
+    } else {
+      return session.image_array[(u32)m_tile_state];
+    }
+  break;
   }
 }
 
@@ -94,7 +105,7 @@ void tile_obj::reveal(bool chance_of_chain) {
   if (m_mined) {
     m_tile_state = grid_tile::mined;
     auto& session = minesweeper_session::the();
-    session.restart_run();
+    session.run->lose_game();
   } else if (m_adjacent_mines > 0) {
     m_tile_state = grid_tile(u32(grid_tile::hidden)+m_adjacent_mines);
   } else {

@@ -9,6 +9,8 @@
 
 namespace minesweeper{
 
+enum class game_state_enum;
+
 enum class grid_tile{
   number_1 = 1,
   number_2 = 2,
@@ -35,7 +37,7 @@ struct tile_obj{
   lapse::array<tile_obj>* adjacent_tiles();
   lapse::array<tile_obj>* adjacent_tiles_cardinal();
   lapse::i32 calculate_adjacent_mines();
-  image get_image(bool hovered = false);
+  image get_image(game_state_enum game_state, bool hovered = false);
   void reset() {
     m_adjacent_mines = 0;
     m_coordinates    = {0, 0};
