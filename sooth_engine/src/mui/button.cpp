@@ -6,14 +6,13 @@
 #include "mui/mui_context.h"
 #include "mui/mui_draw.h"
 #include "mui/mui_div.h"
+#include "mui/mui_text.h"
 
 using namespace lapse;
 
-namespace mui{
+#include "mui/mui_text.h"
 
-mui_size text_size(str label) {
-  return {f32(label.length() * 8), 10.0f};
-}
+namespace mui{
 
 bool button(lapse::str label) {
   auto& context = Context::the();
@@ -24,7 +23,7 @@ bool button(lapse::str label) {
 
   mui::open_div(box);
 
-  params text = {text_size(label)};
+  params text = {text_box_size(label)};
   text.padding = {1, 0, 0, 0};
   text.border = {1};
 

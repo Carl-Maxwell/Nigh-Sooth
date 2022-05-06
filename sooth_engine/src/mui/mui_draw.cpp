@@ -3,6 +3,7 @@
 #include <lapse_lib.h>
 #include "mui/mui_params.h"
 #include "mui/mui_context.h"
+#include "mui/mui_text.h"
 #include "platform_olc_pixel.h"
 
 using namespace lapse;
@@ -43,9 +44,9 @@ void draw_text(str text, params args) {
       auto& context = Context::the();
       auto args = context.dom_stack[call.element_index];
       if (args.font_color != default_color) {
-        platform::draw_text(call.text, args.content_area().top_left_point(), args.font_color);
+        platform::draw_text(call.text, args.content_area().top_left_point(), args.font_color, font_size());
       } else {
-        platform::draw_text(call.text, args.content_area().top_left_point());
+        platform::draw_text(call.text, args.content_area().top_left_point(), vec3<>{1.0, 1.0, 1.0}, font_size());
       }
 
 

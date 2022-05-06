@@ -187,14 +187,17 @@ void fill_rect(rect<> box, vec3<> color) {
   }
 }
 
-void draw_text(str text, vec2<> position, vec3<> color) {
-  // TODO font size
+void draw_text(str text, vec2<> position, vec3<> color, u32 font_size_pixels) {
   // TODO color
+
+  // by default font_size is 8px
+  font_size_pixels /= 8;
 
   app->DrawString(
     olc::vi2d{(i32)position.x, (i32)position.y},
     text.to_c_str(),
-    vec3_to_color(color)
+    vec3_to_color(color),
+    font_size_pixels
   );
 }
 

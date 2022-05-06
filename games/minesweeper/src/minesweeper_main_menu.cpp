@@ -79,7 +79,6 @@ void minesweeper_main_menu::new_game_menu() {
     current_menu = mui::page::main_menu;
   }
 
-
   if (mui::button("normal game")) {
     session.next_grid_size = new vec2<i32>{18, 12};
     session.m_state = session_state::game_run_startup;
