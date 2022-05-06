@@ -110,7 +110,7 @@ void tile_obj::reveal(bool chance_of_chain) {
     m_tile_state = grid_tile(u32(grid_tile::hidden)+m_adjacent_mines);
   } else {
     m_tile_state = grid_tile::empty;
-    if (chance_of_chain) { // && die(3) == 1) {
+    if (chance_of_chain) {
       // set off a chain reaction of revealing empty tiles
       chain_reaction();
     }
