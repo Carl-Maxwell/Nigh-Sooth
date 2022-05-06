@@ -15,7 +15,7 @@ mui_size text_size(str label) {
   return {f32(label.length() * 8), 10.0f};
 }
 
-bool button(lapse::str label, bool debug) {
+bool button(lapse::str label) {
   auto& context = Context::the();
 
   params box;

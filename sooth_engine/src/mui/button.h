@@ -4,6 +4,6 @@
 
 namespace mui{
 
-bool button(lapse::str label, bool debug = false);
+bool button(lapse::str label);
 
 } // end namespace
