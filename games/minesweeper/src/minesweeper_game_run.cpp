@@ -65,6 +65,7 @@ void minesweeper_run::main_loop(f32 delta) {
           mouse_tile->reveal();
         }
       }
+      if (is_game_won()) { game_state = game_state_enum::won; }
     } else if (Mouse::right_mouse_hit()) {
       if (mouse_tile && mouse_tile->m_hidden) {
         if (!mouse_tile->m_flagged) {
@@ -75,8 +76,10 @@ void minesweeper_run::main_loop(f32 delta) {
           mouse_tile->m_flagged = false;
         }
       }
+      if (is_game_won()) { game_state = game_state_enum::won; }
     }
   break;
+  case game_state_enum::won:
   case game_state_enum::lost:
     if (Mouse::left_mouse_hit()) {
       session.restart_run();
@@ -97,6 +100,11 @@ void minesweeper_run::main_loop(f32 delta) {
 
       platform::draw_bitmap(screen_pos, img);
     }
+  }
+
+  if (game_state == game_state_enum::won) {
+    auto center = platform::get_window_size()/2.0f - session.victory_image.m_resolution/2.0f;
+    platform::draw_bitmap(center, session.victory_image);
   }
 
   // open main menu if esc is hit
@@ -149,11 +157,12 @@ bool minesweeper_run::is_game_won() {
         return false;
       } else if (grid[y*grid_width + x].m_flagged && !grid[y*grid_width + x].m_mined) {
         return false;
-      } else if (grid[y*grid_width + x].m_hidden) {
+      } else if (grid[y*grid_width + x].m_hidden && !grid[y*grid_width + x].m_flagged) {
         return false;
       }
     }
   }
+  std::cout << "\n\n//\n// victory is yours!\n//\n\n";
   return true;
 }
 
@@ -239,7 +248,7 @@ void minesweeper_run::generate_safe_spaces(tile_obj* start_tile) {
   //   expanding the frontier each time to include the new adjacent tiles
   //   where those new tiles are not already safe or frontier
 
-  auto extra_spaces = die(6, 5);
+  auto extra_spaces = die(1, 6);
 
   for (auto i = 0; i < extra_spaces; i++) {
     auto& tile = frontier->sample();

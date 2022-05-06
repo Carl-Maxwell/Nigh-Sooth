@@ -74,7 +74,9 @@ void minesweeper_session::initialize_game_session() {
   image_array[ (u32)grid_tile::hovered ]  = image("resources/grid_highlighted.png");
   image_array[ (u32)grid_tile::mined ]    = image("resources/bomb.png");
   image_array[ (u32)grid_tile::flagged ]  = image("resources/flag.png");
-  image_array[ (u32)grid_tile::bad_flag ]  = image("resources/bad_flag.png");
+  image_array[ (u32)grid_tile::bad_flag ] = image("resources/bad_flag.png");
+  
+  victory_image = image("resources/victory.png");
 }
 
 void minesweeper_session::restart_run() {

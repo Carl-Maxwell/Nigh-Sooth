@@ -72,6 +72,14 @@ void minesweeper_main_menu::main_menu() {
 void minesweeper_main_menu::new_game_menu() {
   auto& session = minesweeper_session::the();
 
+  if (mui::button("quick game")) {
+    session.next_grid_size = new vec2<i32>{6, 6};
+    session.m_state = session_state::game_run_startup;
+    platform::close_application();
+    current_menu = mui::page::main_menu;
+  }
+
+
   if (mui::button("normal game")) {
     session.next_grid_size = new vec2<i32>{18, 12};
     session.m_state = session_state::game_run_startup;

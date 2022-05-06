@@ -19,6 +19,7 @@ struct minesweeper_session{
   // TODO default state should be application_startup
   session_state m_state = session_state::game_run_startup;
   image* image_array = new image[11];
+  image victory_image;
   minesweeper_run* run = nullptr;
   minesweeper_main_menu* main_menu = nullptr;
   lapse::vec2<lapse::i32>* next_grid_size = nullptr;

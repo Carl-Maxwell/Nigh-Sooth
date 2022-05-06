@@ -91,6 +91,7 @@ image tile_obj::get_image(game_state_enum game_state, bool hovered) {
       return session.image_array[(u32)m_tile_state];
     }
   break;
+  case game_state_enum::won:
   case game_state_enum::lost:
     if (m_mined) {
       return session.image_array[(u32)grid_tile::mined];
