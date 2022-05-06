@@ -21,8 +21,10 @@ struct Mouse{
 enum class keycode{
   none     = 0,
   escape   = 27,
-  number_1 = 48
+  number_1 = 48,
+  number_2 = 49,
   // note: if you add something here you need to add it to keycode_list() in cpp
+  //   and in platform cpp translate_keycode()
 };
 
 // returns a list of all keycodes

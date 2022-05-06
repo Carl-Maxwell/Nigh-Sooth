@@ -301,6 +301,7 @@ olc::Key translate_keycode(keycode code) {
   switch(code) {
     case keycode::escape : return olc::Key::ESCAPE;
     case keycode::number_1 : return olc::Key::K1;
+    case keycode::number_2 : return olc::Key::K2;
   }
 
   assert(false);

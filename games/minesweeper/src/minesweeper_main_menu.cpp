@@ -23,9 +23,9 @@ void minesweeper_main_menu::start_main_loop() {
 void minesweeper_main_menu::main_loop(f32 delta) {
   // std::cout << "main menu start of frame " << frame_count << "\n";
 
-  for (i32 i = 0; i < 10'000; i++) {
-    platform::plot(rand_vec2() * platform::get_window_size(), rand_vec3());
-  }
+  // for (i32 i = 0; i < 10'000; i++) {
+    // platform::plot(rand_vec2() * platform::get_window_size(), rand_vec3());
+  // }
 
   switch (current_menu) {
     case mui::page::main_menu: main_menu(); break;

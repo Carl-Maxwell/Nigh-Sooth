@@ -85,6 +85,10 @@ void minesweeper_run::main_loop(f32 delta) {
       );
     }
   }
+
+  if (key(keycode::number_2).is_toggled()) {
+    // TODO reveal all tiles
+  }
 }
 
 // called each time we need to setup a new map to play

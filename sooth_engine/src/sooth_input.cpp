@@ -53,6 +53,7 @@ KeyState key(keycode code) {
 lapse::fixed_array<keycode> keycode_list() {
   return lapse::fixed_array<keycode>{
     keycode::escape,
-    keycode::number_1
+    keycode::number_1,
+    keycode::number_2
   };
 }
