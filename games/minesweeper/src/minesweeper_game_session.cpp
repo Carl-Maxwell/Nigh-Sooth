@@ -82,3 +82,10 @@ void minesweeper_session::restart_run() {
 }
 
 } // end namespace
+
+// fully close out everything
+void force_quit() {
+  auto& session = minesweeper::minesweeper_session::the();
+  session.m_state = minesweeper::session_state::application_shutdown;
+  platform::close_application();
+}

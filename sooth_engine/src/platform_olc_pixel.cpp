@@ -8,6 +8,7 @@
 #include "sooth_image.h"
 #include "sooth_input.h"
 
+
 #include "lapse_lib.h"
 
 namespace{
@@ -15,6 +16,8 @@ namespace{
   bool game_session_started = false;
   lapse_lambda(void, lapse::f32) main_loop;
 }
+
+void force_quit();
 
 class PixelEngineApp : public olc::PixelGameEngine
 {
@@ -44,6 +47,11 @@ public:
 
     return m_should_continue_running;
   }
+
+  bool OnUserDestroy() {
+    force_quit();
+    return true;
+  }
 };
 
 namespace platform{
@@ -70,6 +78,8 @@ void initialize(u32 screen_width, u32 screen_height, bool fullscreen, str window
   app = new PixelEngineApp(window_name);
   status = app->Construct(i32(screen_width), i32(screen_height), pixel_size, pixel_size, fullscreen);
 
+  std::cout << "screen resolution: " << i32(screen_width) << "x" << i32(screen_height) << "\n";
+  std::cout << "pixel scale: " << pixel_size << "\n";
   std::cout << "initializing olc::pixel game engine as the nigh sooth platform... status: ";
   
   switch(status) {
@@ -292,8 +302,8 @@ bool is_mouse_right_button_hit() {
 }
 
 vec2<i32> get_mouse_pos() {
-  olc::vi2d temp = app->GetWindowMouse();
-  return vec2<i32>{temp.x, temp.y};
+  olc::vi2d temp = app->GetMousePos(); //app->GetWindowMouse();
+  return vec2<i32>{temp.x*pixel_size, temp.y*pixel_size};
 }
 
 olc::Key translate_keycode(keycode code) {
