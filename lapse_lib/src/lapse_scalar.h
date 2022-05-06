@@ -219,6 +219,9 @@ struct vec2{
     return temp;
     // TODO check for lifetime issues
   }
+  bool operator>(f32 scalar) {
+    return x > scalar && y > scalar;
+  }
 };
 
 template<typename T=f32>

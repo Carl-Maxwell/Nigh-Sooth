@@ -28,7 +28,11 @@ void minesweeper_run::main_loop(f32 delta) {
   mouse_y /= grid_size;
   minesweeper::tile_obj* mouse_tile = nullptr;
 
-  if (mouse_x >= 0 && mouse_y >= 0 && mouse_x < grid_width && mouse_y < grid_height) {
+  if (
+       mouse_x >= 0 && mouse_y >= 0
+    && mouse_x < grid_width && mouse_y < grid_height
+    && Mouse::get_mouse_pos() > (f32)window_padding
+  ) {
     mouse_tile = &grid[mouse_y * grid_width + mouse_x];
   }
 
@@ -121,7 +125,6 @@ void minesweeper_run::initialize_run(i32 n_width, i32 n_height) {
     for (i32 x = 0; x < grid_width; x++) {
       grid[y*grid_width + x].reset();
       grid[y*grid_width + x].m_coordinates = {x, y};
-      // grid[y*grid_width + x].grid = grid; // TODO stop copying this pointer around
     }
   }
 }
