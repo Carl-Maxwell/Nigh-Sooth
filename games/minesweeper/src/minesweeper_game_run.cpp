@@ -9,7 +9,20 @@ using namespace lapse;
 namespace minesweeper{
 
 void minesweeper_run::start_main_loop() {
-  platform::initialize(next_window_size.x, next_window_size.y, false, "Nigh Sooth - Minesweeper Game");
+  auto pixel_size = 4;
+
+  // TODO fetch the actual monitor resolution from platform
+
+  vec2<i32> monitor_resolution = {1920, 1080};
+  monitor_resolution *= 0.8;
+  monitor_resolution = monitor_resolution / next_window_size;
+  pixel_size = min(monitor_resolution.x, monitor_resolution.y);
+
+  std::cout << "pixel size: " << pixel_size;
+
+  pixel_size = max(1, pixel_size);
+
+  platform::initialize(next_window_size.x, next_window_size.y, false, "Nigh Sooth - Minesweeper Game", pixel_size);
   platform::start_application();
 }
 

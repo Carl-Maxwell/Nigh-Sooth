@@ -86,6 +86,14 @@ void minesweeper_main_menu::new_game_menu() {
     current_menu = mui::page::main_menu;
   }
 
+  if (mui::button("huge game")) {
+    session.next_grid_size = new vec2<i32>{i32(1920*0.8f), i32(1080*0.8f)};
+    *session.next_grid_size /= session.run->grid_size;
+    session.m_state = session_state::game_run_startup;
+    platform::close_application();
+    current_menu = mui::page::main_menu;
+  }
+
   if (mui::button("back")) {
     current_menu = mui::page::main_menu;
   }

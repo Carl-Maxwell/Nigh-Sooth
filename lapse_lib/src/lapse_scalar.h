@@ -148,6 +148,15 @@ struct vec2{
     return temp;
     // TODO check for lifetime issues
   }
+  vec2 operator/(vec2 right_value) {
+    vec2 temp;
+
+    temp.x = x / right_value.x;
+    temp.y = y / right_value.y;
+
+    return temp;
+    // TODO check for lifetime issues
+  }
 
   // boolean operators
   bool operator==(vec2 right_value){
@@ -210,6 +219,12 @@ struct vec2{
     return temp;
     // TODO check for lifetime issues
   }
+  vec2& operator*=(f32 scalar) {
+    x *= scalar;
+    y *= scalar;
+
+    return *this;
+  }
   vec2 operator/(f32 scalar) {
     vec2 temp = *this;
 
@@ -218,6 +233,12 @@ struct vec2{
 
     return temp;
     // TODO check for lifetime issues
+  }
+  vec2& operator/=(f32 scalar) {
+    x /= scalar;
+    y /= scalar;
+
+    return *this;
   }
   bool operator>(f32 scalar) {
     return x > scalar && y > scalar;
