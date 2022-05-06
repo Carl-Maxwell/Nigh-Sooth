@@ -121,8 +121,6 @@ void tile_obj::chain_reaction() {
   auto& session = minesweeper_session::the();
   auto& run     = *session.run;
 
-  // std::cout << "chain reaction: ";
-  // m_coordinates.std_cout();
   if (!m_hidden || m_mined || m_flagged) { return; }
   reveal(false);
   i32 x = m_coordinates.x;
