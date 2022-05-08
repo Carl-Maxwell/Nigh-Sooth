@@ -14,10 +14,9 @@ using namespace lapse;
 
 namespace mui{
 
-bool button(lapse::str label) {
+bool button(lapse::str label, params box) {
   auto& context = Context::the();
 
-  params box;
   box.padding = {10};
   box.border  = {1};
 

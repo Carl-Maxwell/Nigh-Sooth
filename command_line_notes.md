@@ -8,4 +8,7 @@ git submodule add https://github.com/Carl-Maxwell/glfw ./sooth_engine/vendor/glf
 git rm sooth_engine/vendor/glfw
 
 
+to clone the repo:
+
+git clone --recurse-submodules https://github.com/Carl-Maxwell/Nigh-Sooth.git
 
