@@ -187,7 +187,7 @@ void fill_rect(rect<> box, vec3<> color) {
   }
 }
 
-void draw_text(str text, vec2<> position, vec3<> color, u32 font_size_pixels) {
+void draw_text(str& text, vec2<> position, vec3<> color, u32 font_size_pixels) {
   // TODO color
 
   // by default font_size is 8px
@@ -263,7 +263,7 @@ void draw_bitmap(
   }
 }
 
-void draw_bitmap(vec2<>  screen_coord, image img) {
+void draw_bitmap(vec2<>  screen_coord, image& img) {
   vec2<> current_coord{screen_coord};
   vec2<> end_coord = screen_coord + img.m_resolution;
 

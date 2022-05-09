@@ -20,7 +20,7 @@ u32 font_size() {
   return size;
 }
 
-mui_size text_box_size(str label) {
+mui_size text_box_size(str& label) {
   return {f32(label.length() * font_size()), f32(font_size() + 2u)};
 }
 

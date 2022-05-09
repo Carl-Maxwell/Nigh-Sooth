@@ -11,5 +11,5 @@ struct image{
 
   image();
   image(lapse::str path);
-  bool load_image();
+  bool load_image(lapse::str a_path = "");
 };

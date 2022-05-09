@@ -5,6 +5,6 @@
 
 namespace mui{
 
-bool button(lapse::str label, params args = {});
+bool button(lapse::str& label, params args = {});
 
 } // end namespace

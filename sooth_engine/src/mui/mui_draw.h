@@ -16,7 +16,7 @@ struct DrawCall{
   // lapse::vec3<> color = mui::transparent;
   lapse::i32 element_index;
   lapse_lambda(void, DrawCall&) draw;
-  lapse::str text;
+  // lapse::str text;
 };
 
 struct DrawCallArray{
@@ -48,6 +48,6 @@ struct DrawCallArray{
 void draw_rect(params args);
 void fill_rect(params args);
 
-void draw_text(lapse::str text, params args);
+void draw_text(lapse::str& text, params args);
 
 }

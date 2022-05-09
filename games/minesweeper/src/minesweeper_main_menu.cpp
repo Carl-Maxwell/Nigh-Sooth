@@ -50,7 +50,7 @@ void open_menu_content() {
 }
 
 // wrapper func for mui::button() that adds this game's style to it
-bool menu_button(str label, mui::params args = {}) {
+bool menu_button(str& label, mui::params args = {}) {
   // args.font_color = minesweeper_font_color;
 
   args.background_color = {0.7254901960784314, 0.8274509803921569, 0.8666666666666667};
@@ -63,20 +63,20 @@ void minesweeper_main_menu::main_menu() {
   open_menu_content();
 
   if (session.run) {
-    if (menu_button("continue game")) {
+    if (menu_button(str_continue_game)) {
       session.m_state = session_state::game_run_main_loop;
     }
   }
 
-  if (menu_button("New Game")) {
+  if (menu_button(str_new_game)) {
     current_menu = mui::page::new_game_menu;
   }
 
-  if (menu_button("test menu")) {
+  if (menu_button(str_test_menu)) {
     //current_menu = mui::page::test_menu;
   }
 
-  if (menu_button("Exit Minesweeper")) {
+  if (menu_button(str_exit)) {
     session.m_state = session_state::application_shutdown;
     platform::close_application();
   }
@@ -84,33 +84,39 @@ void minesweeper_main_menu::main_menu() {
   mui::close_div();
 }
 
+str str_quick_game  = "quick game";
+str str_normal_game = "normal game";
+str str_hard_game   = "hard game";
+str str_huge_game   = "huge game";
+str str_back        = "back";
+
 void minesweeper_main_menu::new_game_menu() {
   auto& session = minesweeper_session::the();
 
   open_menu_content();
 
-  if (menu_button("quick game")) {
+  if (menu_button(str_quick_game)) {
     session.next_grid_size = new vec2<i32>{10, 10};
     session.m_state = session_state::game_run_startup;
     platform::close_application();
     current_menu = mui::page::main_menu;
   }
 
-  if (menu_button("normal game")) {
+  if (menu_button(str_normal_game)) {
     session.next_grid_size = new vec2<i32>{18, 12};
     session.m_state = session_state::game_run_startup;
     platform::close_application();
     current_menu = mui::page::main_menu;
   }
 
-  if (menu_button("hard game")) {
+  if (menu_button(str_hard_game)) {
     session.next_grid_size = new vec2<i32>{27, 16};
     session.m_state = session_state::game_run_startup;
     platform::close_application();
     current_menu = mui::page::main_menu;
   }
 
-  if (menu_button("huge game")) {
+  if (menu_button(str_huge_game)) {
     session.next_grid_size = new vec2<i32>{i32(1920*0.8f), i32(1080*0.8f)};
     *session.next_grid_size /= session.run->grid_size;
     session.m_state = session_state::game_run_startup;
@@ -118,7 +124,7 @@ void minesweeper_main_menu::new_game_menu() {
     current_menu = mui::page::main_menu;
   }
 
-  if (menu_button("back")) {
+  if (menu_button(str_back)) {
     current_menu = mui::page::main_menu;
   }
   mui::close_div();

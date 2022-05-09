@@ -28,6 +28,11 @@ public:
       push(elem);
     }
   };
+
+  // fixed_array(const fixed_array& other) {
+
+  // }
+
   // returns elem, with safety check
   inline T& at(i32 i) const {
     assert(m_size && i < m_size && i >= 0);
@@ -98,7 +103,7 @@ public:
   };
   */
   i32 last_index() { return m_length-1; }
-  u32 length() { return m_length; }
+  u32 length() const { return m_length; }
   // transform each elem with lambda : elem = lambda(elem)
   fixed_array& map(lapse_lambda(T, T) callback) {
     for (u32 i = 0; i < m_length; i++) {
@@ -153,6 +158,7 @@ public:
 
   inline T& operator[](u32 i) const {
     return at(i);
+    // TODO if this operator is used to add elements to an array .length() is not updated
   };
   fixed_array<T>& operator=(std::initializer_list<T> i_list) {
     if (m_size) {
@@ -202,7 +208,8 @@ public:
     }
   };
   void reserve(u32 better_size) {
-    if (this->m_length == 0) {
+    assert(better_size);
+     if (this->m_length == 0) {
       this->m_elements = new T[better_size];
       this->m_size = better_size;
     } else {
@@ -232,7 +239,7 @@ public:
     }
   }
 
-  array& operator+=(const array other) {
+  array& operator+=(const array& other) {
     u32 total_length = this->m_length + other.m_length;
     reserve(total_length);
     

@@ -12,19 +12,19 @@ namespace minesweeper{
 enum class game_state_enum;
 
 enum class grid_tile{
-  number_1 = 1,
-  number_2 = 2,
-  number_3 = 3,
-  number_4 = 4,
-  number_5 = 5,
-  hidden   = 0,
-  hovered  = 9,
-  revealed = 6,
-  mined    = 8,
-  flagged  = 7,
-  empty    = 10,
-  bad_flag = 11
-  // TODO these numbers are not necessary anymore, remove them
+  hidden  ,
+  number_1,
+  number_2,
+  number_3,
+  number_4,
+  number_5,
+  hovered ,
+  revealed,
+  mined   ,
+  flagged ,
+  empty   ,
+  bad_flag,
+  count // used for figuring out how many values there are in the enum (for declaring arrays)
 };
 
 struct tile_obj{
@@ -39,7 +39,7 @@ struct tile_obj{
   lapse::array<tile_obj>* adjacent_tiles();
   lapse::array<tile_obj>* adjacent_tiles_cardinal();
   lapse::i32 calculate_adjacent_mines();
-  image get_image(game_state_enum game_state, bool hovered = false);
+  image& get_image(game_state_enum game_state, bool hovered = false);
   void reset() {
     m_adjacent_mines = 0;
     m_coordinates    = {0, 0};

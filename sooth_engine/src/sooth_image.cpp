@@ -16,7 +16,16 @@ image::image(str path) {
   load_image();
 }
 
-bool image::load_image() {
+bool image::load_image(str a_path) {
+  std::cout << "caliing load_image(" << a_path.to_c_str() << ")\n";
+  if (a_path.length()) { m_path = a_path; }
+
+  std::cout
+    << " a_path (" << a_path.to_c_str()
+    << ") m_path (" << m_path.to_c_str()
+    << ")\n"
+  ;
+
   unsigned char* raw_pixels = stb::stbi_load(
     m_path.to_c_str(),
     &m_width,
@@ -26,10 +35,10 @@ bool image::load_image() {
   );
 
   if (!raw_pixels) {
-    std::cout << "faiiled to load image: \"" << m_path.to_c_str() << "\"\n";
+    std::cout << "failed to load image: \"" << m_path.to_c_str() << "\"\n";
+    assert(raw_pixels);
     return false;
   }
-
 
   m_pixels = new vec3<>[m_width * m_height];
 

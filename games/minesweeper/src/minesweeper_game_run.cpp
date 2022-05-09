@@ -96,7 +96,7 @@ void minesweeper_run::main_loop(f32 delta) {
 
       auto& tile = grid[u32(y*grid_width + x)];
       bool hovering = mouse_tile && mouse_tile == &tile && game_state == game_state_enum::in_progress;
-      image img = tile.get_image(game_state, hovering);
+      image& img = tile.get_image(game_state, hovering);
 
       platform::draw_bitmap(screen_pos, img);
     }

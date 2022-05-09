@@ -14,6 +14,19 @@ struct str{
   str(char* c_str);
   str(char c_str);
 
+  str(const str& other) {
+    std::cout << "creating a copy of str(" << other.to_c_str() << ")\n";
+    *this = other;
+  }
+
+  str(str& other) {
+    std::cout << "creating a copy of str(" << other.to_c_str() << ")\n";
+    *this = other;
+  }
+
+  ~str() {}
+  // inline ~str() noexcept {}
+
   // interprets this string as a binary number
   u64 as_binary();
   // interprets this string as a hexadecimal number
@@ -23,14 +36,14 @@ struct str{
   void clear();
   // add str onto the end of this str
   str& concat(const str& other);
-  u32 length();
+  u32 length() const;
   str slice();
   // remove non-ascii characters from string
   str scrub();
   // break str into array of strings
   array<str> split(str sep);
   array<u8> to_array();
-  char* to_c_str();
+  char* to_c_str() const;
   u32 to_c_str_estimate_length();
   f32 to_f32();
   f64 to_f64();
@@ -41,11 +54,13 @@ struct str{
   // remove leading and trailing whitespace
   str trim();
 
-  str  operator+(str right_value);
-  str& operator+=(const str right_value);
-  str& operator=(str right_value);
+  str  operator+(str& right_value);
+  str& operator+=(const str& right_value);
+  str& operator=(str& right_value);
+  str& operator=(const str& right_value);
   str& operator=(char* right_value);
-  char operator[](u32 index);
+  str& operator=(const char* right_value);
+  char operator[](u32 index) const;
 
   // TODO should we support regex?
 

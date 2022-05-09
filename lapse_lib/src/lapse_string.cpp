@@ -5,18 +5,29 @@
 
 namespace lapse{
 
-str::str() : m_characters(1) {}
+str::str() : m_characters(1) {
+  std::cout << "str() \n\n";
+}
 
 str::str(const char* c_str) {
+  std::cout << "str(const char* c_str) \n\n";
+  if (c_str[0] == '\0') {
+    m_characters.reserve(1);
+    return;
+  }
+
   u32 c_str_length = 0;
   while (c_str[c_str_length++] != '\0') { }
   m_characters.reserve(c_str_length);
 
   u32 i = 0;
   while (c_str[i] != '\0') { m_characters.push(c_str[i]); i++; }
+
+  std::cout << "str(const char* c_str): length(): " << length() << "\n";
 };
 
 str::str(char* c_str) {
+  std::cout << "str(char* c_str) \n\n";
   u32 c_str_length = 0;
   while (c_str[c_str_length++] != '\0') { }
   m_characters.reserve(c_str_length);
@@ -25,7 +36,11 @@ str::str(char* c_str) {
   while (c_str[i] != '\0') { m_characters.push(c_str[i]); i++; }
 };
 
-str::str(char c_str) { m_characters.reserve(3); m_characters.push(c_str); }
+str::str(char c_str) {
+  std::cout << "str(char c_str) \n\n";
+  m_characters.reserve(3);
+  m_characters.push(c_str);
+}
 
 u64 str::as_binary() { return 0; }
 
@@ -40,7 +55,7 @@ str& str::concat(const str& other) {
   return *this;
 }
 
-u32 str::length() { return m_characters.length(); }
+u32 str::length() const { return m_characters.length(); }
 
 str str::slice() { return *this; }
 
@@ -63,12 +78,15 @@ array<str> str::split(str sep) {
 
 array<u8> str::to_array() { return m_characters; };
 
-char* str::to_c_str() {
+char* str::to_c_str() const {
+  if (!m_characters.length()) return new char('\0');
+
   char* c = new char[m_characters.length()+1];
   for (u32 i = 0; i < m_characters.length(); i++) {
     c[i] = (char)m_characters[i];
   }
   c[m_characters.length()] = '\0';
+
   return c;
 };
 
@@ -105,18 +123,53 @@ yaml str::to_yaml() { return yaml{}; }
 
 str str::trim() { return str{}; }
 
-str str::operator+(str right_value) {
+str str::operator+(str& right_value) {
   str temp_str = *this;
   temp_str += right_value;
   return temp_str;
 };
 
-str& str::operator+=(const str right_value) {
+str& str::operator+=(const str& right_value) {
   return concat(right_value);
 };
 
-str& str::operator=(str right_value) {
-  m_characters = right_value.m_characters;
+str& str::operator=(str& right_value) {
+  std::cout << "copying " << right_value.to_c_str() << " into new string";
+  if (length()) std::cout << " " << to_c_str(); 
+  std::cout << "\n";
+
+  if (this->m_characters.m_size) this->m_characters.clear();
+
+  if (!right_value.length()) {
+    this->m_characters.reserve(1);
+    std::cout << "set str equal to empty str\n";
+  } else {
+    this->m_characters.reserve(right_value.length());
+    for (i32 i = 0; i < right_value.length(); i++) {
+      this->m_characters.push(right_value[i]);
+    }
+  }
+
+  return *this;
+}
+
+str& str::operator=(const str& right_value) {
+  std::cout << "copying " << right_value.to_c_str() << " into new string";
+  if (length()) std::cout << " " << to_c_str(); 
+  std::cout << "\n";
+
+  if (this->m_characters.m_size) this->m_characters.clear();
+
+  if (!right_value.length()) {
+    this->m_characters.reserve(1);
+    std::cout << "set str equal to empty str\n";
+  } else {
+    this->m_characters.reserve(right_value.length());
+    for (i32 i = 0; i < right_value.length(); i++) {
+      this->m_characters.push(right_value[i]);
+    }
+  }
+
   return *this;
 }
 
@@ -136,7 +189,31 @@ str& str::operator=(char* right_value) {
   return *this;
 }
 
-char str::operator[](u32 index) {
+str& str::operator=(const char* right_value) {
+  clear();
+
+  if (right_value[0] == '\0') {
+    m_characters.reserve(1);
+    return *this;
+  }
+
+  u32 better_length = 0;
+  {
+    u32 i = 0;
+    while (right_value[i++] != '\0') { better_length++; }
+  }
+
+  m_characters.reserve(better_length);
+
+  {
+    u32 i = 0;
+    while (right_value[i] != '\0') { m_characters.push(right_value[i]); i++; }
+  }
+
+  return *this;
+}
+
+char str::operator[](u32 index) const {
   return (char)m_characters[index];
 }
 

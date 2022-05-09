@@ -7,6 +7,6 @@
 namespace mui{
 
 lapse::u32 font_size();
-mui_size text_box_size(lapse::str label);
+mui_size text_box_size(lapse::str& label);
 
 }

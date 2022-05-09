@@ -80,7 +80,7 @@ i32 tile_obj::calculate_adjacent_mines() {
   return mine_count;
 }
 
-image tile_obj::get_image(game_state_enum game_state, bool hovered) {
+image& tile_obj::get_image(game_state_enum game_state, bool hovered) {
   auto& session = minesweeper_session::the();
 
   switch (game_state) {

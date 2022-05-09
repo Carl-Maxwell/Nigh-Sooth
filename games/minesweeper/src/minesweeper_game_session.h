@@ -18,7 +18,7 @@ enum class session_state{
 struct minesweeper_session{
   // TODO default state should be application_startup
   session_state m_state = session_state::game_run_startup;
-  image* image_array = new image[11];
+  image* image_array = new image[(lapse::u32)grid_tile::count];
   image victory_image;
   minesweeper_run* run = nullptr;
   minesweeper_main_menu* main_menu = nullptr;
