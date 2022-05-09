@@ -12,7 +12,7 @@ lapse::f64 get_application_start_time();
 
 lapse::i32 get_pixel_size();
 
-void initialize(lapse::u32 screen_width, lapse::u32 screen_height, bool fullscreen, lapse::str window_name, lapse::i32 a_pixel_size = 4);
+void initialize(lapse::u32 screen_width, lapse::u32 screen_height, bool fullscreen, lapse::str& window_name, lapse::i32 a_pixel_size = 4);
 
 void close_application();
 void start_application();

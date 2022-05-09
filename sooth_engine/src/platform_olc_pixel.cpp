@@ -25,7 +25,7 @@ public:
   bool m_should_continue_running = true;
   lapse::u64 frame_count = 0;
 
-  PixelEngineApp(lapse::str name) {
+  PixelEngineApp(lapse::str& name) {
     sAppName = name.to_c_str();
   }
 
@@ -74,7 +74,7 @@ f64 get_application_start_time() {
 i32 get_pixel_size() { return pixel_size; }
 f32 get_window_padding() { return 10.0f; };
 
-void initialize(u32 screen_width, u32 screen_height, bool fullscreen, str window_name, i32 a_pixel_size) {
+void initialize(u32 screen_width, u32 screen_height, bool fullscreen, str& window_name, i32 a_pixel_size) {
   // TODO so each time we call this we're creating a new app ... and not deleting the old one
   //   so memory use probably goes up a bit after a few games
 

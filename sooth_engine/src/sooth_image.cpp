@@ -11,17 +11,17 @@ image::image() {
   m_path = "";
 }
 
-image::image(str path) {
+image::image(str& path) {
   m_path = path;
   load_image();
 }
 
-bool image::load_image(str a_path) {
-  std::cout << "caliing load_image(" << a_path.to_c_str() << ")\n";
-  if (a_path.length()) { m_path = a_path; }
+bool image::load_image(str* a_path) {
+  if (a_path) std::cout << "caliing load_image(" << a_path->to_c_str() << ")\n";
+  if (a_path->length()) { m_path = *a_path; }
 
   std::cout
-    << " a_path (" << a_path.to_c_str()
+    << " a_path (" << a_path->to_c_str()
     << ") m_path (" << m_path.to_c_str()
     << ")\n"
   ;

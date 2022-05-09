@@ -10,6 +10,6 @@ struct image{
   lapse::i32 m_width, m_height, m_bytes_per_pixel;
 
   image();
-  image(lapse::str path);
-  bool load_image(lapse::str a_path = "");
+  image(lapse::str& path);
+  bool load_image(lapse::str* a_path = nullptr);
 };

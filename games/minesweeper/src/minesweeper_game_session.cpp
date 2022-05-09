@@ -64,19 +64,36 @@ void minesweeper_session::main_loop(f32 delta) {
 void minesweeper_session::initialize_game_session() {
   main_menu = new minesweeper_main_menu;
 
-  image_array[ (u32)grid_tile::number_1 ] .load_image("resources/number_1.png");
-  image_array[ (u32)grid_tile::number_2 ] .load_image("resources/number_2.png");
-  image_array[ (u32)grid_tile::number_3 ] .load_image("resources/number_3.png");
-  image_array[ (u32)grid_tile::number_4 ] .load_image("resources/number_4.png");
-  image_array[ (u32)grid_tile::number_5 ] .load_image("resources/number_5.png");
-  image_array[ (u32)grid_tile::hidden ]   .load_image("resources/grid.png");
-  image_array[ (u32)grid_tile::empty ]    .load_image("resources/grid_empty.png");
-  image_array[ (u32)grid_tile::hovered ]  .load_image("resources/grid_highlighted.png");
-  image_array[ (u32)grid_tile::mined ]    .load_image("resources/bomb.png");
-  image_array[ (u32)grid_tile::flagged ]  .load_image("resources/flag.png");
-  image_array[ (u32)grid_tile::bad_flag ] .load_image("resources/bad_flag.png");
-  
-  victory_image .load_image("resources/victory.png");
+  str paths[] = {
+    "resources/number_1.png",
+    "resources/number_2.png",
+    "resources/number_3.png",
+    "resources/number_4.png",
+    "resources/number_5.png",
+    "resources/grid.png",
+    "resources/grid_empty.png",
+    "resources/grid_highlighted.png",
+    "resources/bomb.png",
+    "resources/flag.png",
+    "resources/bad_flag.png",
+    "resources/victory.png",
+  };
+
+  i32 i = 0;
+
+  image_array[ (u32)grid_tile::number_1 ] .load_image(&paths[i++]);
+  image_array[ (u32)grid_tile::number_2 ] .load_image(&paths[i++]);
+  image_array[ (u32)grid_tile::number_3 ] .load_image(&paths[i++]);
+  image_array[ (u32)grid_tile::number_4 ] .load_image(&paths[i++]);
+  image_array[ (u32)grid_tile::number_5 ] .load_image(&paths[i++]);
+  image_array[ (u32)grid_tile::hidden ]   .load_image(&paths[i++]);
+  image_array[ (u32)grid_tile::empty ]    .load_image(&paths[i++]);
+  image_array[ (u32)grid_tile::hovered ]  .load_image(&paths[i++]);
+  image_array[ (u32)grid_tile::mined ]    .load_image(&paths[i++]);
+  image_array[ (u32)grid_tile::flagged ]  .load_image(&paths[i++]);
+  image_array[ (u32)grid_tile::bad_flag ] .load_image(&paths[i++]);
+
+  victory_image .load_image(&paths[i++]);
 }
 
 void minesweeper_session::restart_run() {

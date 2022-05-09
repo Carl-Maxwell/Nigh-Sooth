@@ -16,7 +16,8 @@ using namespace lapse;
 namespace minesweeper{
 
 void minesweeper_main_menu::start_main_loop() {
-  platform::initialize(800, 600, false, "Nigh Sooth - Minesweeper Game - Main Menu");
+  static str str_application_name = "Nigh Sooth - Minesweeper Game - Main Menu";
+  platform::initialize(800, 600, false, str_application_name);
   platform::start_application();
 }
 

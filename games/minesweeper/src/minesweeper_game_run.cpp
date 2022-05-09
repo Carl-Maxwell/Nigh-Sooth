@@ -22,7 +22,9 @@ void minesweeper_run::start_main_loop() {
 
   pixel_size = max(1, pixel_size);
 
-  platform::initialize(next_window_size.x, next_window_size.y, false, "Nigh Sooth - Minesweeper Game", pixel_size);
+  static str str_application_name = "Nigh Sooth - Minesweeper Game";
+
+  platform::initialize(next_window_size.x, next_window_size.y, false, str_application_name, pixel_size);
   platform::start_application();
 }
 

@@ -24,7 +24,9 @@ struct str{
     *this = other;
   }
 
-  ~str() {}
+  ~str() {
+    std::cout << "~str(" << to_c_str() << ")\n";
+  }
   // inline ~str() noexcept {}
 
   // interprets this string as a binary number
