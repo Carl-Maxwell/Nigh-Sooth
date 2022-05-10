@@ -36,8 +36,8 @@ struct tile_obj{
   grid_tile m_tile_state = minesweeper::grid_tile::hidden;
   // minesweeper::tile_obj* grid;
 
-  lapse::array<tile_obj>* adjacent_tiles(lapse::array<tile_obj>* adjacents = nullptr);
-  lapse::array<tile_obj>* adjacent_tiles_cardinal(lapse::array<tile_obj>* adjacents = nullptr);
+  lapse::array<tile_obj>& adjacent_tiles(lapse::array<tile_obj>& adjacents);
+  lapse::array<tile_obj>& adjacent_tiles_cardinal(lapse::array<tile_obj>& adjacents);
   lapse::i32 calculate_adjacent_mines();
   image& get_image(game_state_enum game_state, bool hovered = false);
   void reset() {

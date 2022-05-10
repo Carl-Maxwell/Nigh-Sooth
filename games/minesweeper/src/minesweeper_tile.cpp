@@ -8,21 +8,23 @@ namespace minesweeper{
 
 // returns adjacent tiles
 //   note you have to allocate the adjacents arg
-array<tile_obj>* tile_obj::adjacent_tiles(lapse::array<tile_obj>* adjacents) {
+array<tile_obj>& tile_obj::adjacent_tiles(lapse::array<tile_obj>& adjacents) {
   auto& session = minesweeper_session::the();
   auto& run = *session.run;
 
   auto x = m_coordinates.x;
   auto y = m_coordinates.y;
 
-  // allocate adjancents like this:
-  // array<tile_obj>* adjacents = new array<tile_obj>(8);
+  // make sure have a size of at least 8:
+  // adjacents.reserve(8):
+  // array<tile_obj> adjacents(8);
+  // etc ...
   // before calling the func
 
   for (auto y2 = max(y-1, 0); y2 < min(y+2, run.grid_height); y2++) {
     for (auto x2 = max(x-1, 0); x2 < min(x+2, run.grid_width); x2++) {
       if (x2 == x && y2 == y) { continue; }
-      adjacents->push(run.grid[y2*run.grid_width + x2]);
+      adjacents.push(run.grid[y2*run.grid_width + x2]);
     }
   }
 
@@ -30,22 +32,24 @@ array<tile_obj>* tile_obj::adjacent_tiles(lapse::array<tile_obj>* adjacents) {
 }
 
 // returns adjacent tiles, but not diagonally adjacent
-array<tile_obj>* tile_obj::adjacent_tiles_cardinal(lapse::array<tile_obj>* adjacents) {
+array<tile_obj>& tile_obj::adjacent_tiles_cardinal(lapse::array<tile_obj>& adjacents) {
   auto& session = minesweeper_session::the();
   auto& run = *session.run;
 
   auto x = m_coordinates.x;
   auto y = m_coordinates.y;
 
-  // allocate adjacents like:
-  // array<tile_obj>* adjacents = new array<tile_obj>(8);
-  // before calling this func
+  // make sure have a size of at least 8:
+  // adjacents.reserve(8):
+  // array<tile_obj> adjacents(8);
+  // etc ...
+  // before calling the func
 
   for (auto y2 = max(y-1, 0); y2 < min(y+2, run.grid_height); y2++) {
     for (auto x2 = max(x-1, 0); x2 < min(x+2, run.grid_width); x2++) {
       if (x2 == x && y2 == y) { continue; } // skip center
       if (x2 != x && y2 != y) { continue; } // skip diagonals
-      adjacents->push(run.grid[y2*run.grid_width + x2]);
+      adjacents.push(run.grid[y2*run.grid_width + x2]);
     }
   }
 

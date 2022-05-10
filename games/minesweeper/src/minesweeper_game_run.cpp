@@ -212,16 +212,15 @@ void minesweeper_run::generate_safe_spaces(tile_obj* start_tile) {
 
   {
     // add adjacent tiles
-    array<tile_obj>* adjacents = new array<tile_obj>(8);
+    array<tile_obj> adjacents(8);
     adjacents = start_tile->adjacent_tiles(adjacents);
-    for (i32 i = 0; i < adjacents->length(); i++) {
-      safe_spaces.push((*adjacents)[i].m_coordinates);
+    for (i32 i = 0; i < adjacents.length(); i++) {
+      safe_spaces.push(adjacents[i].m_coordinates);
     }
-    delete adjacents;
   }
 
   // find the "frontier" -- the tiles adjacent to the 3x3 safe area
-  array<tile_obj>* frontier = new array<tile_obj>(5*5 - 3*3 + 1);
+  array<tile_obj> frontier(5*5 - 3*3 + 1);
 
   auto x    = safe_3x3.top_left_point().x;
   auto y    = safe_3x3.top_left_point().y;
@@ -231,7 +230,7 @@ void minesweeper_run::generate_safe_spaces(tile_obj* start_tile) {
   for (auto y2 = max(y-1, 0); y2 < min(br_y+1, grid_height); y2++) {
     for (auto x2 = max(x-1, 0); x2 < min(br_x+1, grid_width); x2++) {
       if (x2 >= x && y2 >= y && x2 < br_x && y2 < br_y) { continue; }
-      frontier->push(grid[y2*grid_width + x2]);
+      frontier.push(grid[y2*grid_width + x2]);
     }
   }
 
@@ -254,24 +253,21 @@ void minesweeper_run::generate_safe_spaces(tile_obj* start_tile) {
   auto extra_spaces = die(1, 6);
 
   {
-    array<tile_obj>* adjacents = new array<tile_obj>(8);
+    array<tile_obj> adjacents(8);
     for (auto i = 0; i < extra_spaces; i++) {
-      auto& tile = frontier->sample();
-      frontier->remove(tile);
+      auto& tile = frontier.sample();
+      frontier.remove(tile);
       safe_spaces.push(tile.m_coordinates);
       adjacents = tile.adjacent_tiles_cardinal(adjacents);
-      for (auto i = 0; i < adjacents->length(); i++) {
-        auto& adj_tile = (*adjacents)[i];
+      for (auto i = 0; i < adjacents.length(); i++) {
+        auto& adj_tile = adjacents[i];
         if (safe_spaces.contains(adj_tile.m_coordinates)) { continue; }
-        if (frontier->contains(adj_tile)) { continue; }
-        frontier->push(adj_tile);
+        if (frontier.contains(adj_tile)) { continue; }
+        frontier.push(adj_tile);
       }
-      adjacents->clear_no_dealloc();
+      adjacents.clear_no_dealloc();
     }
-    delete adjacents;
   }
-
-  delete frontier;
 }
 
 // place mines on the map
@@ -281,7 +277,7 @@ void minesweeper_run::generate_mines(i32 num_mines) {
   }
 
   {
-    array<tile_obj>* adjacents = new array<tile_obj>(8);
+    array<tile_obj> adjacents(8);
     i32 x;
     i32 y;
     bool bad_spot = true;
@@ -299,17 +295,16 @@ void minesweeper_run::generate_mines(i32 num_mines) {
         bad_spot = bad_spot || safe_spaces.contains(vec2<i32>{x,y});
 
         adjacents = grid[y*grid_width + x].adjacent_tiles(adjacents);
-        for (i32 i = 0; i < adjacents->length(); i++) {
-          bad_spot = bad_spot || (*adjacents)[i].calculate_adjacent_mines() >= 5;
+        for (i32 i = 0; i < adjacents.length(); i++) {
+          bad_spot = bad_spot || adjacents[i].calculate_adjacent_mines() >= 5;
         }
-        adjacents->clear_no_dealloc();
+        adjacents.clear_no_dealloc();
       }
 
       auto& tile = grid[y*grid_width + x];
       tile.m_mined = true;
       tile.m_adjacent_mines = tile.calculate_adjacent_mines();
     }
-    delete adjacents;
   }
 
   for (i32 y = 0; y < grid_height; y++) {
