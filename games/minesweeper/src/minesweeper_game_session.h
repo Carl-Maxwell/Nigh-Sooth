@@ -24,6 +24,10 @@ struct minesweeper_session{
   minesweeper_main_menu* main_menu = nullptr;
   lapse::vec2<lapse::i32>* next_grid_size = nullptr;
   
+  ~minesweeper_session() {
+    std::cout << "~minesweeper_session()\n";
+  }
+
   // returns singleton
   static minesweeper_session& the() {
     static minesweeper_session* my_session = nullptr;

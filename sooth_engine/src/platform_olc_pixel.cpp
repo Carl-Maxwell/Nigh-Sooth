@@ -338,7 +338,7 @@ KeyState get_key_state(keycode code) {
 }
 
 void poll_key_toggles() {
-  auto codes = keycode_list();
+  const auto& codes = keycode_list();
   for (i32 i = 0; i < codes.length(); i++) {
     auto key_state = key(codes[i]);
     if (key_state.is_hit()) {

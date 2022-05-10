@@ -24,6 +24,11 @@ struct minesweeper_run{
 
   game_state_enum game_state{game_state_enum::in_progress};
 
+  ~minesweeper_run() {
+    std::cout << "~minesweeper_run\n";
+    if (grid) delete[] grid;
+  }
+
   lapse::vec2<> grid_size_vec2() {
     return lapse::vec2<>{(lapse::f32)grid_size, (lapse::f32)grid_size};
   }

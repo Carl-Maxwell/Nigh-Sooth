@@ -28,7 +28,7 @@ enum class keycode{
 };
 
 // returns a list of all keycodes
-lapse::fixed_array<keycode> keycode_list();
+const lapse::fixed_array<keycode>& keycode_list();
 
 struct KeyState{
   keycode code = keycode::none;

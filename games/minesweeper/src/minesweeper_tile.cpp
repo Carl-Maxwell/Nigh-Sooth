@@ -7,14 +7,18 @@ using namespace lapse;
 namespace minesweeper{
 
 // returns adjacent tiles
-array<tile_obj>* tile_obj::adjacent_tiles() {
+//   note you have to allocate the adjacents arg
+array<tile_obj>* tile_obj::adjacent_tiles(lapse::array<tile_obj>* adjacents) {
   auto& session = minesweeper_session::the();
   auto& run = *session.run;
 
   auto x = m_coordinates.x;
   auto y = m_coordinates.y;
 
-  array<tile_obj>* adjacents = new array<tile_obj>(8);
+  // allocate adjancents like this:
+  // array<tile_obj>* adjacents = new array<tile_obj>(8);
+  // before calling the func
+
   for (auto y2 = max(y-1, 0); y2 < min(y+2, run.grid_height); y2++) {
     for (auto x2 = max(x-1, 0); x2 < min(x+2, run.grid_width); x2++) {
       if (x2 == x && y2 == y) { continue; }
@@ -26,14 +30,17 @@ array<tile_obj>* tile_obj::adjacent_tiles() {
 }
 
 // returns adjacent tiles, but not diagonally adjacent
-array<tile_obj>* tile_obj::adjacent_tiles_cardinal() {
+array<tile_obj>* tile_obj::adjacent_tiles_cardinal(lapse::array<tile_obj>* adjacents) {
   auto& session = minesweeper_session::the();
   auto& run = *session.run;
 
   auto x = m_coordinates.x;
   auto y = m_coordinates.y;
 
-  array<tile_obj>* adjacents = new array<tile_obj>(8);
+  // allocate adjacents like:
+  // array<tile_obj>* adjacents = new array<tile_obj>(8);
+  // before calling this func
+
   for (auto y2 = max(y-1, 0); y2 < min(y+2, run.grid_height); y2++) {
     for (auto x2 = max(x-1, 0); x2 < min(x+2, run.grid_width); x2++) {
       if (x2 == x && y2 == y) { continue; } // skip center

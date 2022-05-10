@@ -50,10 +50,11 @@ KeyState key(keycode code) {
   return platform::get_key_state(code);
 }
 
-lapse::fixed_array<keycode> keycode_list() {
-  return lapse::fixed_array<keycode>{
+const lapse::fixed_array<keycode>& keycode_list() {
+  static const lapse::fixed_array<keycode> static_keycode_list = {
     keycode::escape,
     keycode::number_1,
     keycode::number_2
   };
+  return static_keycode_list;
 }

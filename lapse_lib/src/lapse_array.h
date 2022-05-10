@@ -29,6 +29,16 @@ public:
     }
   };
 
+  ~fixed_array() {
+    std::cout << "~fixed_array()\n";
+    // __debugbreak();
+    if (m_elements && sizeof(T) <= 8) {
+      // __debugbreak();
+      // std::cout << *(u64*)(void*)&m_elements[0] << "\n";
+    }
+      
+  }
+
   // fixed_array(const fixed_array& other) {
 
   // }
@@ -46,13 +56,19 @@ public:
   };
   // removes all elements
   void clear() {
+    // TODO rename this to .dealloc()
     assert(m_size);
     delete[] m_elements;
     m_elements = nullptr;
     m_size = 0;
     m_length = 0;
   };
-  bool contains(T elem) {
+  // removes all elements (but keeps allocation)
+  void clear_no_dealloc() {
+    // TODO rename this to .clear()
+    m_length = 0;
+  };
+  bool contains(T elem) const {
     for (u32 i = 0; i < m_length; i++) {
       if (elem == m_elements[i]) {
         return true;
@@ -184,6 +200,10 @@ public:
   array() {};
   array(u32 start_size) { reserve(start_size); };
 
+  ~array() {
+    std::cout << "~array()";
+  }
+
   T& pop() {
     assert(this->m_length > 0);
     this->m_length -= 1;
@@ -242,7 +262,7 @@ public:
   array& operator+=(const array& other) {
     u32 total_length = this->m_length + other.m_length;
     reserve(total_length);
-    
+
     for (u32 i = this->m_length, other_i = 0; i < total_length; i++) {
       this->m_elements[i] = other[other_i++];
     }

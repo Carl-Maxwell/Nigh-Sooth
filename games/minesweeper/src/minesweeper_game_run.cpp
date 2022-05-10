@@ -212,7 +212,8 @@ void minesweeper_run::generate_safe_spaces(tile_obj* start_tile) {
 
   {
     // add adjacent tiles
-    array<tile_obj>* adjacents = start_tile->adjacent_tiles();
+    array<tile_obj>* adjacents = new array<tile_obj>(8);
+    adjacents = start_tile->adjacent_tiles(adjacents);
     for (i32 i = 0; i < adjacents->length(); i++) {
       safe_spaces.push((*adjacents)[i].m_coordinates);
     }
@@ -252,17 +253,22 @@ void minesweeper_run::generate_safe_spaces(tile_obj* start_tile) {
 
   auto extra_spaces = die(1, 6);
 
-  for (auto i = 0; i < extra_spaces; i++) {
-    auto& tile = frontier->sample();
-    frontier->remove(tile);
-    safe_spaces.push(tile.m_coordinates);
-    auto* adjacents = tile.adjacent_tiles_cardinal();
-    for (auto i = 0; i < adjacents->length(); i++) {
-      auto& adj_tile = (*adjacents)[i]; 
-      if (safe_spaces.contains(adj_tile.m_coordinates)) { continue; }
-      if (frontier->contains(adj_tile)) { continue; }
-      frontier->push(adj_tile);
+  {
+    array<tile_obj>* adjacents = new array<tile_obj>(8);
+    for (auto i = 0; i < extra_spaces; i++) {
+      auto& tile = frontier->sample();
+      frontier->remove(tile);
+      safe_spaces.push(tile.m_coordinates);
+      adjacents = tile.adjacent_tiles_cardinal(adjacents);
+      for (auto i = 0; i < adjacents->length(); i++) {
+        auto& adj_tile = (*adjacents)[i];
+        if (safe_spaces.contains(adj_tile.m_coordinates)) { continue; }
+        if (frontier->contains(adj_tile)) { continue; }
+        frontier->push(adj_tile);
+      }
+      adjacents->clear_no_dealloc();
     }
+    delete adjacents;
   }
 
   delete frontier;
@@ -274,30 +280,36 @@ void minesweeper_run::generate_mines(i32 num_mines) {
     num_mines = (grid_width * grid_height)/4;
   }
 
-  for (u32 n = 0; n < num_mines; n++) {
+  {
+    array<tile_obj>* adjacents = new array<tile_obj>(8);
     i32 x;
     i32 y;
     bool bad_spot = true;
+    
+    for (u32 n = 0; n < num_mines; n++) {
+      bad_spot = true;
 
-    // if it's already mined, find a fresh spot
-    while (bad_spot) {
-      x = (i32)rand_integer(grid_width);
-      y = (i32)rand_integer(grid_height);
+      // if it's already mined, find a fresh spot
+      while (bad_spot) {
+        x = (i32)rand_integer(grid_width);
+        y = (i32)rand_integer(grid_height);
 
-      bad_spot = grid[y*grid_width + x].m_mined;
-      bad_spot = bad_spot || grid[y*grid_width + x].calculate_adjacent_mines() >= 5;
-      bad_spot = bad_spot || safe_spaces.contains(vec2<i32>{x,y});
+        bad_spot = grid[y*grid_width + x].m_mined;
+        bad_spot = bad_spot || grid[y*grid_width + x].calculate_adjacent_mines() >= 5;
+        bad_spot = bad_spot || safe_spaces.contains(vec2<i32>{x,y});
 
-      auto* adjacents = grid[y*grid_width + x].adjacent_tiles();
-      for (i32 i = 0; i < adjacents->length(); i++) {
-        bad_spot = bad_spot || (*adjacents)[i].calculate_adjacent_mines() >= 5;
+        adjacents = grid[y*grid_width + x].adjacent_tiles(adjacents);
+        for (i32 i = 0; i < adjacents->length(); i++) {
+          bad_spot = bad_spot || (*adjacents)[i].calculate_adjacent_mines() >= 5;
+        }
+        adjacents->clear_no_dealloc();
       }
-      delete adjacents;
-    }
 
-    auto& tile = grid[y*grid_width + x];
-    tile.m_mined = true;
-    tile.m_adjacent_mines = tile.calculate_adjacent_mines();
+      auto& tile = grid[y*grid_width + x];
+      tile.m_mined = true;
+      tile.m_adjacent_mines = tile.calculate_adjacent_mines();
+    }
+    delete adjacents;
   }
 
   for (i32 y = 0; y < grid_height; y++) {
