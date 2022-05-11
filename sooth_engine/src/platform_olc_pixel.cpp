@@ -156,10 +156,18 @@ void plot(lapse::vec2<> screen_coord, lapse::vec3<u8> color) {
 }
 
 void draw_line(vec2<> start, vec2<> end, vec3<> color) {
-  f32 distance = (start-end).length(); 
+  auto& screen_pixels = app->pDrawTarget->pColData;
+  auto screen_width   = app->pDrawTarget->width;
+  auto screen_height  = app->pDrawTarget->height;
+
+  auto p_color = olc::Pixel{u8(color.r*255), u8(color.g*255), u8(color.b*255)};
+
+  f32 distance = (start-end).length();
   vec2<> dir = (end-start).normalize();
+  vec2<> pos;
   for (vec2<> offset = {0, 0}; offset.length() < distance; offset += dir) {
-    plot(start+offset, color);
+    pos = start+offset;
+    screen_pixels[pos.y*screen_width + pos.x] = p_color;
   }
 }
 
