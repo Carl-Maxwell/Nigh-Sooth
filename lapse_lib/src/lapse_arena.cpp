@@ -31,6 +31,7 @@ void Arena::pop(u64 bytes) {
 }
 
 void Arena::clear() {
+  std::cout << "// Arena::clear() called, bytes used: " << length() << " arena utilization: " << f32(length())/f32(m_size) << "\n";
   m_position = m_memory_start;
 }
 

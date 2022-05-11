@@ -89,13 +89,13 @@ char* str::to_c_str() const {
   }
   c[m_characters.length()] = '\0';
 
-  std::cout << "\n//\n// to_c_str(" << c << ")\n//\n";
+  // std::cout << "\n//\n// to_c_str(" << c << ")\n//\n";
 
-  std::cout << "allocated " << m_characters.length()+1 << " bytes.\n";
-  std::cout << "memory location: " << (void*)c << ".\n";
-  std::cout << "temp arena memory goes from: " << arenas::temp.m_memory_start << ".." << arenas::temp.m_position << "\n";
+  // std::cout << "allocated " << m_characters.length()+1 << " bytes.\n";
+  // std::cout << "memory location: " << (void*)c << ".\n";
+  // std::cout << "temp arena memory goes from: " << arenas::temp.m_memory_start << ".." << arenas::temp.m_position << "\n";
 
-  std::cout << "\n\n";
+  // std::cout << "\n\n";
 
   return c;
 };
@@ -144,15 +144,15 @@ str& str::operator+=(const str& right_value) {
 };
 
 str& str::operator=(str& right_value) {
-  std::cout << "copying " << right_value.to_c_str() << " into new string";
-  if (length()) std::cout << " " << to_c_str(); 
-  std::cout << "\n";
+  // std::cout << "copying " << right_value.to_c_str() << " into new string";
+  // if (length()) std::cout << " " << to_c_str(); 
+  // std::cout << "\n";
 
   if (this->m_characters.m_size) this->m_characters.clear();
 
   if (!right_value.length()) {
     this->m_characters.reserve(1);
-    std::cout << "set str equal to empty str\n";
+    // std::cout << "set str equal to empty str\n";
   } else {
     this->m_characters.reserve(right_value.length());
     for (i32 i = 0; i < right_value.length(); i++) {
@@ -164,15 +164,10 @@ str& str::operator=(str& right_value) {
 }
 
 str& str::operator=(const str& right_value) {
-  std::cout << "copying " << right_value.to_c_str() << " into new string";
-  if (length()) std::cout << " " << to_c_str(); 
-  std::cout << "\n";
-
   if (this->m_characters.m_size) this->m_characters.clear();
 
   if (!right_value.length()) {
     this->m_characters.reserve(1);
-    std::cout << "set str equal to empty str\n";
   } else {
     this->m_characters.reserve(right_value.length());
     for (i32 i = 0; i < right_value.length(); i++) {

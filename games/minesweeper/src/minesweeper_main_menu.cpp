@@ -89,6 +89,7 @@ str str_quick_game  = "quick game";
 str str_normal_game = "normal game";
 str str_hard_game   = "hard game";
 str str_huge_game   = "huge game";
+str str_2x_game     = "impossibly big game";
 str str_back        = "back";
 
 void minesweeper_main_menu::new_game_menu() {
@@ -119,6 +120,14 @@ void minesweeper_main_menu::new_game_menu() {
 
   if (menu_button(str_huge_game)) {
     session.next_grid_size = new vec2<i32>{i32(1920*0.8f), i32(1080*0.8f)};
+    *session.next_grid_size /= session.run->grid_size;
+    session.m_state = session_state::game_run_startup;
+    platform::close_application();
+    current_menu = mui::page::main_menu;
+  }
+
+  if (menu_button(str_2x_game)) {
+    session.next_grid_size = new vec2<i32>{i32(1920*2.0f), i32(1080*2.0f)};
     *session.next_grid_size /= session.run->grid_size;
     session.m_state = session_state::game_run_startup;
     platform::close_application();

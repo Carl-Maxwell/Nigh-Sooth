@@ -182,12 +182,43 @@ void draw_rect(rect<> box, vec3<> color) {
 }
 
 void fill_rect(rect<> box, vec3<> color) {
-  vec2<> point = box.top_left_point();
-  for (; point.y < box.bottom_right_point().y; point.y++) {
-    for (; point.x < box.bottom_right_point().x; point.x++) {
-      plot(point, color);
-    }
-    point.x = box.top_left_point().x;
+  auto rect_height = box.size.y;
+  auto rect_width  = box.size.x;
+  auto screen_y = box.top_left_point().y;
+  auto screen_x = box.top_left_point().x;
+
+  if (screen_x < 0) {
+    rect_width += screen_x;
+    screen_x = 0;
+  }
+  if (screen_y < 0) {
+    rect_height += screen_y;
+    screen_y = 0;
+  }
+
+  auto& screen_pixels = app->pDrawTarget->pColData;
+  auto screen_width   = app->pDrawTarget->width;
+  auto screen_height  = app->pDrawTarget->height;
+
+  if (screen_x + rect_width  > screen_width)  rect_width  = screen_width -screen_x;
+  if (screen_y + rect_height > screen_height) rect_height = screen_height-screen_y;
+
+  auto p_color = olc::Pixel{u8(color.r*255), u8(color.g*255), u8(color.b*255)};
+  i32 bg_color = p_color.n;
+  auto line_size_in_bytes = rect_width*sizeof(olc::Pixel);
+
+  auto line_of_pixels = arenas::temp.push(line_size_in_bytes);
+  // auto line_of_pixels = alloca(line_size_in_bytes);
+  for (u32 x = 0; x < rect_width; x++) {
+    ((i32*)line_of_pixels)[x] = bg_color;
+  }
+
+  for (u32 y = 0; y < rect_height; y++) {
+    memcpy(
+      (void*)&screen_pixels[(screen_y+y)*screen_width + screen_x],
+      line_of_pixels,
+      line_size_in_bytes
+    );
   }
 }
 
@@ -225,7 +256,6 @@ void draw_bitmap(vec2<>  screen_coord, image& img) {
       line_offset
     );
   }
-
 }
 
 void clear(lapse::vec3<> color) {

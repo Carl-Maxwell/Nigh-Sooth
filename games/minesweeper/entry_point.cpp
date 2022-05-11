@@ -33,7 +33,7 @@ void main_loop_callback(f32 delta) {
 } // end minesweeper namespace
 
 int main() {
-  arenas::temp.setup_arena(100'000);
+  arenas::temp.setup_arena(30'000);
 
   sooth::initialize_engine();
 
