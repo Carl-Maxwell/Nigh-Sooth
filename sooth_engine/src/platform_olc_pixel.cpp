@@ -167,6 +167,8 @@ void draw_line(vec2<> start, vec2<> end, vec3<> color) {
   vec2<> pos;
   for (vec2<> offset = {0, 0}; offset.length() < distance; offset += dir) {
     pos = start+offset;
+    assert(pos.x >= 0 && pos.x < screen_width);
+    assert(pos.y >= 0 && pos.y < screen_height);
     screen_pixels[pos.y*screen_width + pos.x] = p_color;
   }
 }
@@ -195,21 +197,12 @@ void fill_rect(rect<> box, vec3<> color) {
   auto screen_y = box.top_left_point().y;
   auto screen_x = box.top_left_point().x;
 
-  if (screen_x < 0) {
-    rect_width += screen_x;
-    screen_x = 0;
-  }
-  if (screen_y < 0) {
-    rect_height += screen_y;
-    screen_y = 0;
-  }
-
   auto& screen_pixels = app->pDrawTarget->pColData;
   auto screen_width   = app->pDrawTarget->width;
   auto screen_height  = app->pDrawTarget->height;
 
-  if (screen_x + rect_width  > screen_width)  rect_width  = screen_width -screen_x;
-  if (screen_y + rect_height > screen_height) rect_height = screen_height-screen_y;
+  assert(screen_x >= 0 && screen_x + rect_width  < screen_width);
+  assert(screen_y >= 0 && screen_y + rect_height < screen_height);
 
   auto p_color = olc::Pixel{u8(color.r*255), u8(color.g*255), u8(color.b*255)};
   i32 bg_color = p_color.n;
@@ -248,8 +241,12 @@ void draw_bitmap(vec2<> screen_coord, image& img) {
 
   auto img_pixels = img.m_u_pixels;
 
-  auto& screen_pixels     = app->pDrawTarget->pColData;
-  auto screen_pixel_width = app->pDrawTarget->width;
+  auto& screen_pixels      = app->pDrawTarget->pColData;
+  auto screen_pixel_width  = app->pDrawTarget->width;
+  auto screen_pixel_height = app->pDrawTarget->height;
+
+  assert(screen_coord.x >= 0 && screen_coord.x + image_width  < screen_pixel_width) ;
+  assert(screen_coord.y >= 0 && screen_coord.y + image_height < screen_pixel_height);
 
   auto line_offset = image_width*sizeof(olc::Pixel);
 
