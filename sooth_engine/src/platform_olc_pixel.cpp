@@ -19,13 +19,13 @@ namespace{
 
 void force_quit();
 
-class PixelEngineApp : public olc::PixelGameEngine
+class SoothPixelEngineApp : public olc::PixelGameEngine
 {
 public:
   bool m_should_continue_running = true;
   lapse::u64 frame_count = 0;
 
-  PixelEngineApp(lapse::str& name) {
+  SoothPixelEngineApp(lapse::str& name) {
     sAppName = name.to_c_str();
   }
 
@@ -61,7 +61,7 @@ namespace platform{
 using namespace lapse;
 
 namespace{
-  PixelEngineApp* app;
+  SoothPixelEngineApp* app;
   olc::rcode status;
   i32 pixel_size = 4;
   f64 application_startup_time = get_timestamp();
@@ -80,7 +80,7 @@ void initialize(u32 screen_width, u32 screen_height, bool fullscreen, str& windo
 
   pixel_size = a_pixel_size;
 
-  app = new PixelEngineApp(window_name);
+  app = new SoothPixelEngineApp(window_name);
   status = app->Construct(i32(screen_width), i32(screen_height), pixel_size, pixel_size, fullscreen);
 
   std::cout << "screen resolution: " << i32(screen_width) << "x" << i32(screen_height) << "\n";
@@ -105,6 +105,10 @@ void close_application() {
   app->m_should_continue_running = false;
 
   // note that this just ends the main loop, causing it to fall back to session::start_session()
+}
+
+void finalize_shutdown() {
+  delete app;
 }
 
 void start_application() {

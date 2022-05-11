@@ -12,6 +12,10 @@
 #include "lapse_f32.h"
 
 #include "lapse_exceptions.h"
+
+#include "lapse_arena.h"
+#include "lapse_temp.h"
+
 #include "lapse_array.h"
 #include "lapse_string.h"
 

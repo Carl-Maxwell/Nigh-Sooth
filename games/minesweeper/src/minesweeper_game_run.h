@@ -27,6 +27,7 @@ struct minesweeper_run{
   ~minesweeper_run() {
     std::cout << "~minesweeper_run\n";
     if (grid) delete[] grid;
+    platform::finalize_shutdown();
   }
 
   lapse::vec2<> grid_size_vec2() {

@@ -5,6 +5,7 @@
 #include "lapse_lambda.h"
 #include "lapse_exceptions.h"
 #include "lapse_random.h"
+#include "lapse_temp.h"
 
 #include <initializer_list>
 
@@ -31,6 +32,7 @@ public:
 
   ~fixed_array() {
     std::cout << "~fixed_array()\n";
+    if (m_elements) delete[] m_elements;
     // __debugbreak();
     if (m_elements && sizeof(T) <= 8) {
       // __debugbreak();
@@ -88,7 +90,7 @@ public:
     while (sep[sep_length++] != '\0') {}
     length_sum += m_length-1 * sep_length;
 
-    output = new char[length_sum];
+    output = (char*)arenas::temp.push(length_sum);
 
     u32 str_pos = 0;
 
@@ -155,6 +157,7 @@ public:
     }
     m_length--;
   }
+  // allocate space for the array
   void reserve(u32 better_size) {
     if (m_length == 0) {
       m_elements = new T[better_size];
@@ -227,9 +230,10 @@ public:
       reserve(u32(ceil_i(f32(this->m_size) * 1.5f)));
     }
   };
+  // allocate space for the array, copying existing elems into new allocation
   void reserve(u32 better_size) {
     assert(better_size);
-     if (this->m_length == 0) {
+    if (this->m_length == 0) {
       this->m_elements = new T[better_size];
       this->m_size = better_size;
     } else {
@@ -290,8 +294,31 @@ public:
   // TODO .difference(arr)
 };
 
+// a temporarily allocated array
+template<class T>
+class temp_array : public array<T>{
+public:
+  // allocate space for the array, copying existing elems into new allocation
+  void reserve(u32 better_size) {
+    assert(better_size);
+    if (this->m_length == 0) {
+      this->m_elements = (T*)arenas::temp.push(better_size);
+      this->m_size = better_size;
+    } else {
+      T* old_elements = this->m_elements;
+      this->m_elements = (T*)arenas::temp.push(better_size);
+      for (u32 i = 0; i < this->m_length; i++) {
+        this->m_elements[i] = old_elements[i];
+      }
+
+      // TODO callback for reference stability?
+
+      this->m_size = better_size;
+    }
+  }
 };
 
-// temporarily putting this here
+}; // end namespace
 
+// TODO temporarily putting this here:
 #include "lapse_range.h"

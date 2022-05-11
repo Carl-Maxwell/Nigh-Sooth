@@ -79,13 +79,23 @@ array<str> str::split(str sep) {
 array<u8> str::to_array() { return m_characters; };
 
 char* str::to_c_str() const {
-  if (!m_characters.length()) return new char('\0');
+  // if (!m_characters.length()) {
+  //   return new char('\0');
+  // }
 
-  char* c = new char[m_characters.length()+1];
+  char* c = (char*)arenas::temp.push(m_characters.length()+1);
   for (u32 i = 0; i < m_characters.length(); i++) {
     c[i] = (char)m_characters[i];
   }
   c[m_characters.length()] = '\0';
+
+  std::cout << "\n//\n// to_c_str(" << c << ")\n//\n";
+
+  std::cout << "allocated " << m_characters.length()+1 << " bytes.\n";
+  std::cout << "memory location: " << (void*)c << ".\n";
+  std::cout << "temp arena memory goes from: " << arenas::temp.m_memory_start << ".." << arenas::temp.m_position << "\n";
+
+  std::cout << "\n\n";
 
   return c;
 };
