@@ -8,7 +8,6 @@
 #include "sooth_image.h"
 #include "sooth_input.h"
 
-
 #include "lapse_lib.h"
 
 namespace{
@@ -36,6 +35,7 @@ public:
       game_session_initialization_callback();
       game_session_started = true;
     }
+
     return true;
   }
 
@@ -205,93 +205,27 @@ void draw_text(str& text, vec2<> position, vec3<> color, u32 font_size_pixels) {
   );
 }
 
-void draw_bitmap(
-  vec2<>  screen_coord,
-  vec2<>  image_size,
-  vec3<u8>* pixels
-) {
-  vec2<> current_coord{screen_coord};
-  vec2<> end_coord = screen_coord + image_size;
-
-  u32 image_width = (u32)image_size.x;
-
-  u32 image_x = 0;
-  u32 image_y = 0;
-
-  while (current_coord.y < end_coord.y) {
-    while(current_coord.x < end_coord.x) {
-      plot(
-        current_coord,
-        pixels[image_y*image_width + image_x]
-      );
-
-      image_x++;
-      current_coord.x++;
-    }
-    current_coord.x = screen_coord.x;
-    image_x = 0;
-
-    image_y++;
-    current_coord.y++;
-  }
-}
-
-void draw_bitmap(
-  vec2<>  screen_coord,
-  vec2<>  image_size,
-  vec3<>* pixels
-) {
-  vec2<> current_coord{screen_coord};
-  vec2<> end_coord = screen_coord + image_size;
-
-  u32 image_width = (u32)image_size.x;
-
-  u32 image_x = 0;
-  u32 image_y = 0;
-
-  while (current_coord.y < end_coord.y) {
-    while(current_coord.x < end_coord.x) {
-      plot(
-        current_coord,
-        pixels[image_y*image_width + image_x]
-      );
-
-      image_x++;
-      current_coord.x++;
-    }
-    current_coord.x = screen_coord.x;
-    image_x = 0;
-
-    image_y++;
-    current_coord.y++;
-  }
-}
-
 void draw_bitmap(vec2<>  screen_coord, image& img) {
-  vec2<> current_coord{screen_coord};
-  vec2<> end_coord = screen_coord + img.m_resolution;
+  u32 image_width  = (u32)img.m_width;
+  u32 image_height = (u32)img.m_height;
 
-  u32 image_width = (u32)img.m_resolution.x;
+  auto img_pixels = img.m_u_pixels;
 
-  u32 image_x = 0;
-  u32 image_y = 0;
+  auto& screen_pixels     = app->pDrawTarget->pColData;
+  auto screen_pixel_width = app->pDrawTarget->width;
 
-  while (current_coord.y < end_coord.y) {
-    while(current_coord.x < end_coord.x) {
-      plot(
-        current_coord,
-        img.m_pixels[image_y*image_width + image_x]
-      );
+  auto line_offset = image_width*sizeof(olc::Pixel);
 
-      image_x++;
-      current_coord.x++;
-    }
-    current_coord.x = screen_coord.x;
-    image_x = 0;
+  assert(sizeof(olc::Pixel) == sizeof(vec4<u8>));
 
-    image_y++;
-    current_coord.y++;
+  for (i32 y = 0; y < image_height; y++) {
+    memcpy(
+      (void*)&screen_pixels[(screen_coord.y+y) * screen_pixel_width + screen_coord.x],
+      (void*)&img_pixels[y*image_width],
+      line_offset
+    );
   }
+
 }
 
 void clear(lapse::vec3<> color) {

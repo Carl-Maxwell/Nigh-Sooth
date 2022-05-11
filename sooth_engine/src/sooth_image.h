@@ -4,7 +4,8 @@
 #include "lapse_string.h"
 
 struct image{
-  lapse::vec3<>* m_pixels = nullptr;
+  // lapse::vec3<>* m_pixels = nullptr;
+  lapse::vec4<lapse::u8>* m_u_pixels = nullptr;
   lapse::vec2<> m_resolution;
   lapse::str m_path;
   lapse::i32 m_width, m_height, m_bytes_per_pixel;

@@ -41,19 +41,7 @@ void draw_rect(lapse::vec2<> start, lapse::vec2<> size, lapse::vec3<> color = {1
 void draw_rect(lapse::rect<> box, lapse::vec3<> color = {0.0f, 0.0f, 0.0f});
 void fill_rect(lapse::rect<> box, lapse::vec3<> color = {0.0f, 0.0f, 0.0f});
 
-void draw_bitmap(
-  lapse::vec2<>  screen_coord,
-  lapse::vec2<>  image_size,
-  lapse::vec3<lapse::u8>* pixels
-);
-
-void draw_bitmap(
-  lapse::vec2<>  screen_coord,
-  lapse::vec2<>  image_size,
-  lapse::vec3<>* pixels
-);
-
-void draw_bitmap(lapse::vec2<>  screen_coord, image& img);
+void draw_bitmap(lapse::vec2<> screen_coord, image& img);
 
 void clear(lapse::vec3<> color);
 

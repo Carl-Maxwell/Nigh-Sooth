@@ -40,13 +40,23 @@ bool image::load_image(str* a_path) {
     return false;
   }
 
-  m_pixels = new vec3<>[m_width * m_height];
+  // m_pixels = new vec3<>[m_width * m_height];
 
+  // for (u32 i = 0; i < m_width * m_height; i++) {
+  //   m_pixels[i] = vec3<>{
+  //     f32(raw_pixels[m_bytes_per_pixel*i+0])/255.0f,
+  //     f32(raw_pixels[m_bytes_per_pixel*i+1])/255.0f,
+  //     f32(raw_pixels[m_bytes_per_pixel*i+2])/255.0f
+  //   };
+  // }
+
+  m_u_pixels = new vec4<u8>[m_width * m_height];
   for (u32 i = 0; i < m_width * m_height; i++) {
-    m_pixels[i] = vec3<>{
-      f32(raw_pixels[m_bytes_per_pixel*i+0])/255.0f,
-      f32(raw_pixels[m_bytes_per_pixel*i+1])/255.0f,
-      f32(raw_pixels[m_bytes_per_pixel*i+2])/255.0f
+    m_u_pixels[i] = vec4<u8>{
+      raw_pixels[m_bytes_per_pixel*i+0],
+      raw_pixels[m_bytes_per_pixel*i+1],
+      raw_pixels[m_bytes_per_pixel*i+2],
+      255
     };
   }
 
