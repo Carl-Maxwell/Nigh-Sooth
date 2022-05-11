@@ -71,7 +71,7 @@ f64 get_application_start_time() {
   return application_startup_time;
 }
 
-i32 get_pixel_size() { return pixel_size; }
+i32 get_pixel_size() { return pixel_size; };
 f32 get_window_padding() { return 10.0f; };
 
 void initialize(u32 screen_width, u32 screen_height, bool fullscreen, str& window_name, i32 a_pixel_size) {
@@ -231,8 +231,6 @@ void fill_rect(rect<> box, vec3<> color) {
 }
 
 void draw_text(str& text, vec2<> position, vec3<> color, u32 font_size_pixels) {
-  // TODO color
-
   // by default font_size is 8px
   font_size_pixels /= 8;
 
@@ -244,7 +242,7 @@ void draw_text(str& text, vec2<> position, vec3<> color, u32 font_size_pixels) {
   );
 }
 
-void draw_bitmap(vec2<>  screen_coord, image& img) {
+void draw_bitmap(vec2<> screen_coord, image& img) {
   u32 image_width  = (u32)img.m_width;
   u32 image_height = (u32)img.m_height;
 
