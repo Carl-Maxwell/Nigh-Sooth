@@ -230,7 +230,19 @@ void draw_bitmap(vec2<>  screen_coord, image& img) {
 
 void clear(lapse::vec3<> color) {
   color *= 255;
-  app->Clear(olc::Pixel{(u8)color.r, (u8)color.g, (u8)color.b});
+  // app->Clear(olc::Pixel{(u8)color.r, (u8)color.g, (u8)color.b});
+
+  auto& screen_pixels = app->pDrawTarget->pColData;
+  auto width          = app->pDrawTarget->width;
+  auto height         = app->pDrawTarget->height;
+
+  auto p_color = olc::Pixel{(u8)color.r, (u8)color.g, (u8)color.b};
+  i32 clear_color = p_color.n;
+  auto line_byte_size = width*sizeof(olc::Pixel);
+
+  for (u32 y = 0; y < height; y++) {
+    memset((void*)&screen_pixels[y*width], clear_color, line_byte_size);
+  }
 }
 
 //-----------------------------------------------------------------------------
