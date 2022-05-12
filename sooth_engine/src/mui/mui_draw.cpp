@@ -40,7 +40,7 @@ void fill_rect(params args) {
       auto& args = context.dom_stack[call.element_index];
 
       auto box = args.box_area();
-      // box.size -= vec2<>{1, 1}; //
+      box.size -= vec2<>{1, 1}; //
       box *= ContextScale::the().scale();
 
       assert(
