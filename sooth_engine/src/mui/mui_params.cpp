@@ -39,7 +39,11 @@ lapse::vec2<> params::position() {
       return container->content_area().top_left_point() + margin.top_left();
     } else {
       // nth child
-      return context.dom_stack[i].margin_area().bottom_left_point() + margin.top_left();
+      return 
+        context.dom_stack[i].margin_area().bottom_left_point()
+        + margin.top_left()
+        // + vec2<>{0, 1}
+      ;
     }
   } else {
     return m_position;

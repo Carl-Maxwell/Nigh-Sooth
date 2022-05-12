@@ -79,6 +79,7 @@ void initialize(u32 screen_width, u32 screen_height, bool fullscreen, str& windo
   //   so memory use probably goes up a bit after a few games
 
   pixel_size = a_pixel_size;
+  // pixel_size = 1;
 
   app = new SoothPixelEngineApp(window_name);
   status = app->Construct(i32(screen_width), i32(screen_height), pixel_size, pixel_size, fullscreen);
@@ -192,10 +193,10 @@ void draw_rect(rect<> box, vec3<> color) {
 }
 
 void fill_rect(rect<> box, vec3<> color) {
-  auto rect_width  = box.size.x;
-  auto rect_height = box.size.y;
-  auto screen_x = box.top_left_point().x;
-  auto screen_y = box.top_left_point().y;
+  u32 rect_width  = box.size.x;
+  u32 rect_height = box.size.y;
+  u32 screen_x = box.top_left_point().x;
+  u32 screen_y = box.top_left_point().y;
 
   auto& screen_pixels = app->pDrawTarget->pColData;
   auto screen_width   = (u32)app->pDrawTarget->width;

@@ -12,15 +12,15 @@ struct rect{
   vec2<T> top_left_point()     { return position; }
   vec2<T> top_right_point()    {
     vec2 temp = position;
-    temp.x += size.x-1;
+    temp.x += size.x;
     return temp;
   }
   vec2<T> bottom_left_point()  {
     vec2 temp = position;
-    temp.y += size.y-1;
+    temp.y += size.y;
     return temp;
   }
-  vec2<T> bottom_right_point() { return position + size - vec2<T>{1, 1}; }
+  vec2<T> bottom_right_point() { return position + size; }
 
   bool is_point_inside(vec2<> point) {
     return point > position &&
