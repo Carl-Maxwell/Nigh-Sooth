@@ -22,7 +22,7 @@ void Console::h3(str heading) {
     std::cout << "\n\n// " << heading.to_c_str() << "\n";
 }
 
-void Console::log(str a_string) {
+void Console::print(str a_string) {
   std::cout << a_string.to_c_str() << "\n";
 }
 

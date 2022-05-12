@@ -30,8 +30,13 @@ void draw_rect(params args) {
         box.position.y = lapse::round(box.position.y);
 
         if (box.bottom_right_point().greater_than_or(screen_size)) {
-          box.size.x = lapse::ceil_f(box.size.x);
-          box.size.y = lapse::ceil_f(box.size.y);
+          // box.size.x = lapse::floor_f(box.size.x);
+          // box.size.y = lapse::floor_f(box.size.y);
+
+          __debugbreak();
+
+          // we should probably round down if it hits the screen edge,
+          //   to solve an edge case where rounding up goes over the window's edge
         } else {
           box.size.x = lapse::round(box.size.x);
           box.size.y = lapse::round(box.size.y);
@@ -69,19 +74,18 @@ void fill_rect(params args) {
         box.position.y = lapse::round(box.position.y);
 
         if (box.bottom_right_point().greater_than_or(screen_size)) {
-          box.size.x = lapse::ceil_f(box.size.x);
-          box.size.y = lapse::ceil_f(box.size.y);
+          // box.size.x = lapse::floor_f(box.size.x);
+          // box.size.y = lapse::floor_f(box.size.y);
+
+          __debugbreak();
+
+          // we should probably round down if it hits the screen edge,
+          //   to solve an edge case where rounding up goes over the window's edge
         } else {
           box.size.x = lapse::round(box.size.x);
           box.size.y = lapse::round(box.size.y);
         }
       }
-
-      Console::h3("mui::fill_rect()");
-      Console::log("position: ");
-      box.position.std_cout();
-      Console::log("size: ");
-      box.size.std_cout();
 
       assert(
         box.position.x >= 0 || box.position.y >= 0
