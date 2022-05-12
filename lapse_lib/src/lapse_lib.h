@@ -19,6 +19,8 @@
 #include "lapse_array.h"
 #include "lapse_string.h"
 
+#include "lapse_console.h"
+
 // #include "lapse_range.h"
 
 #include "lapse_time.h"

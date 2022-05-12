@@ -18,12 +18,29 @@ void draw_rect(params args) {
       auto& args = context.dom_stack[call.element_index];
 
       auto box = args.box_area();
-      box.size -= vec2<>{1, 1}; // 
-      box *= ContextScale::the().scale();
+      box.size -= vec2<>{1, 1}; //
+
+      auto screen_size = platform::get_window_size();
+
+      {
+        auto scale = ContextScale::the().scale();
+        box *= scale;
+
+        box.position.x = lapse::round(box.position.x);
+        box.position.y = lapse::round(box.position.y);
+
+        if (box.bottom_right_point().greater_than_or(screen_size)) {
+          box.size.x = lapse::ceil_f(box.size.x);
+          box.size.y = lapse::ceil_f(box.size.y);
+        } else {
+          box.size.x = lapse::round(box.size.x);
+          box.size.y = lapse::round(box.size.y);
+        }
+      }
 
       assert(
         box.position.x >= 0 && box.position.y >= 0
-        && box.bottom_right_point() < platform::get_window_size()
+        && box.bottom_right_point() < screen_size
       );
 
       // TODO border_color
@@ -41,11 +58,34 @@ void fill_rect(params args) {
 
       auto box = args.box_area();
       box.size -= vec2<>{1, 1}; //
-      box *= ContextScale::the().scale();
+
+      auto screen_size = platform::get_window_size();
+
+      {
+        auto scale = ContextScale::the().scale();
+        box *= scale;
+
+        box.position.x = lapse::round(box.position.x);
+        box.position.y = lapse::round(box.position.y);
+
+        if (box.bottom_right_point().greater_than_or(screen_size)) {
+          box.size.x = lapse::ceil_f(box.size.x);
+          box.size.y = lapse::ceil_f(box.size.y);
+        } else {
+          box.size.x = lapse::round(box.size.x);
+          box.size.y = lapse::round(box.size.y);
+        }
+      }
+
+      Console::h3("mui::fill_rect()");
+      Console::log("position: ");
+      box.position.std_cout();
+      Console::log("size: ");
+      box.size.std_cout();
 
       assert(
         box.position.x >= 0 || box.position.y >= 0
-        && box.bottom_right_point() < platform::get_window_size()
+        && box.bottom_right_point() < screen_size
       );
 
       if (args.background_color != mui::default_color) {
