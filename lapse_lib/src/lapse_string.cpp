@@ -155,7 +155,7 @@ str& str::operator=(str& right_value) {
     // std::cout << "set str equal to empty str\n";
   } else {
     this->m_characters.reserve(right_value.length());
-    for (i32 i = 0; i < right_value.length(); i++) {
+    for (u32 i = 0; i < right_value.length(); i++) {
       this->m_characters.push(right_value[i]);
     }
   }
@@ -170,7 +170,7 @@ str& str::operator=(const str& right_value) {
     this->m_characters.reserve(1);
   } else {
     this->m_characters.reserve(right_value.length());
-    for (i32 i = 0; i < right_value.length(); i++) {
+    for (u32 i = 0; i < right_value.length(); i++) {
       this->m_characters.push(right_value[i]);
     }
   }

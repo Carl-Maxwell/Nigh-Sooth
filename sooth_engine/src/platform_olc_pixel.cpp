@@ -144,14 +144,14 @@ olc::Pixel vec3_to_color(vec3<> color) {
 
 void plot(vec2<> screen_coord, vec3<> color) {
   app->Draw(
-    screen_coord.x, screen_coord.y,
+    i32(screen_coord.x), i32(screen_coord.y),
     olc::Pixel{u8(color.r*255), u8(color.g*255), u8(color.b*255)}
   );
 }
 
 void plot(lapse::vec2<> screen_coord, lapse::vec3<u8> color) {
   app->Draw(
-    screen_coord.x, screen_coord.y,
+    i32(screen_coord.x), i32(screen_coord.y),
     olc::Pixel{color.r, color.g, color.b}
   );
 }
@@ -193,10 +193,10 @@ void draw_rect(rect<> box, vec3<> color) {
 }
 
 void fill_rect(rect<> box, vec3<> color) {
-  u32 rect_width  = box.size.x;
-  u32 rect_height = box.size.y;
-  u32 screen_x = box.top_left_point().x;
-  u32 screen_y = box.top_left_point().y;
+  u32 rect_width  = u32(box.size.x);
+  u32 rect_height = u32(box.size.y);
+  u32 screen_x = u32(box.top_left_point().x);
+  u32 screen_y = u32(box.top_left_point().y);
 
   auto& screen_pixels = app->pDrawTarget->pColData;
   auto screen_width   = (u32)app->pDrawTarget->width;
@@ -253,9 +253,9 @@ void draw_bitmap(vec2<> screen_coord, image& img) {
 
   assert(sizeof(olc::Pixel) == sizeof(vec4<u8>));
 
-  for (i32 y = 0; y < image_height; y++) {
+  for (u32 y = 0; y < image_height; y++) {
     memcpy(
-      (void*)&screen_pixels[(screen_coord.y+y) * screen_pixel_width + screen_coord.x],
+      (void*)&screen_pixels[(u32(screen_coord.y)+y) * u32(screen_pixel_width) + u32(screen_coord.x)],
       (void*)&img_pixels[y*image_width],
       line_offset
     );
@@ -272,9 +272,9 @@ void clear(lapse::vec3<> color) {
 
   auto p_color = olc::Pixel{(u8)color.r, (u8)color.g, (u8)color.b};
   i32 clear_color = p_color.n;
-  auto line_byte_size = width*sizeof(olc::Pixel);
+  auto line_byte_size = width*(i32)sizeof(olc::Pixel);
 
-  for (u32 y = 0; y < height; y++) {
+  for (i32 y = 0; y < height; y++) {
     memset((void*)&screen_pixels[y*width], clear_color, line_byte_size);
   }
 }
@@ -304,6 +304,7 @@ olc::Key translate_keycode(keycode code) {
     case keycode::escape : return olc::Key::ESCAPE;
     case keycode::number_1 : return olc::Key::K1;
     case keycode::number_2 : return olc::Key::K2;
+    default: return olc::Key::NONE;
   }
 
   assert(false);
@@ -323,7 +324,7 @@ KeyState get_key_state(keycode code) {
 
 void poll_key_toggles() {
   const auto& codes = keycode_list();
-  for (i32 i = 0; i < codes.length(); i++) {
+  for (u32 i = 0; i < codes.length(); i++) {
     auto key_state = key(codes[i]);
     if (key_state.is_hit()) {
       key_state.toggle();

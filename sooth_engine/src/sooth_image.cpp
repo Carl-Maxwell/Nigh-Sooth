@@ -51,7 +51,7 @@ bool image::load_image(str* a_path) {
   // }
 
   m_u_pixels = new vec4<u8>[m_width * m_height];
-  for (u32 i = 0; i < m_width * m_height; i++) {
+  for (i32 i = 0; i < m_width * m_height; i++) {
     m_u_pixels[i] = vec4<u8>{
       raw_pixels[m_bytes_per_pixel*i+0],
       raw_pixels[m_bytes_per_pixel*i+1],

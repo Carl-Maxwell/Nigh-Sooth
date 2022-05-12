@@ -24,8 +24,8 @@ public:
   fixed_array() {};
   fixed_array(u32 n) { reserve(n); };
   fixed_array(std::initializer_list<T> i_list) {
-    reserve(i_list.size());
-    for (auto elem : i_list) {
+    reserve((u32)i_list.size());
+    for (T elem : i_list) {
       push(elem);
     }
   };
@@ -47,7 +47,7 @@ public:
 
   // returns elem, with safety check
   inline T& at(i32 i) const {
-    assert(m_size && i < m_size && i >= 0);
+    assert(m_size && i < i32(m_size) && i >= 0);
     return m_elements[i];
   };
   // returns elem at index = length+i
@@ -167,15 +167,15 @@ public:
     }
   }
   // returns n random elements
-  T& sample(i32 n=1) {
-    assert(m_length > 0);
-    assert(n == 1); // TODO implement loop
-    auto r = rand_integer(m_length-1);
-    assert(r < length()-1 && r >= 0);
+  T& sample(u64 n=1) {
+    assert(m_length > u32(0));
+    assert(n == u64(1)); // TODO implement loop
+    u32 r = (u32)rand_integer(m_length-u64(1));
+    assert(r < length()-u32(1) && r >= u32(0));
     return m_elements[r];
   }
 
-  inline T& operator[](u32 i) const {
+  inline T& operator[](i32 i) const {
     return at(i);
     // TODO if this operator is used to add elements to an array .length() is not updated
   };

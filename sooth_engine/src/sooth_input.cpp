@@ -29,7 +29,7 @@ bool Mouse::right_mouse_hit() {
 vec2<> Mouse::get_mouse_pos() {
   _mouse.m_pos = platform::get_mouse_pos();
 
-  return vec2<>{(f32)_mouse.m_pos.x, (f32)_mouse.m_pos.y} / platform::get_pixel_size();
+  return vec2<>{(f32)_mouse.m_pos.x, (f32)_mouse.m_pos.y} / (f32)platform::get_pixel_size();
 }
 
 //

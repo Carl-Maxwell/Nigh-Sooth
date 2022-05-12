@@ -11,7 +11,7 @@ public:
   std::default_random_engine m_engine;
   std::uniform_int_distribution<u64> m_dist;
 
- static Random& the(u64 rngseed = 0) {
+ static Random& the(u32 rngseed = 0) {
     static Random* my_rng = nullptr;
     if (!my_rng) {
       my_rng = new Random;
@@ -23,7 +23,7 @@ public:
   };
 };
 
-void seed_rng(u64 seed) {
+void seed_rng(u32 seed) {
   Random::the(seed);
 }
 

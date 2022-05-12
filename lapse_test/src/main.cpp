@@ -142,7 +142,7 @@ int main() {
       // if (!good) { std::cout << "test passed\n"; }
 
       lapse::fixed_array<lapse::i32> powers_of_two;
-      powers_of_two = lapse::range(1, 10).map([](lapse::i32 a){ return pow(2, a); });
+      powers_of_two = lapse::range(1, 10).map([](lapse::i32 a){ return (i32)lapse::pow(2, a); });
 
       good &= powers_of_two[powers_of_two.m_length-1] && lapse::pow(2, 10);
 
@@ -153,7 +153,7 @@ int main() {
         std::cout << "lapse::pow((f32)i, 2) == " << lapse::pow((f32)i, 2) << " == " <<  i << "\n";
         std::cout << "lapse::sqrt(lapse::pow((f32)i, 2)) == " << lapse::sqrt(lapse::pow((f32)i, 2)) << " == " <<  i << "\n";
         good &= lapse::sqrt(lapse::pow((f32)i, 2)) == i; // nope
-        good &= powers_of_two.contains( lapse::pow(2, (f32)lapse::logarithm_i(2, (f32)i)) );
+        good &= powers_of_two.contains( (i32)lapse::pow(2.0f, (f32)lapse::logarithm_i(2.0f, (f32)i)) );
         // std::cout << "lapse::pow(2, lapse::logarithm_i(2, " << i << ")))" << lapse::pow(2, lapse::logarithm_i(2, i)) << "\n";
       // }
 

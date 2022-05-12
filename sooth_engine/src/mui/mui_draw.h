@@ -36,6 +36,7 @@ struct DrawCallArray{
   static inline void push(DrawCall call) {
     the().m_calls.push(call);
   }
+
   static inline void clear() {
     if (the().m_calls.length()) {
       the().m_calls.clear();

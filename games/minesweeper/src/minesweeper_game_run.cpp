@@ -14,7 +14,7 @@ void minesweeper_run::start_main_loop() {
   // TODO fetch the actual monitor resolution from platform
 
   vec2<i32> monitor_resolution = {1920, 1080};
-  monitor_resolution *= 0.8;
+  monitor_resolution *= 0.8f;
   monitor_resolution = monitor_resolution / next_window_size;
   pixel_size = min(monitor_resolution.x, monitor_resolution.y);
 
@@ -59,7 +59,7 @@ void minesweeper_run::main_loop(f32 delta) {
           m_first_click = false;
           generate_safe_spaces(mouse_tile);
           generate_mines();
-          for (i32 i = 0; i < safe_spaces.length(); i++) {
+          for (u32 i = 0; i < safe_spaces.length(); i++) {
             auto& safe_tile = grid[safe_spaces[i].y * grid_width + safe_spaces[i].x];
             safe_tile.reveal();
           }
@@ -117,7 +117,7 @@ void minesweeper_run::main_loop(f32 delta) {
   // debugging stuff:
 
   if (key(keycode::number_1).is_toggled()) {
-    for (i32 i = 0; i < safe_spaces.length(); i++) {
+    for (u32 i = 0; i < safe_spaces.length(); i++) {
       platform::draw_rect(
         vec2<>{f32(safe_spaces[i].x), f32(safe_spaces[i].y)} * grid_size_vec2() + (f32)window_padding,
         grid_size_vec2(),
@@ -215,7 +215,7 @@ void minesweeper_run::generate_safe_spaces(tile_obj* start_tile) {
     // add adjacent tiles
     array<tile_obj> adjacents(8);
     adjacents = start_tile->adjacent_tiles(adjacents);
-    for (i32 i = 0; i < adjacents.length(); i++) {
+    for (u32 i = 0; i < adjacents.length(); i++) {
       safe_spaces.push(adjacents[i].m_coordinates);
     }
   }
@@ -255,13 +255,13 @@ void minesweeper_run::generate_safe_spaces(tile_obj* start_tile) {
 
   {
     array<tile_obj> adjacents(8);
-    for (auto i = 0; i < extra_spaces; i++) {
+    for (u32 i = 0; i < extra_spaces; i++) {
       auto& tile = frontier.sample();
       frontier.remove(tile);
       safe_spaces.push(tile.m_coordinates);
       adjacents = tile.adjacent_tiles_cardinal(adjacents);
-      for (auto i = 0; i < adjacents.length(); i++) {
-        auto& adj_tile = adjacents[i];
+      for (u32 i2 = 0; i2 < adjacents.length(); i2++) {
+        auto& adj_tile = adjacents[i2];
         if (safe_spaces.contains(adj_tile.m_coordinates)) { continue; }
         if (frontier.contains(adj_tile)) { continue; }
         frontier.push(adj_tile);
@@ -283,7 +283,7 @@ void minesweeper_run::generate_mines(i32 num_mines) {
     i32 y;
     bool bad_spot = true;
     
-    for (u32 n = 0; n < num_mines; n++) {
+    for (i32 n = 0; n < num_mines; n++) {
       bad_spot = true;
 
       // if it's already mined, find a fresh spot
@@ -296,7 +296,7 @@ void minesweeper_run::generate_mines(i32 num_mines) {
         bad_spot = bad_spot || safe_spaces.contains(vec2<i32>{x,y});
 
         adjacents = grid[y*grid_width + x].adjacent_tiles(adjacents);
-        for (i32 i = 0; i < adjacents.length(); i++) {
+        for (u32 i = 0; i < adjacents.length(); i++) {
           bad_spot = bad_spot || adjacents[i].calculate_adjacent_mines() >= 5;
         }
         adjacents.clear_no_dealloc();

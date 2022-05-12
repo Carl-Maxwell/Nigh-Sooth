@@ -20,7 +20,7 @@ void initialize_engine() {
     }
   });
 
-  lapse::seed_rng(platform::get_application_start_time());
+  lapse::seed_rng((u32)platform::get_application_start_time());
 }
 
 }

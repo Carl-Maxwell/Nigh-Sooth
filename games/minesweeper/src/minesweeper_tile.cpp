@@ -112,6 +112,9 @@ image& tile_obj::get_image(game_state_enum game_state, bool hovered) {
       return session.image_array[(u32)m_tile_state];
     }
   break;
+  default:
+    return *(image*)nullptr;
+  break;
   }
 }
 

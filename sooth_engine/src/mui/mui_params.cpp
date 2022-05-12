@@ -59,7 +59,7 @@ mui_size params::size() {
     auto keep_looping = true;
     m_position = position();
 
-    for (i32 i = index+1; i < context.dom_stack.length() && keep_looping; i++) {
+    for (u32 i = index+1; i < context.dom_stack.length() && keep_looping; i++) {
       if (context.dom_stack[i].parent_index == index) {
         // TODO here we're assuming each element occupies only one line
         auto child_width =

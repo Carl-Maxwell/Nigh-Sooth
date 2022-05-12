@@ -79,7 +79,7 @@ void draw_text(str& text, params args) {
 void draw() {
   auto& draw_call_array = DrawCallArray::the();
 
-  for (i32 i = 0; i < draw_call_array.m_calls.length(); i++) {
+  for (u32 i = 0; i < draw_call_array.m_calls.length(); i++) {
     auto& call = draw_call_array.m_calls[i];
     call.draw(call);
   }

@@ -10,16 +10,16 @@ using namespace lapse;
 namespace mui{
 
 u32 font_size() {
-  u32 size = 8;
+  f32 size = 8;
   size = platform::get_window_size().x / 60; // aim for 60 columns
 
   // integer rounding (has to be an integer multiple of 8 ... so either 8 or 16, etc ... )
   size /= 8;
   size *= 8;
   size *= ContextScale::the().scale();
-  size = max(8u, size); // the only size less than 8 is 0
+  size = max(8.0f, size); // the only size less than 8 is 0
 
-  return size;
+  return u32(lapse::round(size));
 }
 
 mui_size text_box_size(str& label) {

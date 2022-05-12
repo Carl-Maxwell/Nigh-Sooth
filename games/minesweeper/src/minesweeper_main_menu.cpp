@@ -54,7 +54,7 @@ void open_menu_content() {
 bool menu_button(str& label, mui::params args = {}) {
   // args.font_color = minesweeper_font_color;
 
-  args.background_color = {0.7254901960784314, 0.8274509803921569, 0.8666666666666667};
+  args.background_color = {0.7254901960784314f, 0.8274509803921569f, 0.8666666666666667f};
   return mui::button(label, args);
 }
 
