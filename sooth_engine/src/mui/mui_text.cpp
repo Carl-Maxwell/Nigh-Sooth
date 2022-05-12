@@ -3,6 +3,7 @@
 #include <lapse_lib.h>
 
 #include "platform_olc_pixel.h"
+#include "mui/mui_context.h"
 
 using namespace lapse;
 
@@ -15,6 +16,7 @@ u32 font_size() {
   // integer rounding (has to be an integer multiple of 8 ... so either 8 or 16, etc ... )
   size /= 8;
   size *= 8;
+  size *= ContextScale::the().scale();
   size = max(8u, size); // the only size less than 8 is 0
 
   return size;

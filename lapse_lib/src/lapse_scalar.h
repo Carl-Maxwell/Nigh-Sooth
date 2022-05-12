@@ -181,6 +181,7 @@ struct vec2{
 
     return temp;
   }
+  // x > x and y > y
   bool operator>(vec2 right_value) {
     bool temp = true;
 
@@ -198,6 +199,16 @@ struct vec2{
     temp |= y > right_value.y;
 
     return temp;
+  }
+  // x >= x and y >= y
+  bool operator>=(vec2 right_value) {
+    bool temp = true;
+
+    temp &= x >= right_value.x;
+    temp &= y >= right_value.y;
+
+    return temp;
+    // TODO check for lifetime issues
   }
 
   // vector scalar operations

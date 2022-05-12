@@ -15,6 +15,9 @@ void Context::reset() {
     dom_stack.reserve(4);
   }
   current_container_index = params::has_no_parent;
+  auto& scale = ContextScale::the();
+  scale.old_scale = scale.scale();
+  scale.m_size_needed = platform::get_window_size();
 }
 
 } // end namespace

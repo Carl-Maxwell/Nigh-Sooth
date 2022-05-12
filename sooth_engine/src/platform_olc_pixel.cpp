@@ -169,7 +169,7 @@ void draw_line(vec2<> start, vec2<> end, vec3<> color) {
     pos = start+offset;
     assert(pos.x >= 0 && pos.x < screen_width);
     assert(pos.y >= 0 && pos.y < screen_height);
-    screen_pixels[pos.y*screen_width + pos.x] = p_color;
+    screen_pixels[u32(pos.y)*u32(screen_width) + u32(pos.x)] = p_color;
   }
 }
 
@@ -192,14 +192,14 @@ void draw_rect(rect<> box, vec3<> color) {
 }
 
 void fill_rect(rect<> box, vec3<> color) {
-  auto rect_height = box.size.y;
   auto rect_width  = box.size.x;
-  auto screen_y = box.top_left_point().y;
+  auto rect_height = box.size.y;
   auto screen_x = box.top_left_point().x;
+  auto screen_y = box.top_left_point().y;
 
   auto& screen_pixels = app->pDrawTarget->pColData;
-  auto screen_width   = app->pDrawTarget->width;
-  auto screen_height  = app->pDrawTarget->height;
+  auto screen_width   = (u32)app->pDrawTarget->width;
+  auto screen_height  = (u32)app->pDrawTarget->height;
 
   assert(screen_x >= 0 && screen_x + rect_width  < screen_width);
   assert(screen_y >= 0 && screen_y + rect_height < screen_height);
@@ -216,7 +216,7 @@ void fill_rect(rect<> box, vec3<> color) {
 
   for (u32 y = 0; y < rect_height; y++) {
     memcpy(
-      (void*)&screen_pixels[(screen_y+y)*screen_width + screen_x],
+      (void*)&screen_pixels[(u32(screen_y)+y)*u32(screen_width) + u32(screen_x)],
       line_of_pixels,
       line_size_in_bytes
     );

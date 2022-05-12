@@ -142,6 +142,7 @@ void minesweeper_run::initialize_run(i32 n_width, i32 n_height) {
     grid_size*grid_height + window_padding*2  // window height
   };
 
+  // initialize grid
   grid = new minesweeper::tile_obj[grid_width * grid_height];
 
   for (i32 y = 0; y < grid_height; y++) {

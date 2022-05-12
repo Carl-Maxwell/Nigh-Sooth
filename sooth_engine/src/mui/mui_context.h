@@ -5,8 +5,36 @@
 
 #include "mui/mui_params.h"
 #include "sooth_input.h"
+#include "platform_olc_pixel.h"
 
 namespace mui{
+
+struct ContextScale{
+  // Scale of the UI, set according to fit the UI onto the screen in case it overflows
+  lapse::f32 scale() {
+    auto v_scale = (platform::get_window_size() / m_size_needed);
+
+    auto scale = lapse::min(v_scale.x, v_scale.y);
+    scale = lapse::min(1.0f, scale); // we only scale down, not up
+    return scale;
+  }
+  // Scale of the UI at the end of the last frame
+  lapse::f32 last_scale() {
+    return old_scale;
+  }
+  // The window size needed last frame
+  lapse::vec2<> m_size_needed;
+  lapse::f32 old_scale;
+
+  static ContextScale& the() {
+    static ContextScale* my_self = nullptr;
+    if (!my_self) {
+      my_self = new ContextScale;
+      my_self->m_size_needed = platform::get_window_size();
+    }
+    return *my_self;
+  }
+};
 
 struct Context{
   lapse::vec2<> current_position = {0, 0};
@@ -56,6 +84,13 @@ struct Context{
     }
     
     args.size(); // calculate current size
+    if (args.box_area().bottom_right_point().greater_than_or(platform::get_window_size())) {
+      auto& scale = ContextScale::the();
+      scale.m_size_needed.x = lapse::max(scale.m_size_needed.x, args.box_area().bottom_right_point().x+1);
+      scale.m_size_needed.y = lapse::max(scale.m_size_needed.y, args.box_area().bottom_right_point().y+1);
+
+      // bottom_right_point() is +1ed so that it fits within the requested screen size
+    }
     current_position = args.margin_area().bottom_left_point();
     return args;
   };
@@ -77,7 +112,9 @@ struct Context{
 
   bool is_hovering() {
     auto mouse_pos = Mouse::get_mouse_pos();
-    return dom_stack.at_reverse(-1).box_area().is_point_inside(mouse_pos);
+    auto box = dom_stack.at_reverse(-1).box_area();
+    box *= ContextScale::the().last_scale();
+    return box.is_point_inside(mouse_pos);
   };
 
   bool is_active() {

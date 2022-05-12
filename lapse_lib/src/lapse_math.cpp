@@ -66,6 +66,10 @@ u32 min(u32 a, u32 b) {
   return a < b ? a : b;
 }
 
+f32 min(f32 a, f32 b) {
+  return a < b ? a : b;
+}
+
 // TODO need to account for floats larger than i32 max
 
 f64 round(f64 whole) {
