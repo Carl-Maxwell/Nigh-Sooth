@@ -8,12 +8,22 @@ struct Input{
 
 struct Mouse{
   lapse::vec2<lapse::i32> m_pos;
+  lapse::vec2<lapse::i32> m_old_pos;
+  lapse::vec2<lapse::i32> m_pos_delta;
+
   
+  static Mouse& the();
+
   // returns true if left mouse button hit event happened this frame
   static bool left_mouse_hit();
   // returns true if left mouse button hit event happened this frame
   static bool right_mouse_hit();
+  // returns true if middle mouse button is held down this frame
+  static bool middle_mouse_down();
+  // returns the mouse position
   static lapse::vec2<> get_mouse_pos();
+  // returns how far the mouse has moved during this frame
+  static lapse::vec2<> get_mouse_delta();
 };
 
 // for whatever reason I've decided to set this enum equal to the javascript keycodes

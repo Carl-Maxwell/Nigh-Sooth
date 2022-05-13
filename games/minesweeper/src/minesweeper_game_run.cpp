@@ -37,30 +37,15 @@ void minesweeper_run::main_loop(f32 delta) {
 
   lapse::LapseErrorQueue::the().tick();
 
-  Console::print("panning offset: ");
-  panning_offset.std_cout();
-
-  Console::h3("initial mouse position");
   i32 mouse_x = static_cast<i32>(Mouse::get_mouse_pos().x);
   i32 mouse_y = static_cast<i32>(Mouse::get_mouse_pos().y);
-
-  std::cout << "mouse_x: " << mouse_x << "\n";
-  std::cout << "mouse_y: " << mouse_y << "\n";
 
   mouse_x = static_cast<i32>(lapse::round(f32(mouse_x)/game_zoom - panning_offset.x));
   mouse_y = static_cast<i32>(lapse::round(f32(mouse_y)/game_zoom - panning_offset.y));
 
-  Console::h3("Post game zoom scaling");
-  std::cout << "mouse_x: " << mouse_x << "\n";
-  std::cout << "mouse_y: " << mouse_y << "\n";
-
   mouse_x /= grid_size;
   mouse_y /= grid_size;
   minesweeper::tile_obj* mouse_tile = nullptr;
-
-  Console::h3("mouse grid position");
-  std::cout << "mouse_x: " << mouse_x << "\n";
-  std::cout << "mouse_y: " << mouse_y << "\n";
 
   if (key(keycode::number_2).is_hit()) {
     __debugbreak();
@@ -166,14 +151,35 @@ void minesweeper_run::main_loop(f32 delta) {
 
   // zoom & pan
 
+  auto old_zoom = game_zoom;
+
   if (platform::get_mouse_wheel_delta()) {
-    if (game_zoom >= 2.0f) {
-      game_zoom += platform::get_mouse_wheel_delta() > 0 ? 1 : -1;
+    if (game_zoom >= 1.0f) {
+      game_zoom += platform::get_mouse_wheel_delta() > 0 ? 0.1f : -0.1f;
     } else {
       if (game_zoom > 0.01f) {
-        game_zoom *= platform::get_mouse_wheel_delta() > 0 ? 2 : 0.5;
+        game_zoom *= platform::get_mouse_wheel_delta() > 0 ? 1.1f : 0.9f;
+      } else {
+        game_zoom  = platform::get_mouse_wheel_delta() > 0 ? 0.02f : 0.01f;
       }
     }
+
+    // game_zoom vs old_zoom tells us how much of a change we're dealing with,
+    //   adding half the difference of them has us zooming in on screen center
+    auto new_screen_size = platform::get_window_size();
+    auto old_screen_size = platform::get_window_size();
+    new_screen_size /= game_zoom;
+    old_screen_size /= old_zoom;
+    panning_offset.x -= lapse::round((old_screen_size-new_screen_size).x/2);
+    panning_offset.y -= lapse::round((old_screen_size-new_screen_size).y/2);
+
+    // zooming_in: -1 if zooming out and +1 if zooming in
+    f32 zooming_in = sign(platform::get_mouse_wheel_delta());
+
+    // offset towards the mouse position so it zooms in on wherever the mouse is hovering
+    auto mouse_offset = (platform::get_window_size()/2) - Mouse::get_mouse_pos();
+    panning_offset += mouse_offset.normalize() * (old_screen_size-new_screen_size).length() * zooming_in;
+    // have to multiply it by the magnitude of the change so it doesn't jitter all over the place
   }
 
   if (key(keycode::d).is_down()) {
@@ -187,6 +193,11 @@ void minesweeper_run::main_loop(f32 delta) {
   }
   if (key(keycode::w).is_down()) {
     panning_offset.y += 12.0f * delta;
+  }
+
+  // panning the view by moving the mouse
+  if (key(keycode::number_3).is_down() || Mouse::middle_mouse_down()) {
+    panning_offset -= Mouse::get_mouse_delta()/game_zoom;
   }
 }
 

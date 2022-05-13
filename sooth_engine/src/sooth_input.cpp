@@ -18,6 +18,10 @@ namespace{
 // Mouse
 //
 
+Mouse& Mouse::the() {
+  return _mouse;
+}
+
 bool Mouse::left_mouse_hit() {
   return platform::is_mouse_left_button_hit();
 }
@@ -26,10 +30,18 @@ bool Mouse::right_mouse_hit() {
   return platform::is_mouse_right_button_hit();
 }
 
+bool Mouse::middle_mouse_down() {
+  return platform::is_mouse_right_button_hit();
+}
+
 vec2<> Mouse::get_mouse_pos() {
   _mouse.m_pos = platform::get_mouse_pos();
 
   return vec2<>{(f32)_mouse.m_pos.x, (f32)_mouse.m_pos.y} / (f32)platform::get_pixel_size();
+}
+
+vec2<> Mouse::get_mouse_delta() {
+  return vec2<>{(f32)_mouse.m_pos_delta.x, (f32)_mouse.m_pos_delta.y} / (f32)platform::get_pixel_size();
 }
 
 //

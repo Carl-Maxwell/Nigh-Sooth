@@ -478,6 +478,11 @@ bool is_mouse_right_button_hit() {
   return app->GetMouse(olc::Mouse::RIGHT).bPressed;
 }
 
+// returns true if mouse hit event happened this frame
+bool is_mouse_middle_button_down() {
+  return app->GetMouse(olc::Mouse::MIDDLE).bHeld;
+}
+
 vec2<i32> get_mouse_pos() {
   olc::vi2d temp = app->GetMousePos(); //app->GetWindowMouse();
   return vec2<i32>{temp.x*pixel_size, temp.y*pixel_size};
@@ -525,6 +530,12 @@ void poll_key_toggles() {
       std::cout << "toggling " << (u32)codes[i] << "\n";
     }
   }
+
+  // poll mouse stuff
+  auto& mouse = Mouse::the();
+  mouse.m_pos = platform::get_mouse_pos();
+  mouse.m_pos_delta = mouse.m_old_pos - mouse.m_pos;
+  mouse.m_old_pos = mouse.m_pos;
 }
 
 }; // end platform namespace
