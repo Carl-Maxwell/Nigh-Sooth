@@ -65,6 +65,7 @@ KeyState key(keycode code) {
 const lapse::fixed_array<keycode>& keycode_list() {
   static const lapse::fixed_array<keycode> static_keycode_list = {
     keycode::escape,
+    keycode::space_bar,
     keycode::number_1,
     keycode::number_2,
     keycode::number_3,

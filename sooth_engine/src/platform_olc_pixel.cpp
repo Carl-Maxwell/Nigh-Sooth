@@ -495,14 +495,15 @@ i32 get_mouse_wheel_delta() {
 olc::Key translate_keycode(keycode code) {
   assert(keycode_list().contains(code));
   switch(code) {
-    case keycode::escape   : return olc::Key::ESCAPE;
-    case keycode::number_1 : return olc::Key::K1;
-    case keycode::number_2 : return olc::Key::K2;
-    case keycode::number_3 : return olc::Key::K3;
-    case keycode::a        : return olc::Key::A;
-    case keycode::d        : return olc::Key::D;
-    case keycode::s        : return olc::Key::S;
-    case keycode::w        : return olc::Key::W;
+    case keycode::escape    : return olc::Key::ESCAPE;
+    case keycode::space_bar : return olc::Key::SPACE;
+    case keycode::number_1  : return olc::Key::K1;
+    case keycode::number_2  : return olc::Key::K2;
+    case keycode::number_3  : return olc::Key::K3;
+    case keycode::a         : return olc::Key::A;
+    case keycode::d         : return olc::Key::D;
+    case keycode::s         : return olc::Key::S;
+    case keycode::w         : return olc::Key::W;
     default: return olc::Key::NONE;
   }
 

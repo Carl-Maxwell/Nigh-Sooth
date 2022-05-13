@@ -189,7 +189,7 @@ void minesweeper_run::main_loop(f32 delta) {
   }
 
   // panning the view by moving the mouse
-  if (key(keycode::number_3).is_down() || Mouse::middle_mouse_down()) {
+  if (key(keycode::space_bar).is_down() || Mouse::middle_mouse_down()) {
     panning_offset -= Mouse::get_mouse_delta()/game_zoom;
   }
 }

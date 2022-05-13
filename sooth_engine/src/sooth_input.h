@@ -29,8 +29,9 @@ struct Mouse{
 // for whatever reason I've decided to set this enum equal to the javascript keycodes
 
 enum class keycode{
-  none     = 0,
-  escape   = 27,
+  none      = 0,
+  escape    = 27,
+  space_bar = 32,
   number_1 = 48,
   number_2 = 49,
   number_3 = 50,
