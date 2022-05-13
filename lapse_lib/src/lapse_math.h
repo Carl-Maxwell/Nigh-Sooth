@@ -5,15 +5,19 @@
 namespace lapse{
 
 // returns -1.0f or 1.0f whichever is nearer
+i32 sign(i32 a);
+u32 sign(u32 a);
 f32 sign(f32 a);
 f64 sign(f64 a);
 
+i32 abs(i32 a);
 f32 abs(f32 a);
 f64 abs(f64 a);
 
 i64 floor_i(f64 whole);
 i32 floor_i(f32 whole);
 f32 floor_f(f32 whole);
+f32 floor_f_positive(f32 whole);
 
 i32 ceil_i(f32 whole);
 f32 ceil_f(f32 whole);

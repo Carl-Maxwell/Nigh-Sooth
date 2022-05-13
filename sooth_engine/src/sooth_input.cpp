@@ -54,7 +54,12 @@ const lapse::fixed_array<keycode>& keycode_list() {
   static const lapse::fixed_array<keycode> static_keycode_list = {
     keycode::escape,
     keycode::number_1,
-    keycode::number_2
+    keycode::number_2,
+    keycode::number_3,
+    keycode::a,
+    keycode::d,
+    keycode::s,
+    keycode::w,
   };
   return static_keycode_list;
 }

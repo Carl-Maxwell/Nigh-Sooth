@@ -23,6 +23,11 @@ enum class keycode{
   escape   = 27,
   number_1 = 48,
   number_2 = 49,
+  number_3 = 50,
+  a = 65,
+  d = 68,
+  s = 83,
+  w = 87,
   // note: if you add something here you need to add it to keycode_list() in cpp
   //   and in platform cpp translate_keycode()
 };

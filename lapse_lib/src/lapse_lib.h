@@ -2,6 +2,8 @@
 
 #include <iostream>
 
+#include "lapse_assert.h"
+
 #include "lapse_scalar.h"
 
 #include "lapse_lambda.h"

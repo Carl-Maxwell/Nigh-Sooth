@@ -42,6 +42,7 @@ void draw_rect(lapse::rect<> box, lapse::vec3<> color = {0.0f, 0.0f, 0.0f});
 void fill_rect(lapse::rect<> box, lapse::vec3<> color = {0.0f, 0.0f, 0.0f});
 
 void draw_bitmap(lapse::vec2<> screen_coord, image& img);
+void draw_bitmap_scaled(lapse::vec2<> screen_coord, image& img, lapse::f32 scale = 1.0f);
 
 void clear(lapse::vec3<> color);
 
@@ -52,6 +53,8 @@ void clear(lapse::vec3<> color);
 bool is_mouse_left_button_hit();
 bool is_mouse_right_button_hit();
 lapse::vec2<lapse::i32> get_mouse_pos();
+// get how much the mouse wheel was rolled this frame
+lapse::i32 get_mouse_wheel_delta();
 
 void poll_key_toggles();
 KeyState get_key_state(keycode code);

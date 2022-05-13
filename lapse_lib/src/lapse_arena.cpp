@@ -19,6 +19,9 @@ void Arena::destroy_arena() {
 }
 
 void* Arena::push(u64 bytes) {
+  if (free_space_available() < bytes) {
+    clear();
+  }
   assert(free_space_available() > bytes);
   void* start_pos = m_position;
   m_position = (void*)((u64)m_position + bytes);
@@ -31,7 +34,7 @@ void Arena::pop(u64 bytes) {
 }
 
 void Arena::clear() {
-  std::cout << "// Arena::clear() called, bytes used: " << length() << " arena utilization: " << f32(length())/f32(m_size) << "\n";
+  // std::cout << "// Arena::clear() called, bytes used: " << length() << " arena utilization: " << f32(length())/f32(m_size) << "\n";
   m_position = m_memory_start;
 }
 

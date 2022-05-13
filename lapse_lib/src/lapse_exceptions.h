@@ -1,6 +1,7 @@
 #pragma once
 
 #include <functional>
+#include "lapse_assert.h"
 
 #include "iostream"
 
@@ -8,8 +9,6 @@
 //   not sure about the definitions of these terms
 
 namespace lapse{
-
-void assert(bool);
 
 enum class error_code{
   undefined = 0,

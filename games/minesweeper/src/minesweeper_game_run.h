@@ -21,6 +21,8 @@ struct minesweeper_run{
   const lapse::i32 grid_size = 16; // size in pixels of each grid img
   const lapse::i32 window_padding = 10; // pixels of padding around the window edge
   bool m_first_click = true;
+  lapse::f32 game_zoom = 1.0f;
+  lapse::vec2<> panning_offset = {10, 10}; // TODO set this to window_padding to start
 
   game_state_enum game_state{game_state_enum::in_progress};
 

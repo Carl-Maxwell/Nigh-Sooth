@@ -34,10 +34,10 @@ public:
     std::cout << "~fixed_array()\n";
     if (m_elements) delete[] m_elements;
     // __debugbreak();
-    if (m_elements && sizeof(T) <= 8) {
+    // if (m_elements && sizeof(T) <= 8) {
       // __debugbreak();
       // std::cout << *(u64*)(void*)&m_elements[0] << "\n";
-    }
+    // }
       
   }
 
@@ -152,6 +152,7 @@ public:
     }
   }
   void remove_at(u32 removal_i) {
+    // TODO memcpy?
     for (u32 i = removal_i; i < m_length-1; i++) {
       m_elements[i] = m_elements[i+1];
     }
@@ -159,12 +160,9 @@ public:
   }
   // allocate space for the array
   void reserve(u32 better_size) {
-    if (m_length == 0) {
-      m_elements = new T[better_size];
-      m_size = better_size;
-    } else {
-      error(error_code::close_app);
-    }
+    assert(m_length == 0);
+    m_elements = new T[better_size];
+    m_size = better_size;
   }
   // returns n random elements
   T& sample(u64 n=1) {

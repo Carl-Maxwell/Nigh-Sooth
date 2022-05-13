@@ -3,23 +3,51 @@
 #include "intrin.h"
 
 #include "lapse_f32.h"
+#include "lapse_assert.h"
 
 namespace lapse{
 
-
-// returns -1.0f or 1.0f whichever is nearer
+// return -1 or 1
+i32 sign(i32 a) {
+  return i32(reinterpret_cast<u32&>(a) >> 31)*-2 + 1;
+  // return a < 0 ? -1.0f : 1.0f;
+};
+// return -1 or 1
+u32 sign(u32 a) {
+  return u32(1);
+  // return a < 0 ? -1.0f : 1.0f;
+};
+// returns -1.0f or +1.0f whichever is nearer
 f32 sign(f32 a) {
-  return a < 0 ? -1.0f : 1.0f;
-};
+  /*
+  auto negative_a = -a;
 
+  auto correct = a < 0 ? -1.0f : 1.0f;
+  auto thing = f32(reinterpret_cast<u32&>(a) >> 31)*-2.0f + 1.0f;
+  auto negative_thing = f32(reinterpret_cast<u32&>(negative_a) >> 31)*-2.0f + 1.0f;
+
+  if (thing != correct) {
+    f32 shift = reinterpret_cast<u32&>(a) >> 31;
+
+    __debugbreak();
+  }
+  */
+
+  return f32(reinterpret_cast<u32&>(a) >> 31)*-2.0f + 1.0f;
+  // return a < 0 ? -1.0f : 1.0f;
+};
+// returns -1.0 or +1.0
 f64 sign(f64 a) {
-  return a < 0 ? -1.0 : 1.0;
+  return f64(reinterpret_cast<u64&>(a) >> 63)*-2.0f + 1.0f;
+  // return a < 0 ? -1.0 : 1.0;
 };
 
+i32 abs(i32 a) {
+  return sign(a) * a;
+}
 f32 abs(f32 a) {
   return sign(a) * a;
 }
-
 f64 abs(f64 a) {
   return sign(a) * a;
 }
@@ -27,45 +55,43 @@ f64 abs(f64 a) {
 i64 floor_i(f64 whole) {
     return whole > 0 ? i64(whole) : i64(whole) - 1;
 };
-
-
 i32 floor_i(f32 whole) {
-  return whole > 0 ? i32(whole) : i32(whole)-1;
+  return whole >= 0 ? i32(whole) : i32(whole)-1;
 };
-
 f32 floor_f(f32 whole) {
-  return whole > 0 ? f32(i32(whole)) : f32(i32(whole))-1;
+  return whole >= 0 ? f32(i32(whole)) : f32(i32(whole))-1;
 };
+// branchless floor_f, only works with whole >= 0
+f32 floor_f_positive(f32 whole) {
+  return f32(i32(whole));
+}
 
 i32 ceil_i(f32 whole) {
   return whole > 0 ? i32(f32(abs(f32(i32(whole)))+1)) : i32(whole);
 };
-
 f32 ceil_f(f32 whole) {
   return whole > 0 ? f32(i32(whole)+1) : f32(i32(whole));
 };
 
 i32 max(i32 a, i32 b) {
-  return a > b ? a : b;
+  // assert that this doesn't go past i32_min or i32_max
+  assert(a > i32_min/2 && a < i32_max/2);
+  assert(b > i32_min/2 && b < i32_max/2);
+  return b * abs(((a-b)>>31)) + a * abs((b-a)>>31);
 }
-
 u32 max(u32 a, u32 b) {
   return a > b ? a : b;
 }
-
 f32 max(f32 a, f32 b) {
   return a > b ? a : b;
 }
 
-
 i32 min(i32 a, i32 b) {
   return a < b ? a : b;
 }
-
 u32 min(u32 a, u32 b) {
   return a < b ? a : b;
 }
-
 f32 min(f32 a, f32 b) {
   return a < b ? a : b;
 }
@@ -94,6 +120,7 @@ f64 pow(f32 base, f32 exponent) {
   f64 temp = 1;
   for (int i = 0; i < exponent; i++) {
     temp *= f64(base);
+    if(f32_obj(temp).is_inf()) { __debugbreak(); }
   }
   return temp;
 }

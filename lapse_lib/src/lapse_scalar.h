@@ -44,7 +44,7 @@ const u64 u64_max = u64(-1); // 2**64 -1
 // floats
 
 // typedef float  f16;  // IEEE 754 16-bit half precision (binary16)
-typedef float  f32;  // IEEE 754 32-bit single precision (binary32)
+typedef float  f32; // IEEE 754 32-bit single precision (binary32)
 typedef double f64; // IEEE 754 64-bit double precision (binary64)
 
 // float constants:

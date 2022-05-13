@@ -262,6 +262,99 @@ void draw_bitmap(vec2<> screen_coord, image& img) {
   }
 }
 
+void draw_bitmap_scaled(vec2<> screen_coord, image& img, f32 scale) {
+  u32 image_width  = (u32)img.m_width;
+  u32 image_height = (u32)img.m_height;
+
+  // the 'target' is the rect in the img we're drawing
+  f32 f_target_width  = lapse::round(static_cast<f32>(image_width)  * scale);
+  f32 f_target_height = lapse::round(static_cast<f32>(image_height) * scale);
+
+  screen_coord *= scale;
+
+  screen_coord.x = lapse::round(screen_coord.x);
+  screen_coord.y = lapse::round(screen_coord.y);
+
+  auto img_pixels = img.m_u_pixels;
+
+  i32 screen_x = (i32)screen_coord.x;
+  i32 screen_y = (i32)screen_coord.y;
+
+  // fetch draw target info (note the two levels of indirection here)
+  auto& draw_target   = *app->pDrawTarget;
+  auto& screen_pixels = draw_target.pColData;
+  auto screen_width   = draw_target.width ; // screen width  in pixels
+  auto screen_height  = draw_target.height; // screen height in pixels
+
+  if (
+    screen_coord.x >= screen_width || screen_coord.y >= screen_height
+    ||
+    screen_coord.x < 0 || screen_coord.y < 0
+    ) {
+    return;
+  }
+
+  {
+    // clip target into screen size
+
+    // target_width  = lapse::min(target_width , screen_width  - screen_x - 1);
+    // target_height = lapse::min(target_height, screen_height - screen_x - 1);
+
+    // TODO deal with negative numbers
+
+    if (screen_coord.x + f_target_width >= (f32)screen_width) {
+      f_target_width = f32(screen_width) - screen_coord.x - 1;
+      // -1 because we need to be < screen_width
+    }
+    if (screen_coord.y + f_target_height >= (f32)screen_height) {
+      f_target_height = f32(screen_height) - screen_coord.y - 1;
+      // -1 because we need to be < screen_height
+    }
+  }
+
+  //
+  // convert to integers for memcpy()
+  //
+
+  u32 u_target_width  = (u32)lapse::round(f_target_width );
+  u32 u_target_height = (u32)lapse::round(f_target_height);
+
+  u32 u_screen_x = (u32)screen_x;
+  u32 u_screen_y = (u32)screen_y;
+
+  {
+    assert(u_screen_x >= 0 && u_screen_x + u_target_width  < u32(screen_width) );
+    assert(u_screen_y >= 0 && u_screen_y + u_target_height < u32(screen_height));
+    assert(sizeof(olc::Pixel) == sizeof(vec4<u8>));
+  }
+
+  auto line_offset = u_target_width*sizeof(olc::Pixel);
+
+  //
+  // construct the scaled image
+  //
+
+  auto scaled_img_pixels = (vec4<u8>*)arenas::temp.push(line_offset * u_target_height);
+  {
+    u32 img_y, img_x;
+    for (u32 y = 0; y < u_target_height; y++) {
+      img_y = static_cast<u32>(lapse::floor_f_positive(f32(y) / scale));
+      for (u32 x = 0; x < u_target_width; x++) {
+        img_x = static_cast<u32>(lapse::floor_f_positive(f32(x) / scale));
+        scaled_img_pixels[y * u_target_width + x] = img_pixels[img_y*image_width + img_x];
+      }
+    }
+  }
+
+  for (u32 y = 0; y < u_target_height; y++) {
+    memcpy(
+      (void*)&screen_pixels[(u_screen_y+y) * u32(screen_width) + u_screen_x],
+      (void*)&scaled_img_pixels[y*u_target_width],
+      line_offset
+    );
+  }
+}
+
 void clear(lapse::vec3<> color) {
   color *= 255;
   // app->Clear(olc::Pixel{(u8)color.r, (u8)color.g, (u8)color.b});
@@ -298,12 +391,21 @@ vec2<i32> get_mouse_pos() {
   return vec2<i32>{temp.x*pixel_size, temp.y*pixel_size};
 }
 
+i32 get_mouse_wheel_delta() {
+  return app->GetMouseWheel();
+}
+
 olc::Key translate_keycode(keycode code) {
   assert(keycode_list().contains(code));
   switch(code) {
-    case keycode::escape : return olc::Key::ESCAPE;
+    case keycode::escape   : return olc::Key::ESCAPE;
     case keycode::number_1 : return olc::Key::K1;
     case keycode::number_2 : return olc::Key::K2;
+    case keycode::number_3 : return olc::Key::K3;
+    case keycode::a        : return olc::Key::A;
+    case keycode::d        : return olc::Key::D;
+    case keycode::s        : return olc::Key::S;
+    case keycode::w        : return olc::Key::W;
     default: return olc::Key::NONE;
   }
 

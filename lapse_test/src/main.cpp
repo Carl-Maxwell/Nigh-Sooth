@@ -12,6 +12,7 @@ void print() {
 }
 
 int main() {
+  arenas::temp.setup_arena(30'000);
 
   std::cout << "Running lapse_lib tests\n";
 
@@ -65,6 +66,8 @@ int main() {
 
     {
       // test round, ceil, floor, etc
+
+      Console::h1("testing lapse math");
 
       good &= lapse::round( 0.1) ==  0 && lapse::round( 0.9) ==  1;
       good &= lapse::round(-3.2) == -3 && lapse::round(-3.9) == -4;
@@ -127,6 +130,37 @@ int main() {
       }
 
       {
+        Console::h3("testing math::sign()");
+
+        for (i32 i = i32_min, last_i = 0; true; i += i32_max/5'000) {
+          auto val = sign(i);
+          good &= val == (i < 0 ? -1 : 1);
+          if (i < last_i) break;
+          last_i = i;
+        }
+        for (u32 i = 0, last_i = 0; true; i += 256) {
+          auto val = sign(i);
+          good &= val == u32(1);
+          if (i < last_i) break;
+          last_i = i;
+        }
+        for (f32 i = -10'000.0f; i < 10'000.0f; i += 0.01f) {
+          auto val = sign(i);
+          good &= val == (i < 0.0f ? -1.0f : 1.0f);
+        }
+        for (f64 i = -10'000.0; i < 10'000.0; i += 0.001) {
+          auto val = sign(i);
+          good &= val == (i < 0 ? -1.0 : 1.0);
+          if (! (i + 0.000'000'001 > i) ) __debugbreak();
+        }
+
+        if (!good) {
+          Console::print("failed math::sign() tests");
+          __debugbreak();
+        }
+      }
+
+      {
         // testing f64_c_str()
 
         // std::cout << "987654321.123456789 : " << lapse::f64_c_str(987654321.123456789) << "\n";
@@ -142,7 +176,11 @@ int main() {
       // if (!good) { std::cout << "test passed\n"; }
 
       lapse::fixed_array<lapse::i32> powers_of_two;
-      powers_of_two = lapse::range(1, 10).map([](lapse::i32 a){ return (i32)lapse::pow(2, a); });
+      powers_of_two = lapse::range(1, 10).map([](lapse::i32 a){
+        return static_cast<i32>(lapse::pow(2, a));
+      } );
+
+      // __debugbreak();
 
       good &= powers_of_two[powers_of_two.m_length-1] && lapse::pow(2, 10);
 

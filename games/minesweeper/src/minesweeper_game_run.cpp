@@ -37,16 +37,38 @@ void minesweeper_run::main_loop(f32 delta) {
 
   lapse::LapseErrorQueue::the().tick();
 
-  i32 mouse_x = (i32)Mouse::get_mouse_pos().x - window_padding;
-  i32 mouse_y = (i32)Mouse::get_mouse_pos().y - window_padding;
+  Console::print("panning offset: ");
+  panning_offset.std_cout();
+
+  Console::h3("initial mouse position");
+  i32 mouse_x = static_cast<i32>(Mouse::get_mouse_pos().x);
+  i32 mouse_y = static_cast<i32>(Mouse::get_mouse_pos().y);
+
+  std::cout << "mouse_x: " << mouse_x << "\n";
+  std::cout << "mouse_y: " << mouse_y << "\n";
+
+  mouse_x = static_cast<i32>(lapse::round(f32(mouse_x)/game_zoom - panning_offset.x));
+  mouse_y = static_cast<i32>(lapse::round(f32(mouse_y)/game_zoom - panning_offset.y));
+
+  Console::h3("Post game zoom scaling");
+  std::cout << "mouse_x: " << mouse_x << "\n";
+  std::cout << "mouse_y: " << mouse_y << "\n";
+
   mouse_x /= grid_size;
   mouse_y /= grid_size;
   minesweeper::tile_obj* mouse_tile = nullptr;
 
+  Console::h3("mouse grid position");
+  std::cout << "mouse_x: " << mouse_x << "\n";
+  std::cout << "mouse_y: " << mouse_y << "\n";
+
+  if (key(keycode::number_2).is_hit()) {
+    __debugbreak();
+  }
+
   if (
        mouse_x >= 0 && mouse_y >= 0
     && mouse_x < grid_width && mouse_y < grid_height
-    && Mouse::get_mouse_pos() > (f32)window_padding
   ) {
     mouse_tile = &grid[mouse_y * grid_width + mouse_x];
   }
@@ -89,18 +111,24 @@ void minesweeper_run::main_loop(f32 delta) {
   break;
   }
 
+  //
+  // Draw tiles
+  //
+
   for (f32 y = 0; y < grid_height; y++) {
     for (f32 x = 0; x < grid_width; x++) {
       vec2<> screen_pos{
-        x*grid_size + window_padding,
-        y*grid_size + window_padding
+        x*grid_size,
+        y*grid_size
       };
 
       auto& tile = grid[u32(y*grid_width + x)];
       bool hovering = mouse_tile && mouse_tile == &tile && game_state == game_state_enum::in_progress;
       image& img = tile.get_image(game_state, hovering);
 
-      platform::draw_bitmap(screen_pos, img);
+      screen_pos += panning_offset;
+      // TODO multiply screen_pos here, not in draw_bitmap
+      platform::draw_bitmap_scaled(screen_pos, img, game_zoom);
     }
   }
 
@@ -108,6 +136,10 @@ void minesweeper_run::main_loop(f32 delta) {
     auto center = platform::get_window_size()/2.0f - session.victory_image.m_resolution/2.0f;
     platform::draw_bitmap(center, session.victory_image);
   }
+
+  //
+  // Player input
+  //
 
   // open main menu if esc is hit
   if (key(keycode::escape).is_hit()) {
@@ -119,15 +151,40 @@ void minesweeper_run::main_loop(f32 delta) {
   if (key(keycode::number_1).is_toggled()) {
     for (u32 i = 0; i < safe_spaces.length(); i++) {
       platform::draw_rect(
-        vec2<>{f32(safe_spaces[i].x), f32(safe_spaces[i].y)} * grid_size_vec2() + (f32)window_padding,
+        vec2<>{f32(safe_spaces[i].x), f32(safe_spaces[i].y)} * grid_size_vec2(),
         grid_size_vec2(),
         vec3<>{0, 0.75, 0}
       );
     }
   }
 
-  if (key(keycode::number_2).is_toggled()) {
-    // TODO reveal all tiles
+  // if (key(keycode::number_3).is_toggled()) {
+  //   game_zoom = 2.0f;
+  // } else {
+  //   game_zoom = 1.0f;
+  // }
+
+  // zoom & pan
+
+  if (platform::get_mouse_wheel_delta()) {
+    if (game_zoom >= 2.0f) {
+      game_zoom += platform::get_mouse_wheel_delta() > 0 ? 1 : -1;
+    } else {
+      game_zoom *= platform::get_mouse_wheel_delta() > 0 ? 2 : 0.5;
+    }
+  }
+
+  if (key(keycode::d).is_down()) {
+    panning_offset.x -= 12.0f * delta;
+  }
+  if (key(keycode::s).is_down()) {
+    panning_offset.y -= 12.0f * delta;
+  }
+  if (key(keycode::a).is_down()) {
+    panning_offset.x += 12.0f * delta;
+  }
+  if (key(keycode::w).is_down()) {
+    panning_offset.y += 12.0f * delta;
   }
 }
 
