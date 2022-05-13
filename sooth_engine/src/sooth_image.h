@@ -2,6 +2,7 @@
 
 #include "lapse_scalar.h"
 #include "lapse_string.h"
+#include "lapse_uid.h"
 
 struct image{
   // lapse::vec3<>* m_pixels = nullptr;
@@ -9,6 +10,7 @@ struct image{
   lapse::vec2<> m_resolution;
   lapse::str m_path;
   lapse::i32 m_width, m_height, m_bytes_per_pixel;
+  lapse::uid id;
 
   image();
   image(lapse::str& path);

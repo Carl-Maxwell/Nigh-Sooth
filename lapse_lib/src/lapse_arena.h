@@ -12,7 +12,7 @@ struct Arena{
   void* m_position = nullptr;
 
   // setup the arena (aka constructor), allocate space for it
-  void setup_arena(u64 bytes);
+  void reserve(u64 bytes);
   // destroy the arena (aka destructor)
   void destroy_arena();
 
@@ -25,6 +25,8 @@ struct Arena{
 
   // take x number of bytes
   void* push(u64 bytes);
+  // take x number of bytes, and zero them out
+  void* push_zeroes(u64 bytes);
   // remove x number of bytes
   void pop(u64 bytes);
   // erase everything in the arena, free up all the space

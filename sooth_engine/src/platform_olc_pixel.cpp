@@ -16,6 +16,10 @@ namespace{
   lapse_lambda(void, lapse::f32) main_loop;
 }
 
+namespace arenas{
+  lapse::Arena image_cache;
+}
+
 void force_quit();
 
 class SoothPixelEngineApp : public olc::PixelGameEngine
@@ -75,9 +79,6 @@ i32 get_pixel_size() { return pixel_size; };
 f32 get_window_padding() { return 10.0f; };
 
 void initialize(u32 screen_width, u32 screen_height, bool fullscreen, str& window_name, i32 a_pixel_size) {
-  // TODO so each time we call this we're creating a new app ... and not deleting the old one
-  //   so memory use probably goes up a bit after a few games
-
   pixel_size = a_pixel_size;
   // pixel_size = 1;
 
@@ -262,6 +263,11 @@ void draw_bitmap(vec2<> screen_coord, image& img) {
   }
 }
 
+// forward declare image cache funcs
+
+vec4<u8>* get_scaled_image(uid imd_id, f32 scale);
+vec4<u8>* create_scaled_image(uid img_id, f32 scale, u32 size_in_bytes);
+
 void draw_bitmap_scaled(vec2<> screen_coord, image& img, f32 scale) {
   u32 image_width  = (u32)img.m_width;
   u32 image_height = (u32)img.m_height;
@@ -269,6 +275,9 @@ void draw_bitmap_scaled(vec2<> screen_coord, image& img, f32 scale) {
   // the 'target' is the rect in the img we're drawing
   f32 f_target_width  = lapse::round(static_cast<f32>(image_width)  * scale);
   f32 f_target_height = lapse::round(static_cast<f32>(image_height) * scale);
+
+  u32 u_target_full_width  = static_cast<u32>(f_target_width );
+  u32 u_target_full_height = static_cast<u32>(f_target_height);
 
   screen_coord *= scale;
 
@@ -334,14 +343,19 @@ void draw_bitmap_scaled(vec2<> screen_coord, image& img, f32 scale) {
   // construct the scaled image
   //
 
-  auto scaled_img_pixels = (vec4<u8>*)arenas::temp.push(line_offset * u_target_height);
-  {
+  auto scaled_img_pixels = get_scaled_image(img.id, scale);
+  // auto* scaled_img_pixels = (vec4<u8>*)arenas::temp.push(line_offset * u_target_height);
+
+  if (!scaled_img_pixels) {
+    scaled_img_pixels = create_scaled_image(img.id, scale, u_target_full_width * u_target_full_height * sizeof(olc::Pixel));
+
+    // scale the image
     u32 img_y, img_x;
-    for (u32 y = 0; y < u_target_height; y++) {
+    for (u32 y = 0; y < u_target_full_height; y++) {
       img_y = static_cast<u32>(lapse::floor_f_positive(f32(y) / scale));
-      for (u32 x = 0; x < u_target_width; x++) {
+      for (u32 x = 0; x < u_target_full_width; x++) {
         img_x = static_cast<u32>(lapse::floor_f_positive(f32(x) / scale));
-        scaled_img_pixels[y * u_target_width + x] = img_pixels[img_y*image_width + img_x];
+        scaled_img_pixels[y * u_target_full_width + x] = img_pixels[img_y*image_width + img_x];
       }
     }
   }
@@ -349,7 +363,7 @@ void draw_bitmap_scaled(vec2<> screen_coord, image& img, f32 scale) {
   for (u32 y = 0; y < u_target_height; y++) {
     memcpy(
       (void*)&screen_pixels[(u_screen_y+y) * u32(screen_width) + u_screen_x],
-      (void*)&scaled_img_pixels[y*u_target_width],
+      (void*)&scaled_img_pixels[y*u_target_full_width],
       line_offset
     );
   }
@@ -370,6 +384,84 @@ void clear(lapse::vec3<> color) {
   for (i32 y = 0; y < height; y++) {
     memset((void*)&screen_pixels[y*width], clear_color, line_byte_size);
   }
+}
+
+//-----------------------------------------------------------------------------
+// Image cache (for scaled images)
+//-----------------------------------------------------------------------------
+
+void allocate_image_cache() {
+  arenas::image_cache.reserve(1'000'000);
+}
+
+struct ImageCacheRecord{
+  uid img_id;
+  vec4<u8>* scaled_pixels;
+  // u32 size_in_bytes;
+};
+
+// limit of how many images can be stored in cache
+inline u32 get_image_cache_max_length() {
+  return 100;
+}
+
+ImageCacheRecord* get_image_cache_table() {
+  return (ImageCacheRecord*)((u8*)(arenas::image_cache.m_memory_start)+4);
+}
+
+vec4<u8>* get_scaled_image(uid img_id, f32 scale) {
+  vec4<u8>* output_img = nullptr;
+
+  auto maximum_possible_images = get_image_cache_max_length();
+
+  f32& arena_scale = *(f32*)arenas::image_cache.m_memory_start;
+  if (arena_scale != scale) {
+    arenas::image_cache.clear();
+    arenas::image_cache.push(4);
+    arena_scale = scale;
+
+    // initialize image cache table
+    
+    arenas::image_cache.push_zeroes(maximum_possible_images * sizeof(ImageCacheRecord));
+  } else {
+    // try to get scaled image from cache
+    // foreach through cache records to find this img_id
+    auto record = get_image_cache_table();
+    auto i = 0;
+    while(record->img_id != img_id) {
+      record++;
+      i++;
+      // if record is null we've gone past the length of the table
+      if (record->scaled_pixels == nullptr) { return nullptr; }
+      // if we hit 100 records we've overrun the table
+      if (i >= maximum_possible_images) { return nullptr; }
+    }
+    output_img = record->scaled_pixels;
+  }
+  
+  return output_img;
+}
+
+vec4<u8>* create_scaled_image(uid img_id, f32 scale, u32 size_in_bytes) {
+  // allocate space for the cached image
+  vec4<u8>* cached_img = (vec4<u8>*)arenas::image_cache.push(size_in_bytes);
+
+  // what we want to do is:
+  //    image_cache_table.push(ImageCacheRecord{ ... })
+  // so we have to find the index for that .push()
+  auto table = get_image_cache_table();
+  auto record = table;
+  while (record->scaled_pixels != nullptr) { record++; }
+  assert(record < table+get_image_cache_max_length());
+
+  // set the record at that index
+  *record = ImageCacheRecord{
+    img_id,
+    cached_img,
+    // size_in_bytes
+  };
+
+  return cached_img;
 }
 
 //-----------------------------------------------------------------------------

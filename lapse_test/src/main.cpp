@@ -12,7 +12,7 @@ void print() {
 }
 
 int main() {
-  arenas::temp.setup_arena(30'000);
+  arenas::temp.reserve(30'000);
 
   std::cout << "Running lapse_lib tests\n";
 

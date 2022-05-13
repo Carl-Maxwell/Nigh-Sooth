@@ -4,7 +4,7 @@
 
 namespace lapse{
 
-void Arena::setup_arena(u64 bytes) {
+void Arena::reserve(u64 bytes) {
   assert(!m_memory_start && !m_position);
   m_memory_start = new u8[bytes];
   m_size = bytes;
@@ -12,7 +12,7 @@ void Arena::setup_arena(u64 bytes) {
 }
 
 void Arena::destroy_arena() {
-  delete m_memory_start;
+  delete[] m_memory_start;
   m_memory_start = nullptr;
   m_size = 0;
   m_position = nullptr;
@@ -26,6 +26,12 @@ void* Arena::push(u64 bytes) {
   void* start_pos = m_position;
   m_position = (void*)((u64)m_position + bytes);
   return start_pos;
+}
+
+void* Arena::push_zeroes(u64 bytes) {
+  auto output = push(bytes);
+  memset(output, 0, bytes);
+  return output;
 }
 
 void Arena::pop(u64 bytes) {

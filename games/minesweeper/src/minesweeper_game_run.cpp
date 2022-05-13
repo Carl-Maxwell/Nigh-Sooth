@@ -170,7 +170,9 @@ void minesweeper_run::main_loop(f32 delta) {
     if (game_zoom >= 2.0f) {
       game_zoom += platform::get_mouse_wheel_delta() > 0 ? 1 : -1;
     } else {
-      game_zoom *= platform::get_mouse_wheel_delta() > 0 ? 2 : 0.5;
+      if (game_zoom > 0.01f) {
+        game_zoom *= platform::get_mouse_wheel_delta() > 0 ? 2 : 0.5;
+      }
     }
   }
 
