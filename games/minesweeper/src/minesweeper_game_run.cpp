@@ -171,7 +171,7 @@ void minesweeper_run::main_loop(f32 delta) {
 
     // offset towards the mouse position so it zooms in on wherever the mouse is hovering
     auto mouse_offset = (platform::get_window_size()/2) - Mouse::get_mouse_pos();
-    panning_offset += mouse_offset * (game_zoom-old_zoom);
+    panning_offset += mouse_offset * (game_zoom-old_zoom) / game_zoom;
     // have to multiply it by the magnitude of the change so it doesn't jitter all over the place
   }
 
