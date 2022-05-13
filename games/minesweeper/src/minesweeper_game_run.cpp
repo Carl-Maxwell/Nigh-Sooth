@@ -143,17 +143,10 @@ void minesweeper_run::main_loop(f32 delta) {
     }
   }
 
-  // if (key(keycode::number_3).is_toggled()) {
-  //   game_zoom = 2.0f;
-  // } else {
-  //   game_zoom = 1.0f;
-  // }
-
   // zoom & pan
-
-  auto old_zoom = game_zoom;
-
   if (platform::get_mouse_wheel_delta()) {
+    auto old_zoom = game_zoom;
+
     if (game_zoom >= 1.0f) {
       game_zoom += platform::get_mouse_wheel_delta() > 0 ? 0.1f : -0.1f;
     } else {
@@ -178,7 +171,7 @@ void minesweeper_run::main_loop(f32 delta) {
 
     // offset towards the mouse position so it zooms in on wherever the mouse is hovering
     auto mouse_offset = (platform::get_window_size()/2) - Mouse::get_mouse_pos();
-    panning_offset += mouse_offset.normalize() * (old_screen_size-new_screen_size).length() * zooming_in;
+    panning_offset += mouse_offset * (game_zoom-old_zoom);
     // have to multiply it by the magnitude of the change so it doesn't jitter all over the place
   }
 
