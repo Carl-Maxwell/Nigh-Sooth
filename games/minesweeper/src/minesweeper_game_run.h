@@ -39,7 +39,7 @@ struct minesweeper_run{
   void initialize_run(lapse::i32 n_width = 18, lapse::i32 n_height = 12);
   void generate_mines(lapse::i32 num_mines = 0);
   void generate_safe_spaces(tile_obj* start_tile);
-  void start_main_loop();
+  bool start_main_loop();
   void main_loop(lapse::f32 delta);
   bool is_game_won();
   void win_game();

@@ -10,6 +10,7 @@
 #include "mui/mui_div.h"
 #include "mui/button.h"
 #include "mui/mui_draw.h"
+#include "mui/mui_context.h"
 
 using namespace lapse;
 
@@ -17,23 +18,28 @@ namespace minesweeper{
 
 void minesweeper_main_menu::start_main_loop() {
   static str str_application_name = "Nigh Sooth - Minesweeper Game - Main Menu";
-  platform::initialize(800, 600, false, str_application_name);
+  platform::initialize(1920/5, 1080/5, false, str_application_name);
   platform::start_application();
 }
 
 void minesweeper_main_menu::main_loop(f32 delta) {
   // std::cout << "main menu start of frame " << frame_count << "\n";
-
-  // for (i32 i = 0; i < 10'000; i++) {
-    // platform::plot(rand_vec2() * platform::get_window_size(), rand_vec3());
-  // }
+  platform::clear(vec3<>{0, 0, 0});
+  mui::Context::the().reset();
+  platform::poll_key_toggles();
+  lapse::LapseErrorQueue::the().tick();
 
   switch (current_menu) {
-    case mui::page::main_menu: main_menu(); break;
+    case mui::page::main_menu:     main_menu(); break;
     case mui::page::new_game_menu: new_game_menu(); break;
   }
 
   mui::draw();
+
+  if (key(keycode::number_2).is_hit()) {
+    auto& session = minesweeper_session::the();
+    __debugbreak();
+  }
 
   // std::cout << "main menu end of frame " << frame_count << "\n";
   frame_count++;
@@ -73,7 +79,7 @@ void minesweeper_main_menu::main_menu() {
 
   if (session.run) {
     if (menu_button_nth(str_continue_game)) {
-      session.m_state = session_state::game_run_main_loop;
+      session.continue_run();
     }
   }
 
@@ -86,8 +92,7 @@ void minesweeper_main_menu::main_menu() {
   }
 
   if (menu_button(str_exit)) {
-    session.m_state = session_state::application_shutdown;
-    platform::close_application();
+    session.change_phase(session_state::application_shutdown);
   }
 
   mui::close_div();
@@ -107,38 +112,33 @@ void minesweeper_main_menu::new_game_menu() {
 
   if (menu_button_nth(str_quick_game)) {
     session.next_grid_size = new vec2<i32>{10, 10};
-    session.m_state = session_state::game_run_startup;
-    platform::close_application();
+    session.change_phase(session_state::game_run_startup);
     current_menu = mui::page::main_menu;
   }
 
   if (menu_button_nth(str_normal_game)) {
     session.next_grid_size = new vec2<i32>{18, 12};
-    session.m_state = session_state::game_run_startup;
-    platform::close_application();
+    session.change_phase(session_state::game_run_startup);
     current_menu = mui::page::main_menu;
   }
 
   if (menu_button_nth(str_hard_game)) {
     session.next_grid_size = new vec2<i32>{27, 16};
-    session.m_state = session_state::game_run_startup;
-    platform::close_application();
+    session.change_phase(session_state::game_run_startup);
     current_menu = mui::page::main_menu;
   }
 
   if (menu_button_nth(str_huge_game)) {
     session.next_grid_size = new vec2<i32>{i32(1920*0.8f), i32(1080*0.8f)};
-    *session.next_grid_size /= session.run->grid_size;
-    session.m_state = session_state::game_run_startup;
-    platform::close_application();
+    *session.next_grid_size /= 16;//session.run->grid_size;
+    session.change_phase(session_state::game_run_startup);
     current_menu = mui::page::main_menu;
   }
 
   if (menu_button_nth(str_2x_game)) {
     session.next_grid_size = new vec2<i32>{i32(1920*2.0f), i32(1080*2.0f)};
-    *session.next_grid_size /= session.run->grid_size;
-    session.m_state = session_state::game_run_startup;
-    platform::close_application();
+    *session.next_grid_size /= 16;//session.run->grid_size;
+    session.change_phase(session_state::game_run_startup);
     current_menu = mui::page::main_menu;
   }
 

@@ -18,9 +18,7 @@ void initialize(lapse::u32 screen_width, lapse::u32 screen_height, bool fullscre
 
 void close_application();
 void finalize_shutdown();
-void start_application();
-
-void set_game_session_initialization_callback(lapse_lambda(void, void) arg_initialization_callback);
+bool start_application();
 
 void set_main_loop_callback(lapse_lambda(void, lapse::f32) main_loop);
 

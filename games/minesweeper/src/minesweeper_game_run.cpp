@@ -8,7 +8,7 @@ using namespace lapse;
 
 namespace minesweeper{
 
-void minesweeper_run::start_main_loop() {
+bool minesweeper_run::start_main_loop() {
   auto pixel_size = 4;
 
   // TODO fetch the actual monitor resolution from platform
@@ -25,7 +25,7 @@ void minesweeper_run::start_main_loop() {
   static str str_application_name = "Nigh Sooth - Minesweeper Game";
 
   platform::initialize(next_window_size.x, next_window_size.y, false, str_application_name, pixel_size);
-  platform::start_application();
+  return platform::start_application();
 }
 
 // main loop of gameplay
@@ -128,7 +128,8 @@ void minesweeper_run::main_loop(f32 delta) {
 
   // open main menu if esc is hit
   if (key(keycode::escape).is_hit()) {
-    session.m_state = session_state::main_menu;
+    session.m_should_end_run = false;
+    session.change_phase(session_state::main_menu);
   }
 
   // debugging stuff:

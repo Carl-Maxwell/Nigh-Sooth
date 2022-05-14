@@ -7,27 +7,34 @@
 #include "minesweeper_tile.h"
 #include "minesweeper_game_run.h"
 
+#include "sooth.h"
+
 #include "lapse_lib.h"
 
 using namespace lapse;
 
 namespace minesweeper{
 
-// 
-void minesweeper_session::start_session() {
-  // TODO this func needs a better name
-  
-  // maybe something like "advance session to next phase?"
+// activate a new session state
+void minesweeper_session::advance_phase() {
+  // this function is called to start the application, and loops until the application closes
+  // it directs execution to the menu, run, etc, objs to do their things.
+  // session.m_state (the session state) determines where it goes
 
-  // activate game session
+  // We only hit this func if:
+    // a run starts/ends, the main menu opens/closes, the application opens/closes
+  // Otherwise see the main loop funcs
+
   while (m_state != session_state::application_shutdown) {
     switch(m_state) {
       case session_state::application_startup:
-        // TODO load images & whatnot
+        //initialize engine
+        sooth::initialize_engine();
+        // load images & whatnot
+        initialize_game_session();
         m_state = session_state::main_menu;
       break;
       case session_state::main_menu:
-        // TODO this line is never hit
         main_menu->start_main_loop();
       break;
       case session_state::game_run_startup:
@@ -39,12 +46,13 @@ void minesweeper_session::start_session() {
         } else {
           run->initialize_run();
         }
-        m_state = session_state::game_run_main_loop;
+        m_state = session_state::game_run;
       // break; // fall through
-      case session_state::game_run_main_loop:
+      case session_state::game_run:
         std::cout << "\n\n//\n// entering main loop\n//\n\n";
         run->start_main_loop();
-        delete run;
+        if (m_should_end_run) { end_run(); }
+        m_should_end_run = true;
         std::cout << "\n\n//\n// exiting main loop\n//\n\n";
       break;
       case session_state::application_shutdown:
@@ -55,11 +63,23 @@ void minesweeper_session::start_session() {
   }
 }
 
+void minesweeper_session::change_phase(session_state new_phase) {
+  assert(m_state != new_phase);
+
+  switch(m_state) {
+    default: break;
+  }
+
+  m_state = new_phase;
+
+  platform::close_application();
+}
+
 void minesweeper_session::main_loop(f32 delta) {
   switch(m_state) {
-    case session_state::game_run_main_loop: run->main_loop(delta);       break;
-    case session_state::main_menu:          main_menu->main_loop(delta); break;
-    case session_state::application_shutdown : return; break;
+    case session_state::game_run:              run->main_loop(delta);       break;
+    case session_state::main_menu:             main_menu->main_loop(delta); break;
+    case session_state::application_shutdown : return;                      break;
     default:
       std::cout << "\n\nError! Bad minesweeper_session::main_loop() call \n\n";
       __debugbreak();
@@ -103,9 +123,18 @@ void minesweeper_session::initialize_game_session() {
   victory_image .load_image(&paths[i++]);
 }
 
+void minesweeper_session::end_run() {
+  delete run;
+}
+
 void minesweeper_session::restart_run() {
-  m_state = session_state::game_run_startup;
-  platform::close_application();
+  change_phase(session_state::game_run_startup);
+}
+
+void minesweeper_session::continue_run() {
+  assert(run);
+  // m_state = session_state::game_run;
+  change_phase(session_state::game_run);
 }
 
 } // end namespace

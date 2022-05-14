@@ -11,8 +11,6 @@
 #include "lapse_lib.h"
 
 namespace{
-  lapse_lambda(void, void) game_session_initialization_callback;
-  bool game_session_started = false;
   lapse_lambda(void, lapse::f32) main_loop;
 }
 
@@ -35,25 +33,20 @@ public:
 public:
   bool OnUserCreate() override {
     std::cout << "\n// calling OnUserCreate()\n\n";
-    if (game_session_initialization_callback && !game_session_started) {
-      game_session_initialization_callback();
-      game_session_started = true;
-    }
-
     return true;
   }
 
   bool OnUserUpdate(float delta) override {
     frame_count++;
 
-    if (main_loop)
-      main_loop(delta);
+    main_loop(delta);
 
     return m_should_continue_running;
   }
 
   bool OnUserDestroy() {
     if (this->bForceQuitEvent) {
+      // user has clicked the window X or otherwise told the app to close immediately
       force_quit();
     }
     return true;
@@ -99,25 +92,22 @@ void initialize(u32 screen_width, u32 screen_height, bool fullscreen, str& windo
   std::cout << "\n";
 }
 
-void set_game_session_initialization_callback(lapse_lambda(void, void) arg_initialization_callback) {
-  game_session_initialization_callback = arg_initialization_callback;
-}
-
 void close_application() {
   app->m_should_continue_running = false;
 
-  // note that this just ends the main loop, causing it to fall back to session::start_session()
+  // note that this just ends the main loop, causing it to fall back to session::advance_phase()
 }
 
 void finalize_shutdown() {
   delete app;
 }
 
-void start_application() {
+bool start_application() {
   std::cout << "\n\n//\n// start of start_application\n//\n\n";
   olc::rcode code = app->Start();
   // TODO look at rcode
   std::cout << "\n\n//\n//end of start_application\n//\n\n";
+  return true;
 }
 
 void set_main_loop_callback(lapse_lambda(void, f32) arg_main_loop) {
