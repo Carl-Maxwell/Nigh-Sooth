@@ -18,7 +18,7 @@ u32 sign(u32 a) {
   // return a < 0 ? -1.0f : 1.0f;
 };
 // returns -1.0f or +1.0f whichever is nearer
-f32 sign(f32 a) {
+inline f32 sign(f32 a) {
   /*
   auto negative_a = -a;
 
@@ -45,7 +45,7 @@ f64 sign(f64 a) {
 i32 abs(i32 a) {
   return sign(a) * a;
 }
-f32 abs(f32 a) {
+inline f32 abs(f32 a) {
   return sign(a) * a;
 }
 f64 abs(f64 a) {
@@ -59,7 +59,10 @@ i32 floor_i(f32 whole) {
   return whole >= 0 ? i32(whole) : i32(whole)-1;
 };
 f32 floor_f(f32 whole) {
-  return whole >= 0 ? f32(i32(whole)) : f32(i32(whole))-1;
+  return 
+    whole - 
+    static_cast<f32>(reinterpret_cast<u32&>(whole) >> 31) // returns sign bit (either 0 or 1)
+  ;
 };
 // branchless floor_f, only works with whole >= 0
 f32 floor_f_positive(f32 whole) {
@@ -106,8 +109,19 @@ f64 round(f64 whole) {
 };
 
 f32 round(f32 whole) {
+  f32 abs_whole = abs(whole);
+  f32 integer_part = floor_f(abs_whole);
+
+  // f32 arr[] = {integer_part, 0, integer_part+1};
+  // return sign(whole) * arr[ static_cast<i32>(sign(abs_whole - f32(integer_part) - 0.5) )+1 ];
+
+  return sign(whole) * 
+    (abs_whole - integer_part < 0.5 ? integer_part : integer_part+1.0f);
+};
+
+f32 old_round(f32 whole) {
   i32 integer_part = floor_i(abs(whole));
-  return sign(whole) * f32( 
+  return sign(whole) * f32(
     abs(whole) - f32(integer_part) < 0.5 ? integer_part : integer_part+1
   );
 };

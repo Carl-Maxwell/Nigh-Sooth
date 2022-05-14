@@ -286,8 +286,7 @@ void draw_bitmap_scaled(vec2<> screen_coord, image& img, f32 scale) {
 
   auto img_pixels = img.m_u_pixels;
 
-  i32 screen_x = (i32)screen_coord.x;
-  i32 screen_y = (i32)screen_coord.y;
+  vec2<> f_target_pos_offset;
 
   // fetch draw target info (note the two levels of indirection here)
   auto& draw_target   = *app->pDrawTarget;
@@ -298,32 +297,35 @@ void draw_bitmap_scaled(vec2<> screen_coord, image& img, f32 scale) {
   if (
     screen_coord.x >= screen_width || screen_coord.y >= screen_height
     ||
-    screen_coord.x < 0 || screen_coord.y < 0
-    ) {
+    screen_coord.x + f_target_width < 0 || screen_coord.y + f_target_height < 0
+    // ||
+    // screen_coord.x < 0 || screen_coord.y < 0
+  ) {
     return;
   }
 
   {
     // clip target into screen size
 
-    // target_width  = lapse::min(target_width , screen_width  - screen_x - 1);
-    // target_height = lapse::min(target_height, screen_height - screen_x - 1);
+    // clip target position inside window
+    f_target_pos_offset.x = lapse::max(-screen_coord.x, 0.0f);
+    f_target_pos_offset.y = lapse::max(-screen_coord.y, 0.0f);
 
-    // TODO deal with negative numbers
+    // clip target size to window topleft edge
+    f_target_width  -= f_target_pos_offset.x;
+    f_target_height -= f_target_pos_offset.y;
 
-    if (screen_coord.x + f_target_width >= (f32)screen_width) {
-      f_target_width = f32(screen_width) - screen_coord.x - 1;
-      // -1 because we need to be < screen_width
-    }
-    if (screen_coord.y + f_target_height >= (f32)screen_height) {
-      f_target_height = f32(screen_height) - screen_coord.y - 1;
-      // -1 because we need to be < screen_height
-    }
+    // clip size inside window bottom right edge
+    f_target_width  = lapse::min(f_target_width , static_cast<f32>(screen_width)  - screen_coord.x - 1.0f);
+    f_target_height = lapse::min(f_target_height, static_cast<f32>(screen_height) - screen_coord.y - 1.0f);
   }
 
   //
   // convert to integers for memcpy()
   //
+
+  i32 screen_x = static_cast<i32>(screen_coord.x + f_target_pos_offset.x);
+  i32 screen_y = static_cast<i32>(screen_coord.y + f_target_pos_offset.y);
 
   u32 u_target_width  = (u32)lapse::round(f_target_width );
   u32 u_target_height = (u32)lapse::round(f_target_height);
@@ -332,15 +334,15 @@ void draw_bitmap_scaled(vec2<> screen_coord, image& img, f32 scale) {
   u32 u_screen_y = (u32)screen_y;
 
   {
-    assert(u_screen_x >= 0 && u_screen_x + u_target_width  < u32(screen_width) );
-    assert(u_screen_y >= 0 && u_screen_y + u_target_height < u32(screen_height));
+    assert(screen_x >= 0 && u_screen_x + u_target_width  < u32(screen_width) );
+    assert(screen_y >= 0 && u_screen_y + u_target_height < u32(screen_height));
     assert(sizeof(olc::Pixel) == sizeof(vec4<u8>));
   }
 
   auto line_offset = u_target_width*sizeof(olc::Pixel);
 
   //
-  // construct the scaled image
+  // Construct the scaled image
   //
 
   auto scaled_img_pixels = get_scaled_image(img.id, scale);
@@ -360,10 +362,18 @@ void draw_bitmap_scaled(vec2<> screen_coord, image& img, f32 scale) {
     }
   }
 
+  //
+  // Render image onto screen draw target
+  //
+
+  // need to know where in the image we start drawing from if it was clipped
+  u32 img_topleft_x = static_cast<u32>(f_target_pos_offset.x);
+  u32 img_topleft_y = static_cast<u32>(f_target_pos_offset.y);
+
   for (u32 y = 0; y < u_target_height; y++) {
     memcpy(
       (void*)&screen_pixels[(u_screen_y+y) * u32(screen_width) + u_screen_x],
-      (void*)&scaled_img_pixels[y*u_target_full_width],
+      (void*)&scaled_img_pixels[(y+img_topleft_y)*u_target_full_width + img_topleft_x],
       line_offset
     );
   }
