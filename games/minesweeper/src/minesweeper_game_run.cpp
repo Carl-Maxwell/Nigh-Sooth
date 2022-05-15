@@ -111,8 +111,8 @@ void minesweeper_run::main_loop(f32 delta) {
     auto window_width  = static_cast<f32>(platform::get_window_width() );
     auto window_height = static_cast<f32>(platform::get_window_height());
 
-    auto current_grid_width = window_width   / (f32(grid_size)*game_zoom);
-    auto current_grid_height = window_height / (f32(grid_size)*game_zoom);
+    auto current_grid_width = window_width   / (f32(grid_size)*game_zoom) + 1.0f;
+    auto current_grid_height = window_height / (f32(grid_size)*game_zoom) + 1.0f;
 
     // calc current topleft tile
     auto grid_topleft_x = lapse::floor_f(-panning_offset.x/f32(grid_size));
