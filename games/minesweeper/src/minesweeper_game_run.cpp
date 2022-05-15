@@ -37,7 +37,7 @@ void minesweeper_run::main_loop(f32 delta) {
   auto& game_zoom      = run.game_zoom;
   auto& game_state     = run.game_state;
   auto  grid           = run.grid;
-  auto& grid_size      = run.grid_size;
+  auto& tile_size      = run.tile_size;
   auto& grid_width     = run.grid_width;
   auto& grid_height    = run.grid_height;
   auto& panning_offset = run.panning_offset;
@@ -54,8 +54,8 @@ void minesweeper_run::main_loop(f32 delta) {
   mouse_x = static_cast<i32>(lapse::round(f32(mouse_x)/game_zoom - panning_offset.x));
   mouse_y = static_cast<i32>(lapse::round(f32(mouse_y)/game_zoom - panning_offset.y));
 
-  mouse_x /= grid_size;
-  mouse_y /= grid_size;
+  mouse_x /= tile_size;
+  mouse_y /= tile_size;
   minesweeper::tile_obj* mouse_tile = nullptr;
 
   if (
@@ -111,12 +111,12 @@ void minesweeper_run::main_loop(f32 delta) {
     auto window_width  = static_cast<f32>(platform::get_window_width() );
     auto window_height = static_cast<f32>(platform::get_window_height());
 
-    auto current_grid_width = window_width   / (f32(grid_size)*game_zoom) + 1.0f;
-    auto current_grid_height = window_height / (f32(grid_size)*game_zoom) + 1.0f;
+    auto current_grid_width = window_width   / (f32(tile_size)*game_zoom) + 1.0f;
+    auto current_grid_height = window_height / (f32(tile_size)*game_zoom) + 1.0f;
 
     // calc current topleft tile
-    auto grid_topleft_x = lapse::floor_f(-panning_offset.x/f32(grid_size));
-    auto grid_topleft_y = lapse::floor_f(-panning_offset.y/f32(grid_size));
+    auto grid_topleft_x = lapse::floor_f(-panning_offset.x/f32(tile_size));
+    auto grid_topleft_y = lapse::floor_f(-panning_offset.y/f32(tile_size));
 
     grid_topleft_x = max(0.0f, grid_topleft_x);
     grid_topleft_y = max(0.0f, grid_topleft_y);
@@ -137,8 +137,8 @@ void minesweeper_run::main_loop(f32 delta) {
       for (f32 x = grid_topleft_x; x < current_grid_width; x++) {
         tile_count++;
         vec2<> screen_pos{
-          x*grid_size,
-          y*grid_size
+          x*tile_size,
+          y*tile_size
         };
 
         auto& tile = grid[u32(y*grid_width + x)];
@@ -174,8 +174,8 @@ void minesweeper_run::main_loop(f32 delta) {
   if (key(keycode::number_1).is_toggled()) {
     for (u32 i = 0; i < safe_spaces.length(); i++) {
       platform::draw_rect(
-        vec2<>{f32(safe_spaces[i].x), f32(safe_spaces[i].y)} * run.grid_size_vec2(),
-        run.grid_size_vec2(),
+        vec2<>{f32(safe_spaces[i].x), f32(safe_spaces[i].y)} * run.tile_size_vec2(),
+        run.tile_size_vec2(),
         vec3<>{0, 0.75, 0}
       );
     }
@@ -245,8 +245,8 @@ void minesweeper_run::initialize_run(i32 n_width, i32 n_height) {
   grid_height = n_height;
 
   next_window_size = {
-    grid_size*grid_width  + window_padding*2, // window width
-    grid_size*grid_height + window_padding*2  // window height
+    tile_size*grid_width  + window_padding*2, // window width
+    tile_size*grid_height + window_padding*2  // window height
   };
 
   // initialize grid

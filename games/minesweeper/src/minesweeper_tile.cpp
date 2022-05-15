@@ -158,7 +158,7 @@ rect<i32> tile_obj::to_rect() {
   auto& session = minesweeper_session::the();
   auto& run = *session.run;
 
-  return rect<i32>{m_coordinates, {run.grid_size, run.grid_size}};
+  return rect<i32>{m_coordinates, {run.tile_size, run.tile_size}};
 }
 
 }; // end namepspace
