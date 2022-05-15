@@ -42,7 +42,7 @@ struct minesweeper_session{
   void advance_phase();
   void change_phase(session_state new_phase);
   void initialize_game_session();
-  void main_loop(lapse::f32 delta);
+  static void main_loop(lapse::f32 delta);
   void end_run();
   void restart_run();
   // this func resumes an ongoing run that was paused (for example, to open a menu)

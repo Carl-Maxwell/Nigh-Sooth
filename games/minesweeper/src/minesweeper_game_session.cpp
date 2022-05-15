@@ -73,18 +73,23 @@ void minesweeper_session::change_phase(session_state new_phase) {
   m_state = new_phase;
 
   platform::close_application();
+  platform::set_main_loop_callback(&minesweeper::minesweeper_session::main_loop);
 }
 
 void minesweeper_session::main_loop(f32 delta) {
-  switch(m_state) {
-    case session_state::game_run:              run->main_loop(delta);       break;
-    case session_state::main_menu:             main_menu->main_loop(delta); break;
-    case session_state::application_shutdown : return;                      break;
+  auto& session = the();
+  switch(session.m_state) {
+    case session_state::game_run:
+      platform::set_main_loop_callback(&minesweeper_run::main_loop);
+    break;
+    case session_state::main_menu:
+      platform::set_main_loop_callback(&minesweeper_main_menu::main_loop);
+    break;
+    case session_state::application_shutdown : return; break;
     default:
       std::cout << "\n\nError! Bad minesweeper_session::main_loop() call \n\n";
       __debugbreak();
   }
-  arenas::temp.clear();
 }
 
 // Initialize graphics (called once on application startup)

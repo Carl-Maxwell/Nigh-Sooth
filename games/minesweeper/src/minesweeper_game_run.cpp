@@ -31,7 +31,18 @@ bool minesweeper_run::start_main_loop() {
 // main loop of gameplay
 void minesweeper_run::main_loop(f32 delta) {
   auto& session = minesweeper_session::the();
+  auto& run = *session.run;
   platform::clear(vec3<>{0, 0, 0});
+
+  auto& game_zoom      = run.game_zoom;
+  auto& game_state     = run.game_state;
+  auto  grid           = run.grid;
+  auto& grid_size      = run.grid_size;
+  auto& grid_width     = run.grid_width;
+  auto& grid_height    = run.grid_height;
+  auto& panning_offset = run.panning_offset;
+  auto& m_first_click  = run.m_first_click;
+  auto& safe_spaces    = run.safe_spaces;
 
   platform::poll_key_toggles();
 
@@ -47,10 +58,6 @@ void minesweeper_run::main_loop(f32 delta) {
   mouse_y /= grid_size;
   minesweeper::tile_obj* mouse_tile = nullptr;
 
-  if (key(keycode::number_2).is_hit()) {
-    __debugbreak();
-  }
-
   if (
        mouse_x >= 0 && mouse_y >= 0
     && mouse_x < grid_width && mouse_y < grid_height
@@ -64,8 +71,8 @@ void minesweeper_run::main_loop(f32 delta) {
       if (mouse_tile && mouse_tile->m_hidden && !mouse_tile->m_flagged) {
         if (m_first_click) {
           m_first_click = false;
-          generate_safe_spaces(mouse_tile);
-          generate_mines();
+          run.generate_safe_spaces(mouse_tile);
+          run.generate_mines();
           for (u32 i = 0; i < safe_spaces.length(); i++) {
             auto& safe_tile = grid[safe_spaces[i].y * grid_width + safe_spaces[i].x];
             safe_tile.reveal();
@@ -74,7 +81,7 @@ void minesweeper_run::main_loop(f32 delta) {
           mouse_tile->reveal();
         }
       }
-      if (is_game_won()) { game_state = game_state_enum::won; }
+      if (run.is_game_won()) { game_state = game_state_enum::won; }
     } else if (Mouse::right_mouse_hit()) {
       if (mouse_tile && mouse_tile->m_hidden) {
         if (!mouse_tile->m_flagged) {
@@ -85,7 +92,7 @@ void minesweeper_run::main_loop(f32 delta) {
           mouse_tile->m_flagged = false;
         }
       }
-      if (is_game_won()) { game_state = game_state_enum::won; }
+      if (run.is_game_won()) { game_state = game_state_enum::won; }
     }
   break;
   case game_state_enum::won:
@@ -100,21 +107,51 @@ void minesweeper_run::main_loop(f32 delta) {
   // Draw tiles
   //
 
-  for (f32 y = 0; y < grid_height; y++) {
-    for (f32 x = 0; x < grid_width; x++) {
-      vec2<> screen_pos{
-        x*grid_size,
-        y*grid_size
-      };
+  {
+    auto window_width  = static_cast<f32>(platform::get_window_width() );
+    auto window_height = static_cast<f32>(platform::get_window_height());
 
-      auto& tile = grid[u32(y*grid_width + x)];
-      bool hovering = mouse_tile && mouse_tile == &tile && game_state == game_state_enum::in_progress;
-      image& img = tile.get_image(game_state, hovering);
+    auto current_grid_width = window_width   / (f32(grid_size)*game_zoom);
+    auto current_grid_height = window_height / (f32(grid_size)*game_zoom);
 
-      screen_pos += panning_offset;
-      // TODO multiply screen_pos here, not in draw_bitmap
-      platform::draw_bitmap_scaled(screen_pos, img, game_zoom);
+    // calc current topleft tile
+    auto grid_topleft_x = lapse::floor_f(-panning_offset.x/f32(grid_size));
+    auto grid_topleft_y = lapse::floor_f(-panning_offset.y/f32(grid_size));
+
+    grid_topleft_x = max(0.0f, grid_topleft_x);
+    grid_topleft_y = max(0.0f, grid_topleft_y);
+
+    if (key(keycode::number_2).is_hit()) {
+      __debugbreak();
     }
+
+    current_grid_width  += grid_topleft_x;
+    current_grid_height += grid_topleft_y;
+
+    current_grid_width  = min(f32(grid_width), current_grid_width);
+    current_grid_height = min(f32(grid_height), current_grid_height);
+
+    auto tile_count = 0;
+
+    for (f32 y = grid_topleft_y; y < current_grid_height; y++) {
+      for (f32 x = grid_topleft_x; x < current_grid_width; x++) {
+        tile_count++;
+        vec2<> screen_pos{
+          x*grid_size,
+          y*grid_size
+        };
+
+        auto& tile = grid[u32(y*grid_width + x)];
+        bool hovering = mouse_tile && mouse_tile == &tile && game_state == game_state_enum::in_progress;
+        image& img = tile.get_image(game_state, hovering);
+
+        screen_pos += panning_offset;
+        // TODO multiply screen_pos here, not in draw_bitmap
+        platform::draw_bitmap_scaled(screen_pos, img, game_zoom);
+      }
+    }
+
+    std::cout << "\n\n// tiles being drawn: " << tile_count << "\n\n";
   }
 
   if (game_state == game_state_enum::won) {
@@ -137,14 +174,17 @@ void minesweeper_run::main_loop(f32 delta) {
   if (key(keycode::number_1).is_toggled()) {
     for (u32 i = 0; i < safe_spaces.length(); i++) {
       platform::draw_rect(
-        vec2<>{f32(safe_spaces[i].x), f32(safe_spaces[i].y)} * grid_size_vec2(),
-        grid_size_vec2(),
+        vec2<>{f32(safe_spaces[i].x), f32(safe_spaces[i].y)} * run.grid_size_vec2(),
+        run.grid_size_vec2(),
         vec3<>{0, 0.75, 0}
       );
     }
   }
 
+  //
   // zoom & pan
+  //
+
   if (platform::get_mouse_wheel_delta()) {
     auto old_zoom = game_zoom;
 
@@ -193,6 +233,9 @@ void minesweeper_run::main_loop(f32 delta) {
   if (key(keycode::space_bar).is_down() || Mouse::middle_mouse_down()) {
     panning_offset -= Mouse::get_mouse_delta()/game_zoom;
   }
+
+  // empty out temp arena
+  arenas::temp.clear();
 }
 
 // called each time we need to setup a new map to play

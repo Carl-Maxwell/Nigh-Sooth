@@ -23,6 +23,10 @@ void minesweeper_main_menu::start_main_loop() {
 }
 
 void minesweeper_main_menu::main_loop(f32 delta) {
+  auto& session      = minesweeper_session::the();
+  auto& main_menu    = *session.main_menu;
+  auto& current_menu = main_menu.current_menu;
+
   // std::cout << "main menu start of frame " << frame_count << "\n";
   platform::clear(vec3<>{0, 0, 0});
   mui::Context::the().reset();
@@ -30,19 +34,21 @@ void minesweeper_main_menu::main_loop(f32 delta) {
   lapse::LapseErrorQueue::the().tick();
 
   switch (current_menu) {
-    case mui::page::main_menu:     main_menu(); break;
-    case mui::page::new_game_menu: new_game_menu(); break;
+    case mui::page::main_menu:     main_menu.main_menu();     break;
+    case mui::page::new_game_menu: main_menu.new_game_menu(); break;
   }
 
   mui::draw();
 
   if (key(keycode::number_2).is_hit()) {
-    auto& session = minesweeper_session::the();
     __debugbreak();
   }
 
   // std::cout << "main menu end of frame " << frame_count << "\n";
-  frame_count++;
+  main_menu.frame_count++;
+
+  // empty out temp arena
+  arenas::temp.clear();
 }
 
 // wrapper for mui::open_div() that adds this game's style to it

@@ -59,10 +59,10 @@ i32 floor_i(f32 whole) {
   return whole >= 0 ? i32(whole) : i32(whole)-1;
 };
 f32 floor_f(f32 whole) {
-  return 
+  return f32(i32(
     whole - 
     static_cast<f32>(reinterpret_cast<u32&>(whole) >> 31) // returns sign bit (either 0 or 1)
-  ;
+  ));
 };
 // branchless floor_f, only works with whole >= 0
 f32 floor_f_positive(f32 whole) {

@@ -14,20 +14,24 @@
 using namespace lapse;
 
 int main() {
-  arenas::temp.reserve(10'000);
+  //
+  // Allocate memory
+  //
+
+  arenas::temp.reserve(3'000);
   platform::allocate_image_cache();
 
-  platform::set_main_loop_callback([](f32 delta){
-    auto& session = minesweeper::minesweeper_session::the();
-    session.main_loop(delta);
-  } );
+  //
+  // Set up main loop callback
+  //
+
+  platform::set_main_loop_callback(&minesweeper::minesweeper_session::main_loop);
 
   //
   // Start the game
   //
 
-  auto& session = minesweeper::minesweeper_session::the();
-  session.advance_phase();
+  minesweeper::minesweeper_session::the().advance_phase();
 
   return 0;
 }

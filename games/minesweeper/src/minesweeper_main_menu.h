@@ -20,7 +20,7 @@ struct minesweeper_main_menu{
   lapse::str str_test_menu     = "test menu";
   lapse::str str_exit          = "Exit Minesweeper";
 
-  void main_loop(lapse::f32 delta);
+  static void main_loop(lapse::f32 delta);
   void start_main_loop();
   void main_menu();
   void new_game_menu();

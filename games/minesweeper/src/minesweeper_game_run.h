@@ -13,7 +13,9 @@ enum class game_state_enum{
 };
 
 struct minesweeper_run{
+  // width (in minesweeper tiles) of the game board
   lapse::i32 grid_width  = 18;
+  // height (in minesweeper tiles) of the game board
   lapse::i32 grid_height = 12;
   minesweeper::tile_obj* grid = nullptr;
   // Spaces where mines are not allowed during lvl generation
@@ -40,7 +42,7 @@ struct minesweeper_run{
   void generate_mines(lapse::i32 num_mines = 0);
   void generate_safe_spaces(tile_obj* start_tile);
   bool start_main_loop();
-  void main_loop(lapse::f32 delta);
+  static void main_loop(lapse::f32 delta);
   bool is_game_won();
   void win_game();
   void lose_game();

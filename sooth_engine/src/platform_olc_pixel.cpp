@@ -391,7 +391,7 @@ void clear(lapse::vec3<> color) {
 //-----------------------------------------------------------------------------
 
 void allocate_image_cache() {
-  arenas::image_cache.reserve(1'000'000);
+  arenas::image_cache.reserve(10'000'000);
 }
 
 struct ImageCacheRecord{
