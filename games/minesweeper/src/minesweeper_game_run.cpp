@@ -150,8 +150,6 @@ void minesweeper_run::main_loop(f32 delta) {
         platform::draw_bitmap_scaled(screen_pos, img, game_zoom);
       }
     }
-
-    std::cout << "\n\n// tiles being drawn: " << tile_count << "\n\n";
   }
 
   if (game_state == game_state_enum::won) {

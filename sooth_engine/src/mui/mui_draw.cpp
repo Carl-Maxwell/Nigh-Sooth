@@ -130,7 +130,7 @@ void draw() {
 
   draw_call_array.clear();
 
-  std::cout << "mui scale: " << ContextScale::the().scale() << "\n";
+  // std::cout << "mui scale: " << ContextScale::the().scale() << "\n";
 }
 
 } // end namespace

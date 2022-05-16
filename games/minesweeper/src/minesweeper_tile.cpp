@@ -15,6 +15,8 @@ array<tile_obj>& tile_obj::adjacent_tiles(lapse::array<tile_obj>& adjacents) {
   auto x = m_coordinates.x;
   auto y = m_coordinates.y;
 
+  assert(adjacents.m_size >= 8);
+
   // make sure have a size of at least 8:
   // adjacents.reserve(8):
   // array<tile_obj> adjacents(8);
@@ -39,7 +41,9 @@ array<tile_obj>& tile_obj::adjacent_tiles_cardinal(lapse::array<tile_obj>& adjac
   auto x = m_coordinates.x;
   auto y = m_coordinates.y;
 
-  // make sure have a size of at least 8:
+  assert(adjacents.m_size >= 8);
+
+  // make sure you have a size of at least 8:
   // adjacents.reserve(8):
   // array<tile_obj> adjacents(8);
   // etc ...
