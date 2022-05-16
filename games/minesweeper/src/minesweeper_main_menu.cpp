@@ -44,6 +44,12 @@ void minesweeper_main_menu::main_loop(f32 delta) {
     __debugbreak();
   }
 
+  if (key(keycode::escape).is_hit()) {
+    if (session.run) {
+      session.continue_run();
+    }
+  }
+
   // std::cout << "main menu end of frame " << frame_count << "\n";
   main_menu.frame_count++;
 
