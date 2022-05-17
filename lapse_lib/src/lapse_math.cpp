@@ -77,9 +77,11 @@ f32 ceil_f(f32 whole) {
 };
 
 i32 max(i32 a, i32 b) {
+  return a > b ? a : b;
   // assert that this doesn't go past i32_min or i32_max
   assert(a > i32_min/2 && a < i32_max/2);
   assert(b > i32_min/2 && b < i32_max/2);
+  // TODO D'oh! This breaks if a == b
   return b * abs(((a-b)>>31)) + a * abs((b-a)>>31);
 }
 u32 max(u32 a, u32 b) {

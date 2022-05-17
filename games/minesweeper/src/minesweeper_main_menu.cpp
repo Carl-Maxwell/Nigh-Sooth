@@ -4,7 +4,6 @@
 
 #include <lapse_lib.h>
 
-#include "platform_olc_pixel.h"
 #include "minesweeper_game_session.h"
 
 #include "mui/mui_div.h"

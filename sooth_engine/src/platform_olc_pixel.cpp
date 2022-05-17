@@ -71,14 +71,14 @@ f64 get_application_start_time() {
 i32 get_pixel_size() { return pixel_size; };
 f32 get_window_padding() { return 10.0f; };
 
-void initialize(u32 screen_width, u32 screen_height, bool fullscreen, str& window_name, i32 a_pixel_size) {
+void initialize(i32 screen_width, i32 screen_height, bool fullscreen, str& window_name, i32 a_pixel_size) {
   pixel_size = a_pixel_size;
   // pixel_size = 1;
 
   app = new SoothPixelEngineApp(window_name);
-  status = app->Construct(i32(screen_width), i32(screen_height), pixel_size, pixel_size, fullscreen);
+  status = app->Construct(screen_width, screen_height, pixel_size, pixel_size, fullscreen);
 
-  std::cout << "screen resolution: " << i32(screen_width) << "x" << i32(screen_height) << "\n";
+  std::cout << "screen resolution: " << screen_width << "x" << screen_height << "\n";
   std::cout << "pixel scale: " << pixel_size << "\n";
   std::cout << "initializing olc::pixel game engine as the nigh sooth platform... status: ";
   

@@ -45,7 +45,6 @@ void minesweeper_run::main_loop(f32 delta) {
   auto& safe_spaces    = run.safe_spaces;
 
   platform::poll_key_toggles();
-
   lapse::LapseErrorQueue::the().tick();
 
   i32 mouse_x = static_cast<i32>(Mouse::get_mouse_pos().x);

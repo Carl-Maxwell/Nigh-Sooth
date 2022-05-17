@@ -14,7 +14,7 @@ void allocate_image_cache();
 
 lapse::i32 get_pixel_size();
 
-void initialize(lapse::u32 screen_width, lapse::u32 screen_height, bool fullscreen, lapse::str& window_name, lapse::i32 a_pixel_size = 4);
+void initialize(lapse::i32 screen_width, lapse::i32 screen_height, bool fullscreen, lapse::str& window_name, lapse::i32 a_pixel_size = 4);
 
 void close_application();
 void finalize_shutdown();

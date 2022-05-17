@@ -14,5 +14,5 @@ I plan for the project to be broken up into various sub projects:
 - **sooth_engine** -- game engine
   - *mui::* -- part of sooth, I'm trying to combine the CSS box model with immediate mode graphical user interface ideas, though I wouldn't say they're synergizing well.
 - **games**
-  - **text_choice_game** -- interactive fiction sortof thing, type 1 or 2 to choose this path or that path, etc. Simple game for testing out the engine's basic string stuff.
   - **minesweeper_game** -- fairly functional minesweeper game
+  - **Ephrais and Gorgander** -- top down shooter, work in progress

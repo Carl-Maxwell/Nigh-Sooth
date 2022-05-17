@@ -24,4 +24,5 @@ include "sooth_engine"
 
 group "games"
   include "games/minesweeper"
+  include "games/ephrais-and-gorgander"
 group ""

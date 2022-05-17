@@ -1,0 +1,7 @@
+--- # this indicates the start/end of a yaml document
+asset: # meta data
+  name: "default_sprite"
+  id: 16988989526085077164
+  images:
+    - path: "resources/images/Sprite-0001.png"
+      id: 16988989526085077165
