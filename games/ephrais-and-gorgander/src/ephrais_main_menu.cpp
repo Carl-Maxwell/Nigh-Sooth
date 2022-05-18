@@ -26,7 +26,7 @@ void MainMenu::main_loop(f32 delta) {
   auto& main_menu    = *session.main_menu;
   auto& current_menu = main_menu.current_menu;
 
-  std::cout << "main menu start of frame " << main_menu.frame_count << "\n";
+  // std::cout << "main menu start of frame " << main_menu.frame_count << "\n";
   platform::clear(vec3<>{0, 0, 0});
   mui::Context::the().reset();
   platform::poll_key_toggles();

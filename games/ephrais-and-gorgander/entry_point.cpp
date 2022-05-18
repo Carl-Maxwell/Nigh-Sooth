@@ -11,7 +11,7 @@ int main() {
   // Allocate memory
   //
 
-  arenas::temp.reserve(3'000);
+  arenas::temp.reserve(10'000'000);
   platform::allocate_image_cache();
 
   //

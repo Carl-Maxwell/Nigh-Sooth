@@ -32,7 +32,7 @@ public:
 
   ~fixed_array() {
     std::cout << "~fixed_array()\n";
-    if (m_elements) delete[] m_elements;
+    // if (m_elements) delete[] m_elements;
     // __debugbreak();
     // if (m_elements && sizeof(T) <= 8) {
       // __debugbreak();

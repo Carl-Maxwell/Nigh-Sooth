@@ -32,7 +32,7 @@ struct Run{
   void win_game();
   void lose_game();
 
-  lapse::vec2<lapse::i32> next_window_size = {1920/10*9, 1080/10*9};
+  lapse::vec2<lapse::i32> next_window_size = {1920/10*9/2, 1080/10*9/2};
 };
 
 } // end namespace

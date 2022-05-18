@@ -172,6 +172,15 @@ struct vec2{
     return temp;
     // TODO check for lifetime issues
   }
+  // x < b or y < b
+  bool less_than_or(f32 right_value) {
+    bool temp = false;
+
+    temp |= x < right_value;
+    temp |= y < right_value;
+
+    return temp;
+  }
   // x < x or y < y
   bool less_than_or(vec2 right_value) {
     bool temp = false;
@@ -253,6 +262,9 @@ struct vec2{
   }
   bool operator>(f32 scalar) {
     return x > scalar && y > scalar;
+  }
+  bool operator<(f32 scalar) {
+    return x < scalar && y < scalar;
   }
 };
 

@@ -18,7 +18,7 @@ bool Run::start_main_loop() {
   // TODO fetch the actual monitor resolution from platform
 
   vec2<i32> monitor_resolution = {1920, 1080};
-  monitor_resolution = (monitor_resolution/5)*4;
+  monitor_resolution = (monitor_resolution/10)*9;
   monitor_resolution = monitor_resolution / next_window_size;
   pixel_size = min(monitor_resolution.x, monitor_resolution.y);
 
@@ -55,12 +55,44 @@ void Run::main_loop(f32 delta) {
   // Draw stuff
   //
 
+  u32 tile_size = 32;
+
+  // The width of the board in game tiles
+  auto board_width  = platform::get_window_width() /tile_size;
+  auto board_height = platform::get_window_height()/tile_size;
+
+  // Draw the ground
+  for (u32 y = 0; y < board_height; y++) {
+    for (u32 x = 0; x < board_width; x++) {
+      vec2<> screen_pos = {f32(x*tile_size), f32(y*tile_size)};
+      platform::draw_bitmap_scaled(screen_pos, session.image_array[3], game_zoom);
+    }
+  }
+
+  static array<fixed_array<vec2<>>> bullets;
+  if (!bullets.m_size) { bullets.reserve(100); }
+
+  vec2<> target_reticle_pos = (mouse_pos - run.player_position).normalize()*32;
+
   // screen_pos += panning_offset;
   platform::draw_bitmap_scaled(run.player_position, session.image_array[0], game_zoom);
+  platform::draw_bitmap_scaled(run.player_position + target_reticle_pos, session.image_array[1], game_zoom);
+
+  for (auto i = 0; i < bullets.length(); i++) {
+    auto rotation = sin(123);
+    platform::draw_bitmap_rotated(bullets[i][0], session.image_array[2], rotation);
+    // platform::draw_bitmap_rs(bullets[i][0], session.image_array[2], game_zoom, rotation);
+    bullets[i][0] += bullets[i][1] * delta;
+  }
 
   //
   // Player input
   //
+
+  // fire bullet if left mouse is hit
+  if (Mouse::left_mouse_hit()) {
+    bullets.push({run.player_position + target_reticle_pos, target_reticle_pos.normalize()});
+  }
 
   // open main menu if esc is hit
   if (key(keycode::escape).is_hit()) {
@@ -77,16 +109,16 @@ void Run::main_loop(f32 delta) {
 
   // wasd player movement
   if (key(keycode::d).is_down()) {
-    run.player_position.x += 12.0f * delta;
+    run.player_position.x += 64.0f * delta;
   }
   if (key(keycode::s).is_down()) {
-    run.player_position.y += 12.0f * delta;
+    run.player_position.y += 64.0f * delta;
   }
   if (key(keycode::a).is_down()) {
-    run.player_position.x -= 12.0f * delta;
+    run.player_position.x -= 64.0f * delta;
   }
   if (key(keycode::w).is_down()) {
-    run.player_position.y -= 12.0f * delta;
+    run.player_position.y -= 64.0f * delta;
   }
 
   //

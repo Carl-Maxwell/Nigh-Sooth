@@ -110,15 +110,28 @@ void Session::initialize_game_session() {
   // deserialize all assets
   // load resource data for all assets
 
-  str image_path("resources/images/Sprite-0001.png");
+  str image_paths[] = {
+    "resources/images/Sprite-0001.png",
+    "resources/images/reticle_001.png",
+    "resources/images/bullet_001.png",
+    "resources/images/ground_001.png",
+    ""
+  };
 
-  image_array = new image[1];
+  {
+    auto image_count = 0;
+    while (image_paths[image_count++].length()) {}
+    image_array = new image[image_count-1];
+  }
 
-  image_array[0].load_image(&image_path);
+  auto* image_path = &image_paths[0];
+  auto i = 0;
+  while ((*image_path).length()) {
+    image_array[i].load_image(image_path);
 
-  i32 i = 0;
-
-  // image_array[ (u32)grid_tile::number_1 ] .load_image(&paths[i++]);
+    i++;
+    image_path = &image_paths[i];
+  }
 
 }
 

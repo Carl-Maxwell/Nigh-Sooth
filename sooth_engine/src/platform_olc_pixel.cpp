@@ -266,6 +266,7 @@ void draw_bitmap_scaled(vec2<> screen_coord, image& img, f32 scale) {
   f32 f_target_width  = lapse::round(static_cast<f32>(image_width)  * scale);
   f32 f_target_height = lapse::round(static_cast<f32>(image_height) * scale);
 
+  // record original target size before we clip it
   u32 u_target_full_width  = static_cast<u32>(f_target_width );
   u32 u_target_full_height = static_cast<u32>(f_target_height);
 
@@ -274,13 +275,10 @@ void draw_bitmap_scaled(vec2<> screen_coord, image& img, f32 scale) {
   screen_coord.x = lapse::round(screen_coord.x);
   screen_coord.y = lapse::round(screen_coord.y);
 
-  auto img_pixels = img.m_u_pixels;
-
   vec2<> f_target_pos_offset;
 
   // fetch draw target info (note the two levels of indirection here)
   auto& draw_target   = *app->pDrawTarget;
-  auto& screen_pixels = draw_target.pColData;
   auto screen_width   = draw_target.width ; // screen width  in pixels
   auto screen_height  = draw_target.height; // screen height in pixels
 
@@ -335,11 +333,13 @@ void draw_bitmap_scaled(vec2<> screen_coord, image& img, f32 scale) {
   // Construct the scaled image
   //
 
+  auto& screen_pixels = draw_target.pColData;
+  auto img_pixels = img.m_u_pixels;
   auto scaled_img_pixels = get_scaled_image(img.id, scale);
-  // auto* scaled_img_pixels = (vec4<u8>*)arenas::temp.push(line_offset * u_target_height);
 
   if (!scaled_img_pixels) {
     scaled_img_pixels = create_scaled_image(img.id, scale, u_target_full_width * u_target_full_height * sizeof(olc::Pixel));
+    // auto* scaled_img_pixels = (vec4<u8>*)arenas::temp.push(line_offset * u_target_height);
 
     // scale the image
     u32 img_y, img_x;
@@ -366,6 +366,161 @@ void draw_bitmap_scaled(vec2<> screen_coord, image& img, f32 scale) {
       (void*)&scaled_img_pixels[(y+img_topleft_y)*u_target_full_width + img_topleft_x],
       line_offset
     );
+  }
+}
+
+void draw_bitmap_rs(vec2<> screen_coord, image& img, f32 scale, f32 rotation) {
+  u32 image_width  = (u32)img.m_width;
+  u32 image_height = (u32)img.m_height;
+
+  // the 'target' is the rect in the img we're drawing
+  f32 f_target_width  = lapse::round(static_cast<f32>(image_width)  * scale);
+  f32 f_target_height = lapse::round(static_cast<f32>(image_height) * scale);
+
+  // record original target size before we clip it
+  u32 u_target_full_width  = static_cast<u32>(f_target_width );
+  u32 u_target_full_height = static_cast<u32>(f_target_height);
+
+  screen_coord *= scale;
+
+  screen_coord.x = lapse::round(screen_coord.x);
+  screen_coord.y = lapse::round(screen_coord.y);
+
+  vec2<> f_target_pos_offset;
+
+  // fetch draw target info (note the two levels of indirection here)
+  auto& draw_target   = *app->pDrawTarget;
+  auto screen_width   = draw_target.width ; // screen width  in pixels
+  auto screen_height  = draw_target.height; // screen height in pixels
+
+  if (
+    screen_coord.x >= screen_width || screen_coord.y >= screen_height
+    ||
+    screen_coord.x + f_target_width < 0 || screen_coord.y + f_target_height < 0
+    // ||
+    // screen_coord.x < 0 || screen_coord.y < 0
+  ) {
+    return;
+  }
+
+  {
+    // clip target into screen size
+
+    // clip target position inside window
+    f_target_pos_offset.x = lapse::max(-screen_coord.x, 0.0f);
+    f_target_pos_offset.y = lapse::max(-screen_coord.y, 0.0f);
+
+    // clip target size to window topleft edge
+    f_target_width  -= f_target_pos_offset.x;
+    f_target_height -= f_target_pos_offset.y;
+
+    // clip size inside window bottom right edge
+    f_target_width  = lapse::min(f_target_width , static_cast<f32>(screen_width)  - screen_coord.x - 1.0f);
+    f_target_height = lapse::min(f_target_height, static_cast<f32>(screen_height) - screen_coord.y - 1.0f);
+  }
+
+  //
+  // convert to integers for memcpy()
+  //
+
+  i32 screen_x = static_cast<i32>(screen_coord.x + f_target_pos_offset.x);
+  i32 screen_y = static_cast<i32>(screen_coord.y + f_target_pos_offset.y);
+
+  u32 u_target_width  = (u32)lapse::round(f_target_width );
+  u32 u_target_height = (u32)lapse::round(f_target_height);
+
+  u32 u_screen_x = (u32)screen_x;
+  u32 u_screen_y = (u32)screen_y;
+
+  {
+    assert(screen_x >= 0 && u_screen_x + u_target_width  < u32(screen_width) );
+    assert(screen_y >= 0 && u_screen_y + u_target_height < u32(screen_height));
+    assert(sizeof(olc::Pixel) == sizeof(vec4<u8>));
+  }
+
+  // this is the size in bytes of one line of the image target
+  auto line_offset = u_target_width*sizeof(olc::Pixel);
+  // TODO I think this is actually called "pitch" ... or maybe "stride" ?
+
+  //
+  // Construct the scaled image
+  //
+
+  auto& screen_pixels = draw_target.pColData;
+  auto img_pixels = img.m_u_pixels;
+  // auto scaled_img_pixels = get_scaled_image(img.id, scale);
+
+  // if (!scaled_img_pixels) {
+    // scaled_img_pixels = create_scaled_image(img.id, scale, u_target_full_width * u_target_full_height * sizeof(olc::Pixel));
+    auto scaled_img_pixels = (vec4<u8>*)arenas::temp.push(u_target_full_width * u_target_full_height * sizeof(olc::Pixel));
+
+    // scale the image
+    u32 img_y, img_x;
+    for (u32 y = 0; y < u_target_full_height; y++) {
+      img_y = static_cast<u32>(lapse::floor_f_positive(f32(y) / scale));
+      for (u32 x = 0; x < u_target_full_width; x++) {
+        img_x = static_cast<u32>(lapse::floor_f_positive(f32(x) / scale));
+        scaled_img_pixels[y * u_target_full_width + x] = img_pixels[img_y*image_width + img_x];
+      }
+    }
+  // }
+
+  //
+  // Render image onto screen draw target
+  //
+
+  // need to know where in the image we start drawing from if it was clipped
+  u32 img_topleft_x = static_cast<u32>(f_target_pos_offset.x);
+  u32 img_topleft_y = static_cast<u32>(f_target_pos_offset.y);
+
+  for (u32 y = 0; y < u_target_height; y++) {
+    memcpy(
+      (void*)&screen_pixels[(u_screen_y+y) * u32(screen_width) + u_screen_x],
+      (void*)&scaled_img_pixels[(y+img_topleft_y)*u_target_full_width + img_topleft_x],
+      line_offset
+    );
+  }
+}
+
+void draw_bitmap_rotated(vec2<> screen_coord, image& img, f32 rotation) {
+  vec2 img_size = vec2<>{f32(img.m_width), f32(img.m_height)};
+
+  vec2<> current_coord{screen_coord};
+  vec2<> end_coord = screen_coord + img_size;
+
+  u32 image_width = (u32)img_size.x;
+
+  u32 image_x = 0;
+  u32 image_y = 0;
+
+  auto& draw_target   = *app->pDrawTarget;
+  auto& screen_pixels = draw_target.pColData;
+  auto screen_width   = draw_target.width ; // screen width  in pixels
+  auto screen_height  = draw_target.height; // screen height in pixels
+  auto screen_size    = vec2<>{f32(screen_width), f32(screen_height)};
+
+  if (
+    screen_coord.less_than_or(0.0f) || screen_coord.greater_than_or(screen_size)
+    ||
+    end_coord.less_than_or(0.0f) || end_coord.greater_than_or(screen_size)
+  ) {
+    return;
+  }
+
+  while (current_coord.y < end_coord.y) {
+    while(current_coord.x < end_coord.x) {
+      auto our_color = img.m_u_pixels[image_y*image_width + image_x];
+      olc::Pixel their_color = {our_color.x, our_color.y, our_color.z, our_color.w};
+      screen_pixels[u32(current_coord.y) * u32(screen_width) + u32(current_coord.x)] = their_color;
+
+      image_x++;
+      current_coord.x++;
+    }
+    current_coord.x = screen_coord.x;
+    image_x = 0;
+
+    image_y++;
+    current_coord.y++;
   }
 }
 
@@ -421,7 +576,6 @@ vec4<u8>* get_scaled_image(uid img_id, f32 scale) {
     arena_scale = scale;
 
     // initialize image cache table
-    
     arenas::image_cache.push_zeroes(maximum_possible_images * sizeof(ImageCacheRecord));
   } else {
     // try to get scaled image from cache
@@ -438,7 +592,7 @@ vec4<u8>* get_scaled_image(uid img_id, f32 scale) {
     }
     output_img = record->scaled_pixels;
   }
-  
+
   return output_img;
 }
 

@@ -42,7 +42,12 @@ void draw_rect(lapse::rect<> box, lapse::vec3<> color = {0.0f, 0.0f, 0.0f});
 void fill_rect(lapse::rect<> box, lapse::vec3<> color = {0.0f, 0.0f, 0.0f});
 
 void draw_bitmap(lapse::vec2<> screen_coord, image& img);
+// draw bitmap, and scale it
 void draw_bitmap_scaled(lapse::vec2<> screen_coord, image& img, lapse::f32 scale = 1.0f);
+// draw bitmap with rotation and scale
+void draw_bitmap_rs(lapse::vec2<> screen_coord, image& img, lapse::f32 scale, lapse::f32 rotation);
+// draw bitmap with rotation
+void draw_bitmap_rotated(lapse::vec2<> screen_coord, image& img, lapse::f32 rotation);
 
 void clear(lapse::vec3<> color);
 
