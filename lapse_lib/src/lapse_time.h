@@ -4,6 +4,7 @@
 
 namespace lapse{
 
+// returns the current timestamp in seconds
 f64 get_timestamp();
 
 }

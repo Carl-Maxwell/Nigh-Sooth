@@ -627,12 +627,17 @@ bool is_mouse_left_button_hit() {
   return app->GetMouse(olc::Mouse::LEFT).bPressed;
 }
 
+// returns true every frame while left mouse button is down
+bool is_mouse_left_button_down() {
+  return app->GetMouse(olc::Mouse::LEFT).bHeld;
+}
+
 // returns true if mouse hit event happened this frame
 bool is_mouse_right_button_hit() {
   return app->GetMouse(olc::Mouse::RIGHT).bPressed;
 }
 
-// returns true if mouse hit event happened this frame
+// returns true each frame while button is held down
 bool is_mouse_middle_button_down() {
   return app->GetMouse(olc::Mouse::MIDDLE).bHeld;
 }

@@ -82,16 +82,20 @@ void Run::main_loop(f32 delta) {
     auto rotation = sin(123);
     platform::draw_bitmap_rotated(bullets[i][0], session.image_array[2], rotation);
     // platform::draw_bitmap_rs(bullets[i][0], session.image_array[2], game_zoom, rotation);
-    bullets[i][0] += bullets[i][1] * delta;
+    bullets[i][0] += bullets[i][1] * tile_size/2 * delta;
+    // TODO add player velocity onto bullet velocity
   }
 
   //
   // Player input
   //
 
+  static auto last_bullet_fired = lapse::get_timestamp();
+
   // fire bullet if left mouse is hit
-  if (Mouse::left_mouse_hit()) {
+  if (Mouse::left_mouse_down() && get_timestamp() > last_bullet_fired + 0.2f) {
     bullets.push({run.player_position + target_reticle_pos, target_reticle_pos.normalize()});
+    last_bullet_fired = lapse::get_timestamp();
   }
 
   // open main menu if esc is hit

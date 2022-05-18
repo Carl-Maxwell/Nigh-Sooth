@@ -11,14 +11,15 @@ struct Mouse{
   lapse::vec2<lapse::i32> m_old_pos;
   lapse::vec2<lapse::i32> m_pos_delta;
 
-  
   static Mouse& the();
 
   // returns true if left mouse button hit event happened this frame
   static bool left_mouse_hit();
+  // returns true every frame while left mouse button is pressed
+  static bool left_mouse_down();
   // returns true if left mouse button hit event happened this frame
   static bool right_mouse_hit();
-  // returns true if middle mouse button is held down this frame
+  // returns true every frame while middle mouse button is pressed
   static bool middle_mouse_down();
   // returns the mouse position
   static lapse::vec2<> get_mouse_pos();

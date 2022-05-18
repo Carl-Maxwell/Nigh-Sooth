@@ -26,6 +26,10 @@ bool Mouse::left_mouse_hit() {
   return platform::is_mouse_left_button_hit();
 }
 
+bool Mouse::left_mouse_down() {
+  return platform::is_mouse_left_button_down();
+}
+
 bool Mouse::right_mouse_hit() {
   return platform::is_mouse_right_button_hit();
 }

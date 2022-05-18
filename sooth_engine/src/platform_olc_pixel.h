@@ -56,6 +56,7 @@ void clear(lapse::vec3<> color);
 //
 
 bool is_mouse_left_button_hit();
+bool is_mouse_left_button_down();
 bool is_mouse_right_button_hit();
 lapse::vec2<lapse::i32> get_mouse_pos();
 // get how much the mouse wheel was rolled this frame
