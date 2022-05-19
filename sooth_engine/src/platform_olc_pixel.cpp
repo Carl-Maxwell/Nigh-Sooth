@@ -488,7 +488,8 @@ void draw_bitmap_rotated(vec2<> screen_coord, image& img, f32 rotation) {
   vec2<> current_coord{screen_coord};
   vec2<> end_coord = screen_coord + img_size;
 
-  u32 image_width = (u32)img_size.x;
+  u32 image_width  = (u32)img_size.x;
+  u32 image_height = (u32)img_size.y;
 
   u32 image_x = 0;
   u32 image_y = 0;
@@ -509,9 +510,38 @@ void draw_bitmap_rotated(vec2<> screen_coord, image& img, f32 rotation) {
 
   while (current_coord.y < end_coord.y) {
     while(current_coord.x < end_coord.x) {
-      auto our_color = img.m_u_pixels[image_y*image_width + image_x];
-      olc::Pixel their_color = {our_color.x, our_color.y, our_color.z, our_color.w};
-      screen_pixels[u32(current_coord.y) * u32(screen_width) + u32(current_coord.x)] = their_color;
+      // rotated x & y within the image
+      u32 rot_image_x;
+      u32 rot_image_y;
+      {
+        // calculate rotated x & y
+        auto f_rot_image_x = static_cast<f32>(image_x) - img_size.x/2.0f;
+        auto f_rot_image_y = static_cast<f32>(image_y) - img_size.y/2.0f;
+
+        auto old_x = f_rot_image_x;
+        auto old_y = f_rot_image_y;
+
+        f_rot_image_y = cos(rotation) * old_y - sin(rotation) * old_x;
+        f_rot_image_x = cos(rotation) * old_x + sin(rotation) * old_y;
+
+        f_rot_image_x += img_size.x/2.0f;
+        f_rot_image_y += img_size.y/2.0f;
+
+        rot_image_x = u32(f_rot_image_x < 0 ? image_width  + f_rot_image_x : f_rot_image_x);
+        rot_image_y = u32(f_rot_image_y < 0 ? image_height + f_rot_image_y : f_rot_image_y);
+
+        rot_image_x = rot_image_x >= image_width  ? rot_image_x - image_width  : rot_image_x;
+        rot_image_y = rot_image_y >= image_height ? rot_image_y - image_height : rot_image_y;
+      }
+
+      if (
+        rot_image_x > 0 && rot_image_x < image_width &&
+        rot_image_y > 0 && rot_image_y < image_height
+      ) {
+        auto our_color = img.m_u_pixels[rot_image_y*image_width + rot_image_x];
+        olc::Pixel their_color = {our_color.x, our_color.y, our_color.z, our_color.w};
+        screen_pixels[u32(current_coord.y) * u32(screen_width) + u32(current_coord.x)] = their_color;
+      }
 
       image_x++;
       current_coord.x++;

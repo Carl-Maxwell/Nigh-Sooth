@@ -79,11 +79,18 @@ void Run::main_loop(f32 delta) {
   platform::draw_bitmap_scaled(run.player_position + target_reticle_pos, session.image_array[1], game_zoom);
 
   for (auto i = 0; i < bullets.length(); i++) {
-    auto rotation = sin(123);
+    auto& bullet_dir = bullets[i][1];
+    auto rotation = atan2(bullet_dir.y, bullet_dir.x);
     platform::draw_bitmap_rotated(bullets[i][0], session.image_array[2], rotation);
+    // std::cout << "// rotation:" << rotation << "\n";
     // platform::draw_bitmap_rs(bullets[i][0], session.image_array[2], game_zoom, rotation);
-    bullets[i][0] += bullets[i][1] * tile_size/2 * delta;
-    // TODO add player velocity onto bullet velocity
+    bullets[i][0] += bullet_dir * tile_size/2 * delta;
+    if (
+      bullets[i][0].greater_than_or(platform::get_window_size()) ||
+      bullets[i][0].less_than_or(0)
+      ) {
+        bullets.remove_at(i);
+      }
   }
 
   //
@@ -95,6 +102,7 @@ void Run::main_loop(f32 delta) {
   // fire bullet if left mouse is hit
   if (Mouse::left_mouse_down() && get_timestamp() > last_bullet_fired + 0.2f) {
     bullets.push({run.player_position + target_reticle_pos, target_reticle_pos.normalize()});
+    // TODO add player velocity onto bullet velocity
     last_bullet_fired = lapse::get_timestamp();
   }
 
@@ -113,16 +121,16 @@ void Run::main_loop(f32 delta) {
 
   // wasd player movement
   if (key(keycode::d).is_down()) {
-    run.player_position.x += 64.0f * delta;
+    run.player_position.x += tile_size *4 * delta;
   }
   if (key(keycode::s).is_down()) {
-    run.player_position.y += 64.0f * delta;
+    run.player_position.y += tile_size *4 * delta;
   }
   if (key(keycode::a).is_down()) {
-    run.player_position.x -= 64.0f * delta;
+    run.player_position.x -= tile_size *4 * delta;
   }
   if (key(keycode::w).is_down()) {
-    run.player_position.y -= 64.0f * delta;
+    run.player_position.y -= tile_size *4 * delta;
   }
 
   //
