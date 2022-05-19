@@ -513,9 +513,13 @@ void draw_bitmap_rotated(vec2<> screen_coord, image& img, f32 rotation) {
       // rotated x & y within the image coords
       u32 rot_image_x;
       u32 rot_image_y;
+
       // rotated x & y within screen coords
       u32 rot_screen_x;
       u32 rot_screen_y;
+      // rotated x & y within screen coords as floats
+      f32 f_rot_screen_x;
+      f32 f_rot_screen_y;
       {
         // calculate rotated x & y
         auto f_rot_image_x = static_cast<f32>(image_x) - img_size.x/2.0f;
@@ -566,6 +570,9 @@ void draw_bitmap_rotated(vec2<> screen_coord, image& img, f32 rotation) {
         f_rot_x += screen_coord.x + img_size.x/2.0f;
         f_rot_y += screen_coord.y + img_size.y/2.0f;
 
+        f_rot_screen_x = f_rot_x;
+        f_rot_screen_y = f_rot_y;
+
         rot_screen_x = u32(f_rot_x);
         rot_screen_y = u32(f_rot_y);
       }
@@ -584,6 +591,33 @@ void draw_bitmap_rotated(vec2<> screen_coord, image& img, f32 rotation) {
         olc::Pixel their_color = {our_color.x, our_color.y, our_color.z, our_color.w};
         // olc::Pixel their_color = {(u8)rot_image_x, (u8)rot_image_y, 0, our_color.w}; // this'll show the coordinates
         screen_pixels[rot_screen_y * u32(screen_width) + rot_screen_x] = their_color;
+
+        if (
+          f_rot_screen_x > 1 && f_rot_screen_x < screen_width -2 &&
+          f_rot_screen_y > 1 && f_rot_screen_y < screen_height-2
+        ){
+          auto x_diff = f_rot_screen_x;
+          auto y_diff = f_rot_screen_y;
+
+          // fract()
+          x_diff -= static_cast<f32>(static_cast<i32>(x_diff));
+          y_diff -= static_cast<f32>(static_cast<i32>(y_diff));
+
+          x_diff = lapse::round(x_diff);
+          y_diff = lapse::round(y_diff);
+
+          olc::Pixel alarm_color = {255, 255, 0, our_color.w};
+
+          if (x_diff != 0.0f) {
+            screen_pixels[(rot_screen_y) * u32(screen_width) + (rot_screen_x+u32(x_diff))] = their_color;
+          }
+          if (y_diff != 0.0f) {
+            screen_pixels[(rot_screen_y+u32(y_diff)) * u32(screen_width) + rot_screen_x] = their_color;
+          }
+          if (x_diff != 0.0f && y_diff != 0.0f) {
+            screen_pixels[(rot_screen_y+u32(y_diff)) * u32(screen_width) + (rot_screen_x+u32(x_diff))] = their_color;
+          }
+        }
       } else {
         // __debugbreak();
       }
