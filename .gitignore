@@ -7,6 +7,7 @@ bin-intermediate/
 .vs/
 *.sln
 *.vcx*
+enc_temp_folder/
 
 # vscode
 .vscode/

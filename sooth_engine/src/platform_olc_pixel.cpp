@@ -510,9 +510,12 @@ void draw_bitmap_rotated(vec2<> screen_coord, image& img, f32 rotation) {
 
   while (current_coord.y < end_coord.y) {
     while(current_coord.x < end_coord.x) {
-      // rotated x & y within the image
+      // rotated x & y within the image coords
       u32 rot_image_x;
       u32 rot_image_y;
+      // rotated x & y within screen coords
+      u32 rot_screen_x;
+      u32 rot_screen_y;
       {
         // calculate rotated x & y
         auto f_rot_image_x = static_cast<f32>(image_x) - img_size.x/2.0f;
@@ -521,27 +524,68 @@ void draw_bitmap_rotated(vec2<> screen_coord, image& img, f32 rotation) {
         auto old_x = f_rot_image_x;
         auto old_y = f_rot_image_y;
 
-        f_rot_image_y = cos(rotation) * old_y - sin(rotation) * old_x;
         f_rot_image_x = cos(rotation) * old_x + sin(rotation) * old_y;
+        f_rot_image_y = cos(rotation) * old_y - sin(rotation) * old_x;
 
         f_rot_image_x += img_size.x/2.0f;
         f_rot_image_y += img_size.y/2.0f;
+
+        rot_image_x = static_cast<u32>(f_rot_image_x);
+        rot_image_y = static_cast<u32>(f_rot_image_y);
 
         rot_image_x = u32(f_rot_image_x < 0 ? image_width  + f_rot_image_x : f_rot_image_x);
         rot_image_y = u32(f_rot_image_y < 0 ? image_height + f_rot_image_y : f_rot_image_y);
 
         rot_image_x = rot_image_x >= image_width  ? rot_image_x - image_width  : rot_image_x;
         rot_image_y = rot_image_y >= image_height ? rot_image_y - image_height : rot_image_y;
+
+        // rot_screen_x = u32(current_coord.x + f_rot_image_x) - image_x;
+        // rot_screen_y = u32(current_coord.y + f_rot_image_y) - image_y;
       }
+
+      rot_image_x = image_x;
+      rot_image_y = image_y;
+
+      {
+        // rotate screen coords
+        
+        // we have to move the coords so that the center of the image is at 0,0
+        //   this makes it so the image rotates about its center
+        auto f_rot_x = current_coord.x - screen_coord.x - img_size.x/2.0f;
+        auto f_rot_y = current_coord.y - screen_coord.y - img_size.y/2.0f;
+
+        {
+          auto old_x = f_rot_x;
+          auto old_y = f_rot_y;
+
+          f_rot_x =  cos(rotation) * old_x + sin(rotation) * old_y;
+          f_rot_y = -cos(rotation) * old_y + sin(rotation) * old_x;
+        }
+
+        // translate coords back away from 0,0
+        f_rot_x += screen_coord.x + img_size.x/2.0f;
+        f_rot_y += screen_coord.y + img_size.y/2.0f;
+
+        rot_screen_x = u32(f_rot_x);
+        rot_screen_y = u32(f_rot_y);
+      }
+
+      // rot_screen_x = u32(current_coord.x);
+      // rot_screen_y = u32(current_coord.y);
 
       if (
         rot_image_x >= 0 && rot_image_x < image_width &&
         rot_image_y >= 0 && rot_image_y < image_height
+        &&
+        rot_screen_x >= 0 && rot_screen_x < screen_width &&
+        rot_screen_y >= 0 && rot_screen_y < screen_height
       ) {
         auto our_color = img.m_u_pixels[rot_image_y*image_width + rot_image_x];
         olc::Pixel their_color = {our_color.x, our_color.y, our_color.z, our_color.w};
         // olc::Pixel their_color = {(u8)rot_image_x, (u8)rot_image_y, 0, our_color.w}; // this'll show the coordinates
-        screen_pixels[u32(current_coord.y) * u32(screen_width) + u32(current_coord.x)] = their_color;
+        screen_pixels[rot_screen_y * u32(screen_width) + rot_screen_x] = their_color;
+      } else {
+        // __debugbreak();
       }
 
       image_x++;
