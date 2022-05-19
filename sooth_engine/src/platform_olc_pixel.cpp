@@ -535,11 +535,12 @@ void draw_bitmap_rotated(vec2<> screen_coord, image& img, f32 rotation) {
       }
 
       if (
-        rot_image_x > 0 && rot_image_x < image_width &&
-        rot_image_y > 0 && rot_image_y < image_height
+        rot_image_x >= 0 && rot_image_x < image_width &&
+        rot_image_y >= 0 && rot_image_y < image_height
       ) {
         auto our_color = img.m_u_pixels[rot_image_y*image_width + rot_image_x];
         olc::Pixel their_color = {our_color.x, our_color.y, our_color.z, our_color.w};
+        // olc::Pixel their_color = {(u8)rot_image_x, (u8)rot_image_y, 0, our_color.w}; // this'll show the coordinates
         screen_pixels[u32(current_coord.y) * u32(screen_width) + u32(current_coord.x)] = their_color;
       }
 
