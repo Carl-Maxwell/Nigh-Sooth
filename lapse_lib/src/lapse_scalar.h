@@ -316,6 +316,27 @@ struct vec4{
       default: __debugbreak(); "Error! Index out of bounds"; return *(f32*)nullptr;
     }
   };
+
+  vec4 operator+(vec4 right_value) {
+    vec4 temp = *this;
+
+    temp.x = x + right_value.x;
+    temp.y = y + right_value.y;
+    temp.z = z + right_value.z;
+    temp.w = w + right_value.w;
+
+    return temp;
+  }
+  vec4 operator/(f32 scalar) {
+    vec4 temp = *this;
+
+    temp.x = x / scalar;
+    temp.y = y / scalar;
+    temp.z = z / scalar;
+    temp.w = w / scalar;
+
+    return temp;
+  }
 };
 
 // TODO need vector math funcs
