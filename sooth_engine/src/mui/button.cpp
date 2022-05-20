@@ -30,8 +30,6 @@ bool button(lapse::str& label, params box) {
   mui::draw_text(label, text);
   context.close_element();
 
-  mui::draw_rect(text);
-
   if (context.is_hovering()) {
     // TODO highlight button or underline text or whatever
     mui::draw_rect(text);
