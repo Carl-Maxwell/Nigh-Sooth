@@ -4,6 +4,8 @@
 
 #include <iostream>
 
+#include "lapse_exceptions.h"
+
 namespace lapse{
 
 //-----------------------------------------------------------------------------
@@ -105,6 +107,7 @@ struct vec2{
   }
   // returns this vector normalized to a length of 1.0
   vec2 normalize() {
+    lapse::assert(length() != 0);
     return (*this)/length();
   }
   f32 dot(vec2 right_value) {

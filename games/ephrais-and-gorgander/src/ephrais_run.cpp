@@ -107,10 +107,11 @@ void Run::main_loop(f32 delta) {
   if (Mouse::left_mouse_down() && get_timestamp() > last_bullet_fired + 0.2f) {
     std::cout << player_velocity.length() << "\n";
     auto player_push = player_velocity.length() > 0 ? player_velocity.normalize().dot(reticle_offset.normalize()) : 0.0f;
-    std::cout << player_push << "\n";
+    std::cout << "player_push dot product: " << player_push << "\n";
+
     bullets.push({
       run.player_position + reticle_offset,
-      reticle_offset.normalize() * (tile_size/2) + (player_velocity * player_push)
+      reticle_offset.normalize() * (tile_size/2) // + (player_velocity * player_push)
     });
     // TODO add player velocity onto bullet velocity
     last_bullet_fired = lapse::get_timestamp();
@@ -125,7 +126,7 @@ void Run::main_loop(f32 delta) {
   // debug
   if (key(keycode::number_2).is_hit()) {
     auto window = platform::get_window_size();
-    auto pixel_siez = platform::get_pixel_size();
+    auto pixel_size = platform::get_pixel_size();
     __debugbreak();
   }
 
@@ -133,18 +134,20 @@ void Run::main_loop(f32 delta) {
 
   // wasd player movement
   if (key(keycode::d).is_down()) {
-    player_velocity.x += tile_size *4;
+    player_velocity.x += 1.0f;
   }
   if (key(keycode::s).is_down()) {
-    player_velocity.y += tile_size *4;
+    player_velocity.y += 1.0f;
   }
   if (key(keycode::a).is_down()) {
-    player_velocity.x -= tile_size *4;
+    player_velocity.x -= 1.0f;
   }
   if (key(keycode::w).is_down()) {
-    player_velocity.y -= tile_size *4;
+    player_velocity.y -= 1.0f;
   }
 
+  // have to normalize velocity after adding each input direction to avoid faster diagonal movement
+  player_velocity = player_velocity.length() ? player_velocity.normalize()*4*tile_size : player_velocity;
   run.player_position += player_velocity * delta;
 
   //
