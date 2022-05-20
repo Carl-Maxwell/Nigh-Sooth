@@ -59,7 +59,7 @@ bool image::load_image(str* a_path) {
       raw_pixels[m_bytes_per_pixel*i+0],
       raw_pixels[m_bytes_per_pixel*i+1],
       raw_pixels[m_bytes_per_pixel*i+2],
-      255
+      m_bytes_per_pixel == 4 ? raw_pixels[m_bytes_per_pixel*i+3] : (u8)255
     };
   }
 

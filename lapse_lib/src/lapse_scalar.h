@@ -107,6 +107,9 @@ struct vec2{
   vec2 normalize() {
     return (*this)/length();
   }
+  f32 dot(vec2 right_value) {
+    return x*right_value.x + y*right_value.y;
+  }
 
   // vector vector operations
   vec2 operator+(vec2 right_value) {
@@ -226,6 +229,15 @@ struct vec2{
 
     temp.x += scalar;
     temp.y += scalar;
+
+    return temp;
+    // TODO check for lifetime issues
+  }
+  vec2 operator-(f32 scalar) {
+    vec2 temp = *this;
+
+    temp.x -= scalar;
+    temp.y -= scalar;
 
     return temp;
     // TODO check for lifetime issues

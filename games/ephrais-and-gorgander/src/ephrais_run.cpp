@@ -13,9 +13,11 @@ namespace ephrais{
 // TODO is there any point to having namespaces like ephrais and minesweeper?
 
 bool Run::start_main_loop() {
-  auto pixel_size = 4;
+  auto pixel_size = 8;
 
   // TODO fetch the actual monitor resolution from platform
+
+  // next_window_size /= pixel_size;
 
   vec2<i32> monitor_resolution = {1920, 1080};
   monitor_resolution = (monitor_resolution/10)*9;
@@ -72,11 +74,12 @@ void Run::main_loop(f32 delta) {
   static array<fixed_array<vec2<>>> bullets;
   if (!bullets.m_size) { bullets.reserve(100); }
 
-  vec2<> target_reticle_pos = (mouse_pos - run.player_position).normalize()*32;
+  vec2<> reticle_offset = (mouse_pos - run.player_position - (tile_size/2)).normalize()*tile_size;
 
   // screen_pos += panning_offset;
   platform::draw_bitmap_scaled(run.player_position, session.image_array[0], game_zoom);
-  platform::draw_bitmap_scaled(run.player_position + target_reticle_pos, session.image_array[1], game_zoom);
+  auto reticle_rotation = atan2(reticle_offset.y, reticle_offset.x);
+  platform::draw_bitmap_rotated(run.player_position + reticle_offset, session.image_array[1], reticle_rotation);
 
   for (auto i = 0; i < bullets.length(); i++) {
     auto& bullet_dir = bullets[i][1];
@@ -84,7 +87,7 @@ void Run::main_loop(f32 delta) {
     platform::draw_bitmap_rotated(bullets[i][0], session.image_array[2], rotation);
     // std::cout << "// rotation:" << rotation << "\n";
     // platform::draw_bitmap_rs(bullets[i][0], session.image_array[2], game_zoom, rotation);
-    bullets[i][0] += bullet_dir * tile_size/2 * delta;
+    bullets[i][0] += bullet_dir * delta;
     if (
       bullets[i][0].greater_than_or(platform::get_window_size()) ||
       bullets[i][0].less_than_or(0)
@@ -98,10 +101,17 @@ void Run::main_loop(f32 delta) {
   //
 
   static auto last_bullet_fired = lapse::get_timestamp();
+  static vec2<> player_velocity = {0, 0};
 
   // fire bullet if left mouse is hit
   if (Mouse::left_mouse_down() && get_timestamp() > last_bullet_fired + 0.2f) {
-    bullets.push({run.player_position + target_reticle_pos, target_reticle_pos.normalize()});
+    std::cout << player_velocity.length() << "\n";
+    auto player_push = player_velocity.length() > 0 ? player_velocity.normalize().dot(reticle_offset.normalize()) : 0.0f;
+    std::cout << player_push << "\n";
+    bullets.push({
+      run.player_position + reticle_offset,
+      reticle_offset.normalize() * (tile_size/2) + (player_velocity * player_push)
+    });
     // TODO add player velocity onto bullet velocity
     last_bullet_fired = lapse::get_timestamp();
   }
@@ -119,19 +129,23 @@ void Run::main_loop(f32 delta) {
     __debugbreak();
   }
 
+  player_velocity = {0, 0};
+
   // wasd player movement
   if (key(keycode::d).is_down()) {
-    run.player_position.x += tile_size *4 * delta;
+    player_velocity.x += tile_size *4;
   }
   if (key(keycode::s).is_down()) {
-    run.player_position.y += tile_size *4 * delta;
+    player_velocity.y += tile_size *4;
   }
   if (key(keycode::a).is_down()) {
-    run.player_position.x -= tile_size *4 * delta;
+    player_velocity.x -= tile_size *4;
   }
   if (key(keycode::w).is_down()) {
-    run.player_position.y -= tile_size *4 * delta;
+    player_velocity.y -= tile_size *4;
   }
+
+  run.player_position += player_velocity * delta;
 
   //
   // Zoom & Pan

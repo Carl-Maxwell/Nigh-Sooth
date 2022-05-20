@@ -486,6 +486,13 @@ olc::Pixel translate_color(vec4<u8> our_color) {
   return {our_color.x, our_color.y, our_color.z, our_color.w};
 }
 
+olc::Pixel& blend_pixels(olc::Pixel fg_color, olc::Pixel& bg_color) {
+  auto blend_factor = static_cast<f32>(fg_color.a)/255.0f;
+  fg_color *= blend_factor;
+  bg_color = fg_color + bg_color * (1.0f - blend_factor);
+  return bg_color;
+}
+
 void draw_bitmap_rotated(vec2<> screen_coord, image& img, f32 rotation) {
   vec2 img_size = vec2<>{f32(img.m_width), f32(img.m_height)};
 
@@ -590,6 +597,8 @@ void draw_bitmap_rotated(vec2<> screen_coord, image& img, f32 rotation) {
         &&
         rot_screen_x >= 0 && rot_screen_x < screen_width &&
         rot_screen_y >= 0 && rot_screen_y < screen_height
+        &&
+        img.m_u_pixels[rot_image_y*image_width + rot_image_x].a != 0
       ) {
         auto our_color = img.m_u_pixels[rot_image_y*image_width + rot_image_x];
         olc::Pixel their_color = {our_color.x, our_color.y, our_color.z, our_color.w};
@@ -619,7 +628,9 @@ void draw_bitmap_rotated(vec2<> screen_coord, image& img, f32 rotation) {
                 (img.m_u_pixels[rot_image_y*image_width + rot_image_x + u_x_diff]/2)
               )
             );
-            screen_pixels[(rot_screen_y) * u32(screen_width) + (rot_screen_x + u_x_diff)] = avg_color;
+            auto& screen_pixel = screen_pixels[(rot_screen_y) * u32(screen_width) + (rot_screen_x + u_x_diff)];
+            screen_pixel = blend_pixels(avg_color, screen_pixel);
+            // screen_pixels[(rot_screen_y) * u32(screen_width) + (rot_screen_x + u_x_diff)] = avg_color;
           }
           if (y_diff != 0.0f) {
             olc::Pixel avg_color = translate_color(
@@ -628,7 +639,8 @@ void draw_bitmap_rotated(vec2<> screen_coord, image& img, f32 rotation) {
                 (img.m_u_pixels[(rot_image_y + u_y_diff)*image_width + rot_image_x]/2)
               )
             );
-            screen_pixels[(rot_screen_y + u_y_diff) * u32(screen_width) + rot_screen_x] = avg_color;
+            auto& screen_pixel = screen_pixels[(rot_screen_y + u_y_diff) * u32(screen_width) + rot_screen_x];
+            screen_pixel = blend_pixels(avg_color, screen_pixel);
           }
           if (x_diff != 0.0f && y_diff != 0.0f) {
             olc::Pixel avg_color = translate_color(
@@ -637,7 +649,8 @@ void draw_bitmap_rotated(vec2<> screen_coord, image& img, f32 rotation) {
                 (img.m_u_pixels[(rot_image_y + u_y_diff)*image_width + rot_image_x + u_x_diff]/2)
               )
             );
-            screen_pixels[(rot_screen_y + u_y_diff) * u32(screen_width) + rot_screen_x + u_x_diff] = avg_color;
+            auto& screen_pixel = screen_pixels[(rot_screen_y + u_y_diff) * u32(screen_width) + rot_screen_x + u_x_diff];
+            screen_pixel = blend_pixels(avg_color, screen_pixel);
           }
         }
       } else {
