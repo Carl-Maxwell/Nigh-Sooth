@@ -342,6 +342,17 @@ struct vec4{
 
     return temp;
   }
+  vec4 operator*(f32 scalar) {
+    vec4 temp = *this;
+
+    temp.x *= scalar;
+    temp.y *= scalar;
+    temp.z *= scalar;
+    temp.w *= scalar;
+
+    return temp;
+    // TODO check for lifetime issues
+  }
   vec4 operator/(f32 scalar) {
     vec4 temp = *this;
 

@@ -605,6 +605,9 @@ void draw_bitmap_rotated(vec2<> screen_coord, image& img, f32 rotation) {
         // olc::Pixel their_color = {(u8)rot_image_x, (u8)rot_image_y, 0, our_color.w}; // this'll show the coordinates
         screen_pixels[rot_screen_y * u32(screen_width) + rot_screen_x] = their_color;
 
+        //
+        // try to fix "missing pixels"
+        //
         if (
           f_rot_screen_x > 1 && f_rot_screen_x < screen_width -2 &&
           f_rot_screen_y > 1 && f_rot_screen_y < screen_height-2
@@ -616,6 +619,9 @@ void draw_bitmap_rotated(vec2<> screen_coord, image& img, f32 rotation) {
           x_diff -= static_cast<f32>(static_cast<i32>(x_diff));
           y_diff -= static_cast<f32>(static_cast<i32>(y_diff));
 
+          auto abs_x_diff = lapse::abs(x_diff);
+          auto abs_y_diff = lapse::abs(y_diff);
+
           u32 u_x_diff = static_cast<u32>(lapse::round(x_diff));
           u32 u_y_diff = static_cast<u32>(lapse::round(y_diff));
 
@@ -624,8 +630,8 @@ void draw_bitmap_rotated(vec2<> screen_coord, image& img, f32 rotation) {
           if (x_diff != 0.0f) {
             olc::Pixel avg_color = translate_color(
               (
-                (img.m_u_pixels[rot_image_y*image_width + rot_image_x]/2) +
-                (img.m_u_pixels[rot_image_y*image_width + rot_image_x + u_x_diff]/2)
+                (img.m_u_pixels[rot_image_y*image_width + rot_image_x] * (1.0f-abs_y_diff)) +
+                (img.m_u_pixels[rot_image_y*image_width + rot_image_x + u_x_diff] * abs_y_diff)
               )
             );
             auto& screen_pixel = screen_pixels[(rot_screen_y) * u32(screen_width) + (rot_screen_x + u_x_diff)];
@@ -635,18 +641,19 @@ void draw_bitmap_rotated(vec2<> screen_coord, image& img, f32 rotation) {
           if (y_diff != 0.0f) {
             olc::Pixel avg_color = translate_color(
               (
-                (img.m_u_pixels[rot_image_y*image_width + rot_image_x]/2) +
-                (img.m_u_pixels[(rot_image_y + u_y_diff)*image_width + rot_image_x]/2)
+                (img.m_u_pixels[rot_image_y*image_width + rot_image_x] * (1.0f-abs_x_diff)) +
+                (img.m_u_pixels[(rot_image_y + u_y_diff)*image_width + rot_image_x] * abs_x_diff)
               )
             );
             auto& screen_pixel = screen_pixels[(rot_screen_y + u_y_diff) * u32(screen_width) + rot_screen_x];
             screen_pixel = blend_pixels(avg_color, screen_pixel);
           }
           if (x_diff != 0.0f && y_diff != 0.0f) {
+            auto avg_abs_diff = (abs_x_diff + abs_y_diff)/2.0f;
             olc::Pixel avg_color = translate_color(
               (
-                (img.m_u_pixels[rot_image_y*image_width + rot_image_x]/2) +
-                (img.m_u_pixels[(rot_image_y + u_y_diff)*image_width + rot_image_x + u_x_diff]/2)
+                (img.m_u_pixels[rot_image_y*image_width + rot_image_x] * (1.0f-avg_abs_diff)) +
+                (img.m_u_pixels[(rot_image_y + u_y_diff)*image_width + rot_image_x + u_x_diff] * avg_abs_diff)
               )
             );
             auto& screen_pixel = screen_pixels[(rot_screen_y + u_y_diff) * u32(screen_width) + rot_screen_x + u_x_diff];
