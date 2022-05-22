@@ -93,6 +93,7 @@ void Run::main_loop(f32 delta) {
       bullets[i][0].less_than_or(0)
       ) {
         bullets.remove_at(i);
+        i--; // have to decrement to hit the next bullet (since length() just went down by 1)
       }
   }
 
