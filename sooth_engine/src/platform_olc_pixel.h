@@ -29,6 +29,7 @@ lapse::u32 get_window_height();
 // gets window resolution, after dividing it by pixel_size
 //   so you'd multiply this by pixel_size if you want the resolution in monitor pixels
 lapse::vec2<> get_window_size();
+lapse::rect<> get_window_rect();
 
 lapse::f32 get_window_padding();
 

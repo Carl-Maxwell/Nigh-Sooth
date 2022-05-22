@@ -41,6 +41,19 @@ f64 rand_float() {
   //   inclusive of the number 1
 }
 
+f32 rand_f32() {
+  return static_cast<f32>(rand_float());
+}
+
+f32 rand_f32(f32 max) {
+  return static_cast<f32>(rand_float()) * max;
+}
+
+f32 rand_f32(f32 min, f32 max) {
+  f32 length = max-min;
+  return f32(rand_f32() * length + min);
+}
+
 f64 rand_range(f64 min, f64 max) {
   f64 length = max-min;
   return f64(rand_float() * length + min);
@@ -59,7 +72,11 @@ u32 die(u32 n, u32 sides) {
 }
 
 vec2<> rand_vec2() {
-  return vec2<f32>{(f32)rand_float(), (f32)rand_float()};
+  return vec2<>{rand_f32(), rand_f32()};
+}
+
+vec2<> rand_vec2(vec2<> limits) {
+  return vec2<>{rand_f32(limits.x), rand_f32(limits.y)};
 }
 
 vec3<> rand_vec3() {

@@ -128,6 +128,13 @@ vec2<> get_window_size() {
   };
 }
 
+rect<> get_window_rect() {
+  return rect<> {
+    {0.0f, 0.0f},
+    get_window_size()
+  };
+}
+
 // convert our vec3<> colors to olc pixel vi2d u8 colors
 olc::Pixel vec3_to_color(vec3<> color) {
   return olc::Pixel{u8(color.r*255), u8(color.g*255), u8(color.b*255)};

@@ -4,6 +4,8 @@
 
 namespace lapse{
 
+extern f32 pi;
+
 // returns -1.0f or 1.0f whichever is nearer
 i32 sign(i32 a);
 u32 sign(u32 a);

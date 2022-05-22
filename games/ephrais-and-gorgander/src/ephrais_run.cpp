@@ -71,9 +71,6 @@ void Run::main_loop(f32 delta) {
     }
   }
 
-  static array<fixed_array<vec2<>>> bullets;
-  if (!bullets.m_size) { bullets.reserve(100); }
-
   vec2<> reticle_offset = (mouse_pos - run.player_position - (tile_size/2)).normalize()*tile_size;
 
   // screen_pos += panning_offset;
@@ -81,11 +78,111 @@ void Run::main_loop(f32 delta) {
   auto reticle_rotation = atan2(reticle_offset.y, reticle_offset.x);
   platform::draw_bitmap_rotated(run.player_position + reticle_offset, session.image_array[1], reticle_rotation);
 
+  //
+  // draw enemies
+  //
+
+  struct EnemyTransform{
+    vec2<> m_pos;
+    f32 m_rotation;
+  };
+  struct EnemySprite{
+    f32 m_scale;
+    i32 m_sprite_index;
+
+    image& sprite() {
+      auto& session = Session::the();
+      return session.image_array[m_sprite_index];
+    }
+    rect<> box() {
+      auto& l_sprite = sprite();
+      return {{0, 0}, {l_sprite.m_width*m_scale, l_sprite.m_height*m_scale}};
+    }
+  };
+
+  static array<EnemyTransform> enemy_transforms;
+  static array<EnemySprite>    enemy_sprites;
+  static array<vec2<>>         enemy_velocities;
+  static array<vec2<>>         enemy_target_pos;
+
+  if (!enemy_transforms.m_size) { enemy_transforms.reserve(100); }
+  if (!enemy_sprites.m_size)    { enemy_sprites   .reserve(100); }
+  if (!enemy_velocities.m_size) { enemy_velocities.reserve(100);}
+  if (!enemy_target_pos.m_size) { enemy_target_pos.reserve(100); }
+
+  if (enemy_transforms.length() == 0) {
+    auto spawn_count = die(3, 6);
+    for (decltype(spawn_count) i = 0; i < spawn_count; i++) {
+      enemy_transforms.push( {
+        rand_vec2(platform::get_window_size()),
+        rand_f32(pi * 2.0f)
+      } );
+      enemy_sprites.push( {
+        1.0f,
+        4
+      } );
+      enemy_velocities.push( { 
+        rand_vec2()
+      } );
+    }
+  }
+
+  // draw enemies
+  for (auto i = 0; i < enemy_transforms.length(); i++) {
+    auto& position = enemy_transforms[i].m_pos;
+    auto& image = enemy_sprites[i].sprite();
+    platform::draw_bitmap_scaled(position, image, game_zoom);
+  }
+
+  // update enemy postion & velocity
+  for (auto i = 0; i < enemy_transforms.length(); i++) {
+    auto& position   = enemy_transforms[i].m_pos;
+    auto& velocity   = enemy_velocities[i];
+    auto& target_pos = enemy_target_pos[i];
+
+    // update target position
+    auto distance = (target_pos - position).length();
+    if (distance < tile_size) {
+      target_pos = {0, 0};
+      auto relative_position = position - run.player_position;
+      while (
+        target_pos.length() < 5.0f || target_pos.length() > 6.0f
+      ) {
+        target_pos = rand_vec2() * 10.0f;
+        target_pos = target_pos * vec2<>{
+          sign(rand_f32(-1.0f, 1.0f)),
+          sign(rand_f32(-1.0f, 1.0f))
+        };
+      }
+      std::cout << "target_pos: "; target_pos.std_cout();
+
+      target_pos *= tile_size;
+      target_pos += run.player_position;
+    }
+
+    if (
+      platform::get_window_rect().is_point_inside(target_pos) &&
+      platform::get_window_rect().is_point_inside(position)
+    ) {
+      platform::draw_line(position, target_pos);
+    }
+
+    // update position
+    velocity = (target_pos - position).normalize() * tile_size * 10;
+    position += velocity * delta;
+  }
+
+  //
+  // draw bullets
+  //
+
+  static array<fixed_array<vec2<>>> bullets;
+  if (!bullets.m_size) { bullets.reserve(100); }
+
   for (auto i = 0; i < bullets.length(); i++) {
     auto& bullet_dir = bullets[i][1];
     auto rotation = atan2(bullet_dir.y, bullet_dir.x);
     platform::draw_bitmap_rotated(bullets[i][0], session.image_array[2], rotation);
-    // std::cout << "// rotation:" << rotation << "\n";
     // platform::draw_bitmap_rs(bullets[i][0], session.image_array[2], game_zoom, rotation);
     bullets[i][0] += bullet_dir * delta;
     if (

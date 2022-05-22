@@ -115,6 +115,7 @@ void Session::initialize_game_session() {
     "resources/images/reticle_001.png",
     "resources/images/bullet_001.png",
     "resources/images/ground_001.png",
+    "resources/images/enemy_sprite_001.png",
     ""
   };
 

@@ -7,6 +7,8 @@
 
 namespace lapse{
 
+f32 pi = 3.14159265359;
+
 // return -1 or 1
 i32 sign(i32 a) {
   return i32(reinterpret_cast<u32&>(a) >> 31)*-2 + 1;
