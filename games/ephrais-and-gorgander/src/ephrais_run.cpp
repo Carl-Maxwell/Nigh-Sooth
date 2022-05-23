@@ -79,7 +79,7 @@ void Run::main_loop(f32 delta) {
   platform::draw_bitmap_rotated(run.player_position + reticle_offset, session.image_array[1], reticle_rotation);
 
   //
-  // draw enemies
+  // Draw enemies
   //
 
   struct EnemyTransform{
@@ -107,7 +107,7 @@ void Run::main_loop(f32 delta) {
 
   if (!enemy_transforms.m_size) { enemy_transforms.reserve(100); }
   if (!enemy_sprites.m_size)    { enemy_sprites   .reserve(100); }
-  if (!enemy_velocities.m_size) { enemy_velocities.reserve(100);}
+  if (!enemy_velocities.m_size) { enemy_velocities.reserve(100); }
   if (!enemy_target_pos.m_size) { enemy_target_pos.reserve(100); }
 
   if (enemy_transforms.length() == 0) {
@@ -121,43 +121,34 @@ void Run::main_loop(f32 delta) {
         1.0f,
         4
       } );
-      enemy_velocities.push( { 
+      enemy_velocities.push( {
         rand_vec2()
       } );
     }
   }
 
-  // draw enemies
+  // Draw enemies
   for (auto i = 0; i < enemy_transforms.length(); i++) {
     auto& position = enemy_transforms[i].m_pos;
     auto& image = enemy_sprites[i].sprite();
     platform::draw_bitmap_scaled(position, image, game_zoom);
   }
 
-  // update enemy postion & velocity
+  // Update enemy postion & velocity
   for (auto i = 0; i < enemy_transforms.length(); i++) {
     auto& position   = enemy_transforms[i].m_pos;
     auto& velocity   = enemy_velocities[i];
     auto& target_pos = enemy_target_pos[i];
 
-    // update target position
+    // Update target position
     auto distance = (target_pos - position).length();
     if (distance < tile_size) {
-      target_pos = {0, 0};
-      auto relative_position = position - run.player_position;
-      while (
-        target_pos.length() < 5.0f || target_pos.length() > 6.0f
-      ) {
-        target_pos = rand_vec2() * 10.0f;
-        target_pos = target_pos * vec2<>{
-          sign(rand_f32(-1.0f, 1.0f)),
-          sign(rand_f32(-1.0f, 1.0f))
-        };
+      target_pos = (run.player_position - position).normalize() * 5 + position;
+      if ((target_pos - run.player_position).length() < 10.0f * tile_size) {
+        target_pos = (position - run.player_position).normalize() * 7.0f * tile_size;
+        target_pos += run.player_position;
+        target_pos += (rand_vec2() - 0.5f) * 2.0f * 3.0f * tile_size;
       }
-      std::cout << "target_pos: "; target_pos.std_cout();
-
-      target_pos *= tile_size;
-      target_pos += run.player_position;
     }
 
     if (
@@ -167,13 +158,13 @@ void Run::main_loop(f32 delta) {
       platform::draw_line(position, target_pos);
     }
 
-    // update position
+    // Update position
     velocity = (target_pos - position).normalize() * tile_size * 10;
     position += velocity * delta;
   }
 
   //
-  // draw bullets
+  // Draw bullets
   //
 
   static array<fixed_array<vec2<>>> bullets;
@@ -190,7 +181,7 @@ void Run::main_loop(f32 delta) {
       bullets[i][0].less_than_or(0)
       ) {
         bullets.remove_at(i);
-        i--; // have to decrement to hit the next bullet (since length() just went down by 1)
+        i--; // Have to decrement to hit the next bullet (since length() just went down by 1)
       }
   }
 
@@ -201,7 +192,7 @@ void Run::main_loop(f32 delta) {
   static auto last_bullet_fired = lapse::get_timestamp();
   static vec2<> player_velocity = {0, 0};
 
-  // fire bullet if left mouse is hit
+  // Fire bullet if left mouse is hit
   if (Mouse::left_mouse_down() && get_timestamp() > last_bullet_fired + 0.2f) {
     std::cout << player_velocity.length() << "\n";
     auto player_push = player_velocity.length() > 0 ? player_velocity.normalize().dot(reticle_offset.normalize()) : 0.0f;
@@ -215,7 +206,7 @@ void Run::main_loop(f32 delta) {
     last_bullet_fired = lapse::get_timestamp();
   }
 
-  // open main menu if esc is hit
+  // Open main menu if esc is hit
   if (key(keycode::escape).is_hit()) {
     session.m_should_end_run = false;
     session.change_phase(SessionState::main_menu);
@@ -244,7 +235,7 @@ void Run::main_loop(f32 delta) {
     player_velocity.y -= 1.0f;
   }
 
-  // have to normalize velocity after adding each input direction to avoid faster diagonal movement
+  // Have to normalize velocity after adding each input direction to avoid faster diagonal movement
   player_velocity = player_velocity.length() ? player_velocity.normalize()*4*tile_size : player_velocity;
   run.player_position += player_velocity * delta;
 
@@ -256,16 +247,16 @@ void Run::main_loop(f32 delta) {
 
   }
 
-  // panning the view by moving the mouse
+  // Panning the view by moving the mouse
   if (key(keycode::space_bar).is_down() || Mouse::middle_mouse_down()) {
     panning_offset -= Mouse::get_mouse_delta()/game_zoom;
   }
 
-  // empty out temp arena
+  // Empty out temp arena
   arenas::temp.clear();
 }
 
-// called each time we need to setup a new map to play
+// Called each time we need to setup a new map to play
 void Run::initialize_run(NextMapSettings next_map) {
 
 }
