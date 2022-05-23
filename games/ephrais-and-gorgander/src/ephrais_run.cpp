@@ -79,7 +79,7 @@ void Run::main_loop(f32 delta) {
   platform::draw_bitmap_rotated(run.player_position + reticle_offset, session.image_array[1], reticle_rotation);
 
   //
-  // Draw enemies
+  // Enemies
   //
 
   struct EnemyTransform{
@@ -98,17 +98,22 @@ void Run::main_loop(f32 delta) {
       auto& l_sprite = sprite();
       return {{0, 0}, {l_sprite.m_width*m_scale, l_sprite.m_height*m_scale}};
     }
+    vec2<> size() {
+      return sprite().m_resolution * m_scale;
+    }
   };
 
   static array<EnemyTransform> enemy_transforms;
   static array<EnemySprite>    enemy_sprites;
   static array<vec2<>>         enemy_velocities;
   static array<vec2<>>         enemy_target_pos;
+  static array<f32>            enemy_hp; 
 
   if (!enemy_transforms.m_size) { enemy_transforms.reserve(100); }
   if (!enemy_sprites.m_size)    { enemy_sprites   .reserve(100); }
   if (!enemy_velocities.m_size) { enemy_velocities.reserve(100); }
   if (!enemy_target_pos.m_size) { enemy_target_pos.reserve(100); }
+  if (!enemy_hp.m_size)         { enemy_hp        .reserve(100); }
 
   if (enemy_transforms.length() == 0) {
     auto spawn_count = die(3, 6);
@@ -124,6 +129,10 @@ void Run::main_loop(f32 delta) {
       enemy_velocities.push( {
         rand_vec2()
       } );
+      enemy_target_pos.push( {
+        0, 0
+      } );
+      enemy_hp.push( { 3 } );
     }
   }
 
@@ -151,6 +160,7 @@ void Run::main_loop(f32 delta) {
       }
     }
 
+    // draw target position (for debug purposes)
     if (
       platform::get_window_rect().is_point_inside(target_pos) &&
       platform::get_window_rect().is_point_inside(position)
@@ -183,6 +193,35 @@ void Run::main_loop(f32 delta) {
         bullets.remove_at(i);
         i--; // Have to decrement to hit the next bullet (since length() just went down by 1)
       }
+  }
+
+  // Check for collisions between bullets and enemies
+  for (u32 i = 0; i < bullets.length(); i++) {
+    auto bullet_rect = rect<>{bullets[i][0], session.image_array[2].m_resolution};
+    auto bullet_collided = false;
+    for (u32 e_i = 0; e_i < enemy_hp.length(); e_i++) {
+      auto enemy_top_left     = enemy_transforms[e_i].m_pos;
+      auto enemy_bottom_right = enemy_sprites[e_i].sprite().m_resolution + enemy_top_left;
+      if (
+        bullet_rect.is_point_inside(enemy_top_left) ||
+        bullet_rect.is_point_inside(enemy_bottom_right)
+      ) {
+        // Delete one enemy ...
+        enemy_transforms.remove_at(e_i);
+        enemy_sprites   .remove_at(e_i);
+        enemy_velocities.remove_at(e_i);
+        enemy_target_pos.remove_at(e_i);
+        enemy_hp        .remove_at(e_i);
+        
+        // And mark this bullet for deletion ...
+        bullet_collided = true;
+      }
+    }
+
+    if (bullet_collided) {
+      bullets.remove_at(i);
+      i--;
+    }
   }
 
   //
