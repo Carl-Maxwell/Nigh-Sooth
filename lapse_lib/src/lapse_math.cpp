@@ -151,6 +151,10 @@ i32 logarithm_i(f32 base, f32 big_number) {
   f64 range_start = base;
   f64 range_end   = base*base;
 
+  if (big_number < base) {
+      return 1;
+  }
+
   while (true) {
     if (range_start <= big_number && big_number < range_end) {
       return exponent;

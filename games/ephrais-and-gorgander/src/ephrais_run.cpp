@@ -7,6 +7,8 @@
 
 #include "ephrais_session.h"
 
+#include <mui/mui_text.h>
+
 using namespace lapse;
 
 namespace ephrais{
@@ -72,7 +74,11 @@ void Run::main_loop(f32 delta) {
   }
 
   vec2<> reticle_offset = (mouse_pos - run.player_position - (tile_size/2)).normalize()*tile_size;
-
+  
+  //
+  // Draw the player sprite
+  //
+  
   // screen_pos += panning_offset;
   platform::draw_bitmap_scaled(run.player_position, session.image_array[0], game_zoom);
   auto reticle_rotation = atan2(reticle_offset.y, reticle_offset.x);
@@ -82,9 +88,16 @@ void Run::main_loop(f32 delta) {
   // Enemies
   //
 
-  struct EnemyTransform{
+  struct Transform{
     vec2<> m_pos;
     f32 m_rotation;
+
+    vec2<> forward_vector() {
+      vec2<> forward = {0.0f, 0.0f};
+      forward.x = cos(m_rotation);
+      forward.y = sin(m_rotation);
+      return forward;
+    }
   };
   struct EnemySprite{
     f32 m_scale;
@@ -102,18 +115,33 @@ void Run::main_loop(f32 delta) {
       return sprite().m_resolution * m_scale;
     }
   };
+  struct EnemyAttackTimer{
+    f64 m_last_fire_time;
+    f64 m_refire;
+  };
 
-  static array<EnemyTransform> enemy_transforms;
-  static array<EnemySprite>    enemy_sprites;
-  static array<vec2<>>         enemy_velocities;
-  static array<vec2<>>         enemy_target_pos;
-  static array<f32>            enemy_hp; 
+  static array<Transform>        enemy_transforms;
+  static array<EnemySprite>      enemy_sprites;
+  static array<vec2<>>           enemy_velocities;
+  static array<vec2<>>           enemy_target_pos;
+  static array<f32>              enemy_hp;
+  static array<EnemyAttackTimer> enemy_attack_time;
 
-  if (!enemy_transforms.m_size) { enemy_transforms.reserve(100); }
-  if (!enemy_sprites.m_size)    { enemy_sprites   .reserve(100); }
-  if (!enemy_velocities.m_size) { enemy_velocities.reserve(100); }
-  if (!enemy_target_pos.m_size) { enemy_target_pos.reserve(100); }
-  if (!enemy_hp.m_size)         { enemy_hp        .reserve(100); }
+  // Enemy projectile transforms
+  static array<Transform>   e_bullet_transforms;
+  static array<EnemySprite> e_bullet_sprites;
+  static array<f64>         e_bullet_lifetimes;
+
+  if (!enemy_transforms.m_size)      { enemy_transforms   .reserve(100); }
+  if (!enemy_sprites.m_size)         { enemy_sprites      .reserve(100); }
+  if (!enemy_velocities.m_size)      { enemy_velocities   .reserve(100); }
+  if (!enemy_target_pos.m_size)      { enemy_target_pos   .reserve(100); }
+  if (!enemy_hp.m_size)              { enemy_hp           .reserve(100); }
+  if (!enemy_attack_time.m_size)     { enemy_attack_time  .reserve(100); }
+
+  if (!e_bullet_transforms.m_size)   { e_bullet_transforms.reserve(100); }
+  if (!e_bullet_sprites.m_size)      { e_bullet_sprites   .reserve(100); }
+  if (!e_bullet_lifetimes.m_size)    { e_bullet_lifetimes .reserve(100); }
 
   if (enemy_transforms.length() == 0) {
     auto spawn_count = die(3, 6);
@@ -122,17 +150,11 @@ void Run::main_loop(f32 delta) {
         rand_vec2(platform::get_window_size()),
         rand_f32(pi * 2.0f)
       } );
-      enemy_sprites.push( {
-        1.0f,
-        4
-      } );
-      enemy_velocities.push( {
-        rand_vec2()
-      } );
-      enemy_target_pos.push( {
-        0, 0
-      } );
+      enemy_sprites.push( { 1.0f, 4 } );
+      enemy_velocities.push( { rand_vec2() } );
+      enemy_target_pos.push( { 0, 0 } );
       enemy_hp.push( { 3 } );
+      enemy_attack_time.push( { get_timestamp(), rand_range(0.6f, 1.4f) } );
     }
   }
 
@@ -141,6 +163,15 @@ void Run::main_loop(f32 delta) {
     auto& position = enemy_transforms[i].m_pos;
     auto& image = enemy_sprites[i].sprite();
     platform::draw_bitmap_scaled(position, image, game_zoom);
+  }
+
+  // Draw enemy HP
+  for (auto i = 0; i < enemy_transforms.length(); i++) {
+    auto position = enemy_transforms[i].m_pos;
+    auto hp = enemy_hp[i];
+    str str_hp = str(f32_to_c_str(hp));
+    position.y -= mui::text_box_size(str_hp).y;
+    platform::draw_text(str_hp, position);
   }
 
   // Update enemy postion & velocity
@@ -160,7 +191,7 @@ void Run::main_loop(f32 delta) {
       }
     }
 
-    // draw target position (for debug purposes)
+    // Draw target position (for debug purposes)
     if (
       platform::get_window_rect().is_point_inside(target_pos) &&
       platform::get_window_rect().is_point_inside(position)
@@ -169,33 +200,85 @@ void Run::main_loop(f32 delta) {
     }
 
     // Update position
-    velocity = (target_pos - position).normalize() * tile_size * 10;
+    velocity = (target_pos - position).normalize() * tile_size * 1.5f;
     position += velocity * delta;
   }
 
+  // Enemy attacks (spawning bullets)
+  {
+    auto now = get_timestamp();
+    for (u32 i = 0; i < enemy_attack_time.length(); i++) {
+      auto attack = enemy_attack_time[i];
+      if (now > attack.m_last_fire_time + attack.m_refire) {
+        // Spawn an enemy bullet
+        auto move = (run.player_position - enemy_transforms[i].m_pos).normalize();
+        auto position = enemy_transforms[i].m_pos + (move * 1.0f * tile_size);
+        auto rotation = atan2(move.y, move.x);
+
+        e_bullet_transforms.push( { position, rotation } );
+        e_bullet_sprites   .push( { 1.0f, 5 } );
+        e_bullet_lifetimes .push( { get_timestamp() + 3.0f } );
+
+        // Update attack last fire time
+        enemy_attack_time[i].m_last_fire_time = now;
+      }
+    }
+  }
+
+  // Draw enemy bullets
+  for (u32 i = 0; i < e_bullet_transforms.length(); i++) {
+    auto position     = e_bullet_transforms[i].m_pos;
+    auto rotation     = e_bullet_transforms[i].m_rotation;
+    auto sprite_index = e_bullet_sprites[i].m_sprite_index;
+
+    platform::draw_bitmap_rotated(position, session.image_array[sprite_index], rotation);
+  }
+
+  // Update enemy bullet positions
+  for (u32 i = 0; i < e_bullet_transforms.length(); i++) {
+    auto dir = e_bullet_transforms[i].forward_vector();
+    e_bullet_transforms[i].m_pos += dir * delta * 1.0f * tile_size;
+  }
+
+  // Delete old enemy bullets
+  {
+    auto now = get_timestamp();
+    for (u32 i = 0; i < e_bullet_lifetimes.length(); i++) {
+      if (now > e_bullet_lifetimes[i]) {
+        e_bullet_transforms.remove_at(i);
+        e_bullet_sprites   .remove_at(i);
+        e_bullet_lifetimes .remove_at(i);
+        i--;
+      }
+    }
+  }
+
   //
-  // Draw bullets
+  // Draw friendly (player) bullets
   //
 
   static array<fixed_array<vec2<>>> bullets;
   if (!bullets.m_size) { bullets.reserve(100); }
 
   for (auto i = 0; i < bullets.length(); i++) {
-    auto& bullet_dir = bullets[i][1];
-    auto rotation = atan2(bullet_dir.y, bullet_dir.x);
+    auto& bullet_move = bullets[i][1];
+    auto rotation = atan2(bullet_move.normalize().y, bullet_move.normalize().x);
     platform::draw_bitmap_rotated(bullets[i][0], session.image_array[2], rotation);
     // platform::draw_bitmap_rs(bullets[i][0], session.image_array[2], game_zoom, rotation);
-    bullets[i][0] += bullet_dir * delta;
+    // Move bullets forward
+    bullets[i][0] += bullet_move * delta;
     if (
       bullets[i][0].greater_than_or(platform::get_window_size()) ||
       bullets[i][0].less_than_or(0)
       ) {
         bullets.remove_at(i);
-        i--; // Have to decrement to hit the next bullet (since length() just went down by 1)
+        // Have to decrement to hit the next bullet
+        //   (since length() just went down by 1)
+        i--; 
       }
   }
 
-  // Check for collisions between bullets and enemies
+  // Check for collisions between friendly bullets and enemies
   for (u32 i = 0; i < bullets.length(); i++) {
     auto bullet_rect = rect<>{bullets[i][0], session.image_array[2].m_resolution};
     auto bullet_collided = false;
@@ -206,12 +289,17 @@ void Run::main_loop(f32 delta) {
         bullet_rect.is_point_inside(enemy_top_left) ||
         bullet_rect.is_point_inside(enemy_bottom_right)
       ) {
-        // Delete one enemy ...
-        enemy_transforms.remove_at(e_i);
-        enemy_sprites   .remove_at(e_i);
-        enemy_velocities.remove_at(e_i);
-        enemy_target_pos.remove_at(e_i);
-        enemy_hp        .remove_at(e_i);
+        enemy_hp[e_i] -= 1;
+
+        if (enemy_hp[e_i] <= 0) {
+          // Delete one enemy ...
+          enemy_transforms .remove_at(e_i);
+          enemy_sprites    .remove_at(e_i);
+          enemy_velocities .remove_at(e_i);
+          enemy_target_pos .remove_at(e_i);
+          enemy_hp         .remove_at(e_i);
+          enemy_attack_time.remove_at(e_i);
+        }
         
         // And mark this bullet for deletion ...
         bullet_collided = true;
@@ -220,7 +308,10 @@ void Run::main_loop(f32 delta) {
 
     if (bullet_collided) {
       bullets.remove_at(i);
-      i--;
+      // Have to decrement to hit the next bullet
+      //   (since length() just went down by 1)
+      i--; 
+      
     }
   }
 
@@ -239,7 +330,7 @@ void Run::main_loop(f32 delta) {
 
     bullets.push({
       run.player_position + reticle_offset,
-      reticle_offset.normalize() * (tile_size/2) // + (player_velocity * player_push)
+      reticle_offset.normalize() * tile_size * 1.5f // + (player_velocity * player_push)
     });
     // TODO add player velocity onto bullet velocity
     last_bullet_fired = lapse::get_timestamp();
