@@ -18,7 +18,9 @@ struct Run{
   lapse::f32     game_zoom = 1.0f;
   lapse::vec2<>  panning_offset = {10, 10};
   GameState_Enum game_state{GameState_Enum::in_progress};
+
   lapse::vec2<>  player_position = {0, 0};
+  lapse::f32     player_hp = 15;
 
   ~Run() {
     std::cout << "~ephrais Run()\n";

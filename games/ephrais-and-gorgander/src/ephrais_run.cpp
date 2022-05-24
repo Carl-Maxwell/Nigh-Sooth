@@ -78,11 +78,19 @@ void Run::main_loop(f32 delta) {
   //
   // Draw the player sprite
   //
-  
+
   // screen_pos += panning_offset;
   platform::draw_bitmap_scaled(run.player_position, session.image_array[0], game_zoom);
   auto reticle_rotation = atan2(reticle_offset.y, reticle_offset.x);
   platform::draw_bitmap_rotated(run.player_position + reticle_offset, session.image_array[1], reticle_rotation);
+
+  // Draw player HP
+  {
+    str str_hp = f32_to_c_str(run.player_hp);
+    auto player_hp_pos = run.player_position;
+    player_hp_pos.y -= mui::text_box_size(str_hp).y;
+    platform::draw_text(str_hp, player_hp_pos);
+  }
 
   //
   // Enemies
@@ -204,6 +212,24 @@ void Run::main_loop(f32 delta) {
     position += velocity * delta;
   }
 
+  // Check for collisions between enemy sprites and player sprite
+  {
+    auto player_rect = rect<>{
+      run.player_position,
+      {(f32)tile_size, (f32)tile_size}
+    };
+    for (u32 i = 0; i < enemy_transforms.length(); i++) {
+      auto enemy_size = enemy_sprites[i].size();
+      if (
+        player_rect.is_point_inside(enemy_transforms[i].m_pos) ||
+        player_rect.is_point_inside(enemy_transforms[i].m_pos + enemy_size)
+      ) {
+        enemy_hp[i]--;
+        run.player_hp--;
+      }
+    }
+  }
+
   // Enemy attacks (spawning bullets)
   {
     auto now = get_timestamp();
@@ -251,6 +277,16 @@ void Run::main_loop(f32 delta) {
         i--;
       }
     }
+  }
+
+  //
+  // Check whether the player is still alive
+  //
+
+  if (run.player_hp <= 0.0f) {
+    // TODO have to delete this run and make a new run ...
+    // TODO stop and show the player how they died
+    session.restart_run();
   }
 
   //
@@ -312,6 +348,23 @@ void Run::main_loop(f32 delta) {
       //   (since length() just went down by 1)
       i--; 
       
+    }
+  }
+
+  //
+  // Kill enemies
+  //
+
+  // Check for any enemies with HP of 0 or less and delete them
+  for (u32 i = 0; i < enemy_hp.length(); i++) {
+    if (enemy_hp[i] <= 0.0f) {
+      // Delete one enemy ...
+      enemy_transforms .remove_at(i);
+      enemy_sprites    .remove_at(i);
+      enemy_velocities .remove_at(i);
+      enemy_target_pos .remove_at(i);
+      enemy_hp         .remove_at(i);
+      enemy_attack_time.remove_at(i);
     }
   }
 
