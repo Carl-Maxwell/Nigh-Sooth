@@ -42,6 +42,8 @@ bool Run::start_main_loop() {
   return platform::start_application();
 }
 
+str& get_hp_str(f32 hp);
+
 void Run::main_loop(f32 delta) {
   auto& session = Session::the();
   auto& run = *session.run;
@@ -86,7 +88,7 @@ void Run::main_loop(f32 delta) {
 
   // Draw player HP
   {
-    str str_hp = f32_to_c_str(run.player_hp);
+    str& str_hp = get_hp_str(run.player_hp);
     auto player_hp_pos = run.player_position;
     player_hp_pos.y -= mui::text_box_size(str_hp).y;
     platform::draw_text(str_hp, player_hp_pos);
@@ -177,7 +179,7 @@ void Run::main_loop(f32 delta) {
   for (auto i = 0; i < enemy_transforms.length(); i++) {
     auto position = enemy_transforms[i].m_pos;
     auto hp = enemy_hp[i];
-    str str_hp = str(f32_to_c_str(hp));
+    str& str_hp = get_hp_str(hp);
     position.y -= mui::text_box_size(str_hp).y;
     platform::draw_text(str_hp, position);
   }
@@ -442,6 +444,29 @@ void Run::main_loop(f32 delta) {
 // Called each time we need to setup a new map to play
 void Run::initialize_run(NextMapSettings next_map) {
 
+}
+
+str& get_hp_str(f32 hp) {
+  i32 index = static_cast<i32>(hp);
+  static fixed_array<str> hp_strs = {
+    "0",  "1",  "2",  "3",  "4",  "5",  "6",  "7",  "8",  "9",
+    "10", "11", "12", "13", "14", "15", "16", "17", "18", "19",
+    "20", "21", "22", "23", "24", "25", "26", "27", "28", "29",
+    "30", "31", "32", "33", "34", "35", "36", "37", "38", "39",
+    "40", "41", "42", "43", "44", "45", "46", "47", "48", "49",
+    "50", "51", "52", "53", "54", "55", "56", "57", "58", "59",
+  };
+
+  if (index >= 0 && index <= hp_strs.length()) {
+    return hp_strs[index];
+  } else {
+    static str invalid_hp = "invalid HP";
+    return invalid_hp;
+  }
+
+  __debugbreak();
+
+  return *(str*)nullptr;
 }
 
 }
