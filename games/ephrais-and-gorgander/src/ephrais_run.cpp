@@ -141,6 +141,7 @@ void Run::main_loop(f32 delta) {
   static array<Transform>   e_bullet_transforms;
   static array<EnemySprite> e_bullet_sprites;
   static array<f64>         e_bullet_lifetimes;
+  static array<rect<>>      e_bullet_collision;
 
   if (!enemy_transforms.m_size)      { enemy_transforms   .reserve(100); }
   if (!enemy_sprites.m_size)         { enemy_sprites      .reserve(100); }
@@ -152,6 +153,7 @@ void Run::main_loop(f32 delta) {
   if (!e_bullet_transforms.m_size)   { e_bullet_transforms.reserve(100); }
   if (!e_bullet_sprites.m_size)      { e_bullet_sprites   .reserve(100); }
   if (!e_bullet_lifetimes.m_size)    { e_bullet_lifetimes .reserve(100); }
+  if (!e_bullet_collision.m_size)    { e_bullet_collision .reserve(100); }
 
   if (enemy_transforms.length() == 0) {
     auto spawn_count = die(3, 6);
@@ -245,7 +247,13 @@ void Run::main_loop(f32 delta) {
 
         e_bullet_transforms.push( { position, rotation } );
         e_bullet_sprites   .push( { 1.0f, 5 } );
-        e_bullet_lifetimes .push( { get_timestamp() + 3.0f } );
+        e_bullet_lifetimes .push( { get_timestamp() + 9.0f } );
+        e_bullet_collision .push( { {8.0f, 12.0f}, {17.0f, 8.0f} } );
+
+        // collision rect is relative to bullet transform
+
+        // collision rects would have to be entered manually within a game engine editor ...
+        //   once we get to that point
 
         // Update attack last fire time
         enemy_attack_time[i].m_last_fire_time = now;
@@ -262,24 +270,37 @@ void Run::main_loop(f32 delta) {
     platform::draw_bitmap_rotated(position, session.image_array[sprite_index], rotation);
   }
 
-  // Check for collisions with the player character
-  for (u32 i = 0; i < e_bullet_transforms.length(); i++) {
-    auto bullet_rect = rect<>{e_bullet_transforms[i].m_pos, e_bullet_sprites[i].size()};
-    // TODO rotate the rect
-    if (
-      platform::get_window_rect().is_point_inside(bullet_rect.top_left_point()) &&
-      platform::get_window_rect().is_point_inside(bullet_rect.bottom_right_point())
-    ) {
-      platform::draw_rect(bullet_rect);
-    }
-    if (
-      bullet_rect.is_point_inside(run.player_position) ||
-      bullet_rect.is_point_inside(run.player_position + tile_size)
-    ) {
-      run.player_hp--;
+  {
+    // Check for collisions with the player character
+    auto player_rect = rect<>{run.player_position, vec2<>{1.0f, 1.0f} * tile_size};
+    platform::draw_rect(player_rect);
 
-      // Mark bullet for deletion
-      e_bullet_lifetimes[i] = 0;
+    for (u32 i = 0; i < e_bullet_transforms.length(); i++) {
+      auto bullet_rect = rect<>{e_bullet_transforms[i].m_pos, {0.0f, 0.0f}};
+      bullet_rect.position += e_bullet_collision[i].position;
+      bullet_rect.size = e_bullet_collision[i].size;
+
+      // TODO rotate the rect
+
+      if (
+        platform::get_window_rect().is_point_inside(bullet_rect.top_left_point()) &&
+        platform::get_window_rect().is_point_inside(bullet_rect.bottom_right_point())
+      ) {
+        // Display debug rect
+        platform::draw_rect(bullet_rect);
+      }
+
+      if (
+        player_rect.is_point_inside(bullet_rect.top_left_point())     ||
+        player_rect.is_point_inside(bullet_rect.top_right_point())    ||
+        player_rect.is_point_inside(bullet_rect.bottom_left_point())  ||
+        player_rect.is_point_inside(bullet_rect.bottom_right_point())
+      ) {
+        run.player_hp--;
+
+        // Mark bullet for deletion
+        e_bullet_lifetimes[i] = 0;
+      }
     }
   }
 
