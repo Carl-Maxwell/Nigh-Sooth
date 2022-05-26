@@ -164,7 +164,7 @@ void Run::main_loop(f32 delta) {
       enemy_velocities.push( { rand_vec2() } );
       enemy_target_pos.push( { 0, 0 } );
       enemy_hp.push( { 3 } );
-      enemy_attack_time.push( { get_timestamp(), rand_range(0.6f, 1.4f) } );
+      enemy_attack_time.push( { get_timestamp(), rand_range(1.4f, 2.8f) } );
     }
   }
 
@@ -260,6 +260,27 @@ void Run::main_loop(f32 delta) {
     auto sprite_index = e_bullet_sprites[i].m_sprite_index;
 
     platform::draw_bitmap_rotated(position, session.image_array[sprite_index], rotation);
+  }
+
+  // Check for collisions with the player character
+  for (u32 i = 0; i < e_bullet_transforms.length(); i++) {
+    auto bullet_rect = rect<>{e_bullet_transforms[i].m_pos, e_bullet_sprites[i].size()};
+    // TODO rotate the rect
+    if (
+      platform::get_window_rect().is_point_inside(bullet_rect.top_left_point()) &&
+      platform::get_window_rect().is_point_inside(bullet_rect.bottom_right_point())
+    ) {
+      platform::draw_rect(bullet_rect);
+    }
+    if (
+      bullet_rect.is_point_inside(run.player_position) ||
+      bullet_rect.is_point_inside(run.player_position + tile_size)
+    ) {
+      run.player_hp--;
+
+      // Mark bullet for deletion
+      e_bullet_lifetimes[i] = 0;
+    }
   }
 
   // Update enemy bullet positions
