@@ -130,6 +130,7 @@ void Run::main_loop(f32 delta) {
     f64 m_refire;
   };
 
+  // Used for storing pointers to static variables so they can be reset on run reset
   static array<array<void*>*> gamestate;
 
   static array<Transform>        enemy_transforms;
@@ -380,7 +381,10 @@ void Run::main_loop(f32 delta) {
   //
 
   static array<fixed_array<vec2<>>> bullets;
-  if (!bullets.m_size) { bullets.reserve(100); }
+  if (!bullets.m_size) {
+    bullets.reserve(100);
+    gamestate.push( (array<void*>*)&bullets );
+  }
 
   for (auto i = 0; i < bullets.length(); i++) {
     auto& bullet_move = bullets[i][1];
