@@ -81,8 +81,11 @@ void Run::main_loop(f32 delta) {
   // Draw the player sprite
   //
 
-  // screen_pos += panning_offset;
-  platform::draw_bitmap_scaled(run.player_position, session.image_array[0], game_zoom);
+  if (get_timestamp() > run.m_player_damageable || i64(get_timestamp()*3) % 2 == 0) {
+    // screen_pos += panning_offset;
+    platform::draw_bitmap_scaled(run.player_position, session.image_array[0], game_zoom);
+  }
+  // Draw reticle
   auto reticle_rotation = atan2(reticle_offset.y, reticle_offset.x);
   platform::draw_bitmap_rotated(run.player_position + reticle_offset, session.image_array[1], reticle_rotation);
 
@@ -235,7 +238,7 @@ void Run::main_loop(f32 delta) {
   }
 
   // Check for collisions between enemy sprites and player sprite
-  {
+  if (get_timestamp() > run.m_player_damageable) {
     auto player_rect = rect<>{
       run.player_position,
       {(f32)tile_size, (f32)tile_size}
@@ -248,6 +251,7 @@ void Run::main_loop(f32 delta) {
       ) {
         enemy_hp[i]--;
         run.player_hp--;
+        run.m_player_damageable = get_timestamp() + run.m_player_invuln_period;
       }
     }
   }
@@ -288,8 +292,8 @@ void Run::main_loop(f32 delta) {
     platform::draw_bitmap_rotated(position, session.image_array[sprite_index], rotation);
   }
 
-  {
-    // Check for collisions with the player character
+  if (get_timestamp() > run.m_player_damageable) {
+    // Check for collisions between enemy bullets & player character
     auto player_rect = rect<>{run.player_position, vec2<>{1.0f, 1.0f} * tile_size};
 
     for (u32 i = 0; i < e_bullet_transforms.length(); i++) {
@@ -337,6 +341,8 @@ void Run::main_loop(f32 delta) {
         player_rect.is_point_inside(rotated_points[3])
       ) {
         run.player_hp--;
+
+        run.m_player_damageable = get_timestamp() + run.m_player_invuln_period;
 
         // Mark bullet for deletion
         e_bullet_lifetimes[i] = 0;
@@ -437,7 +443,6 @@ void Run::main_loop(f32 delta) {
       // Have to decrement to hit the next bullet
       //   (since length() just went down by 1)
       i--; 
-      
     }
   }
 
@@ -494,7 +499,7 @@ void Run::main_loop(f32 delta) {
 
   player_velocity = {0, 0};
 
-  // wasd player movement
+  // Wasd player movement
   if (key(keycode::d).is_down()) {
     player_velocity.x += 1.0f;
   }
@@ -531,7 +536,7 @@ void Run::main_loop(f32 delta) {
 
 // Called each time we need to setup a new map to play
 void Run::initialize_run(NextMapSettings next_map) {
-
+  m_player_damageable = get_timestamp();
 }
 
 str& get_hp_str(f32 hp) {

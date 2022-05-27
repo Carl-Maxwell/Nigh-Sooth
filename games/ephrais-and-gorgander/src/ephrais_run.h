@@ -21,6 +21,8 @@ struct Run{
 
   lapse::vec2<>  player_position = {0, 0};
   lapse::f32     player_hp = 15;
+  lapse::f64     m_player_damageable;
+  lapse::f64     m_player_invuln_period = 1.0;
 
   ~Run() {
     std::cout << "~ephrais Run()\n";
