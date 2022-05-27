@@ -273,28 +273,50 @@ void Run::main_loop(f32 delta) {
   {
     // Check for collisions with the player character
     auto player_rect = rect<>{run.player_position, vec2<>{1.0f, 1.0f} * tile_size};
-    platform::draw_rect(player_rect);
 
     for (u32 i = 0; i < e_bullet_transforms.length(); i++) {
       auto bullet_rect = rect<>{e_bullet_transforms[i].m_pos, {0.0f, 0.0f}};
       bullet_rect.position += e_bullet_collision[i].position;
       bullet_rect.size = e_bullet_collision[i].size;
 
-      // TODO rotate the rect
+      fixed_array<vec2<>> rotated_points = {
+        bullet_rect.top_left_point()     ,
+        bullet_rect.top_right_point()    ,
+        bullet_rect.bottom_left_point()  ,
+        bullet_rect.bottom_right_point()
+      };
 
-      if (
-        platform::get_window_rect().is_point_inside(bullet_rect.top_left_point()) &&
-        platform::get_window_rect().is_point_inside(bullet_rect.bottom_right_point())
-      ) {
-        // Display debug rect
-        platform::draw_rect(bullet_rect);
+      {
+        auto rotation         = e_bullet_transforms[i].m_rotation;
+        auto centering_offset =
+          bullet_rect.top_left_point() +
+          bullet_rect.size/2.0f
+        ;
+        for (u32 rot_i = 0; rot_i < 4; rot_i++) {
+          auto old_x = rotated_points[rot_i].x - centering_offset.x;
+          auto old_y = rotated_points[rot_i].y - centering_offset.y;
+
+          rotated_points[rot_i].x =  cos(rotation) * old_x + sin(rotation) * old_y;
+          rotated_points[rot_i].y = -cos(rotation) * old_y + sin(rotation) * old_x;
+
+          rotated_points[rot_i].x += centering_offset.x;
+          rotated_points[rot_i].y += centering_offset.y;
+        }
+      }
+
+      // Display debug:
+      for (u32 rot_i = 0; rot_i < 4; rot_i++) {
+        auto point = rotated_points[rot_i];
+        if (platform::get_window_rect().is_point_inside(point)) {
+          platform::plot(point, vec3<u8>{255, 255, 255});
+        }
       }
 
       if (
-        player_rect.is_point_inside(bullet_rect.top_left_point())     ||
-        player_rect.is_point_inside(bullet_rect.top_right_point())    ||
-        player_rect.is_point_inside(bullet_rect.bottom_left_point())  ||
-        player_rect.is_point_inside(bullet_rect.bottom_right_point())
+        player_rect.is_point_inside(rotated_points[0]) ||
+        player_rect.is_point_inside(rotated_points[1]) ||
+        player_rect.is_point_inside(rotated_points[2]) ||
+        player_rect.is_point_inside(rotated_points[3])
       ) {
         run.player_hp--;
 
