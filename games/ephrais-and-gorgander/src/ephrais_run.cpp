@@ -130,6 +130,8 @@ void Run::main_loop(f32 delta) {
     f64 m_refire;
   };
 
+  static array<array<void*>*> gamestate;
+
   static array<Transform>        enemy_transforms;
   static array<EnemySprite>      enemy_sprites;
   static array<vec2<>>           enemy_velocities;
@@ -154,6 +156,21 @@ void Run::main_loop(f32 delta) {
   if (!e_bullet_sprites.m_size)      { e_bullet_sprites   .reserve(100); }
   if (!e_bullet_lifetimes.m_size)    { e_bullet_lifetimes .reserve(100); }
   if (!e_bullet_collision.m_size)    { e_bullet_collision .reserve(100); }
+
+  if (!gamestate.m_size) {
+    gamestate.reserve(10);
+    gamestate.push( (array<void*>*)&enemy_transforms );
+    gamestate.push( (array<void*>*)&enemy_sprites );
+    gamestate.push( (array<void*>*)&enemy_velocities );
+    gamestate.push( (array<void*>*)&enemy_target_pos );
+    gamestate.push( (array<void*>*)&enemy_hp );
+    gamestate.push( (array<void*>*)&enemy_attack_time );
+
+    gamestate.push( (array<void*>*)&e_bullet_transforms );
+    gamestate.push( (array<void*>*)&e_bullet_sprites );
+    gamestate.push( (array<void*>*)&e_bullet_lifetimes );
+    gamestate.push( (array<void*>*)&e_bullet_collision );
+  }
 
   if (enemy_transforms.length() == 0) {
     auto spawn_count = die(3, 6);
@@ -352,6 +369,9 @@ void Run::main_loop(f32 delta) {
   if (run.player_hp <= 0.0f) {
     // TODO have to delete this run and make a new run ...
     // TODO stop and show the player how they died
+    for (i32 i = 0; i < gamestate.length(); i++) {
+      gamestate[i]->clear_no_dealloc();
+    }
     session.restart_run();
   }
 
